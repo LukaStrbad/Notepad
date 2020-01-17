@@ -1,0 +1,31 @@
+﻿<Window x:Class="Notepad.FontWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Notepad"
+        mc:Ignorable="d"
+        Title="Font" Height="300" Width="400" FontFamily="Consolas" ResizeMode="NoResize" Closed="Window_Closed">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="230"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Label Content="Choose Font Family: " VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
+        <ListBox x:Name="FontChooseListBox" Grid.Row="1" Grid.Column="0" Margin="10" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ItemsSource="{x:Static Fonts.SystemFontFamilies}" SelectedIndex="8" />
+
+        <Label Content="Choose Font Size: " VerticalAlignment="Bottom" HorizontalAlignment="Center" Grid.Column="1"/>
+        <ListBox x:Name="FontSizeChooseListBox" Grid.Row="1" Grid.Column="1" Margin="10" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
+
+        <Button x:Name="FontOKButton" Content="OK" Width="50" Click="FontOKButton_Click" Grid.Row="2" Grid.ColumnSpan="2" VerticalAlignment="Top"/>
+
+    </Grid>
+</Window>
