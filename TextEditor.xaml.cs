@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using System.IO;
 using Notepad.ExtensionMethods;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace Notepad
 {
@@ -112,11 +113,10 @@ namespace Notepad
                 //    MainTextBox.Document.ContentEnd);
                 //textRange.Text = value ?? "";
 
-                var regex = new Regex(String.Join("|", Keywords));
-
-                var matches = regex.Matches(value);
-
-
+                highlightingRunning = true;
+                MainTextBox.Document.Blocks.Clear();
+                MainTextBox.Document.Blocks.AddRange(HighlightLines(value.TrimEnd().Split(new string[] { Environment.NewLine }, StringSplitOptions.None)));
+                highlightingRunning = false;
             }
         }
 
@@ -186,7 +186,7 @@ namespace Notepad
         /// </summary>
         private void MainTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            int lineCount = new TextRange(MainTextBox.Document.ContentStart, MainTextBox.Document.ContentEnd).Text.Count(c => c == '\n');
+            int lineCount = MainTextBox.Document.Blocks.Count;
             if (oldNumberOfLines != lineCount)
             {
                 WriteLineNumbers();
@@ -194,46 +194,72 @@ namespace Notepad
             }
 
             if (!highlightingRunning)
-                SyntaxHighlighting();
+            {
+                highlightingRunning = true;                
 
-            MainTextBox.SelectionTextBrush = Brushes.Blue;
+                try
+                {
+                    string text = new TextRange(MainTextBox.CaretPosition.Paragraph.ContentStart, MainTextBox.CaretPosition.Paragraph.ContentEnd).Text;
+                    var paragraph = HighlightLine(text);
+
+                    int caretIndex = MainTextBox.CaretPosition.GetOffsetToPosition(MainTextBox.CaretPosition) * e.Changes.ElementAt(0).AddedLength;
+
+                    MainTextBox.CaretPosition.Paragraph.Inlines.Clear();
+                    MainTextBox.CaretPosition.Paragraph.Inlines.AddRange(paragraph.Inlines.ToArray());
+
+                    MainTextBox.CaretPosition = MainTextBox.CaretPosition.GetPositionAtOffset(caretIndex);
+                }
+                catch { }
+
+
+                highlightingRunning = false;
+            }
         }
 
-        bool highlightingRunning = false;
-        public void SyntaxHighlighting()
+        bool highlightingRunning = true;
+        public List<Paragraph> HighlightLines(params string[] lines)
         {
-            highlightingRunning = true;
-            var pattern = new Regex($"({String.Join("|", Keywords)})");
-
-            var ptr = MainTextBox.CaretPosition;
-
-            //var matches = pattern.Matches(Text);
-
-            //for (int i = matches.Count - 1; i >= 0; i--)
-            //{
-            //    MainTextBox.Selection.Select(ptr.GetPositionAtOffset(matches[i].Index) ?? ptr, ptr.GetPositionAtOffset(matches[i].Length) ?? ptr);
-            //    MainTextBox.Selection.Text = "";
-            //    MainTextBox.Document.Blocks.Add(new Paragraph(new Run()
-            //    {
-            //        Text = matches[i].Value,
-            //        Foreground = Brushes.Blue
-            //    }));
-            //}
-
-            
-
-            MainTextBox.CaretPosition = ptr;
-            highlightingRunning = false;
+            var tempList = new List<Paragraph>(lines.Length); 
+            foreach (var line in lines)
+            {
+                tempList.Add(HighlightLine(line));
+            }
+            return tempList;
         }
 
-        private readonly string[] Keywords = new string[] { "using", "public", "static", "private", "class", "void" };
+        private readonly string[] Keywords = new string[] { "using", "public", "static", "private", "class", "void", "string", "int", "double", "float", "long" };
 
-
-        private void ColorTextBox(int startIndex, int endIndex, SolidColorBrush color)
+        private Paragraph HighlightLine(string line)
         {
-            var ptr = MainTextBox.CaretPosition;
-            var range = new TextRange(ptr.GetPositionAtOffset(startIndex) ?? ptr, ptr.GetPositionAtOffset(endIndex) ?? ptr);
-            range.ApplyPropertyValue(TextElement.ForegroundProperty, color);
+            var pattern = new Regex(String.Join("|", Keywords));
+            var paragraph = new Paragraph();
+            var sb = new StringBuilder();
+            var matches = pattern.Matches(line);
+
+            int i = 0;
+            while (i < line.Length)
+            {
+                if (matches.Select(x => x.Index).Contains(i))
+                {
+                    if (sb.Length > 0)
+                        paragraph.Inlines.Add(new Run(sb.ToString()));
+                    sb.Clear();
+                    paragraph.Inlines.Add(new Run(line.Substring(i, matches.First(x => x.Index == i).Length))
+                    {
+                        Foreground = Brushes.Blue
+                    });
+                    i += matches.First(x => x.Index == i).Length;
+                }
+                else
+                {
+                    sb.Append(line[i]);
+                    i++;
+                }
+            }
+            if (sb.Length > 0)
+                paragraph.Inlines.Add(new Run(sb.ToString()));
+
+            return paragraph;
         }
 
         private void MainTextBox_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -262,7 +288,7 @@ namespace Notepad
         {
             var sb = new StringBuilder();
 
-            for (int i = 1; i <= Text.Count(c => c == '\n'); i++)
+            for (int i = 1; i <= MainTextBox.Document.Blocks.Count; i++)
             {
                 sb.AppendLine(i.ToString());
             }
