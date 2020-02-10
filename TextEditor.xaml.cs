@@ -207,7 +207,9 @@ namespace Notepad
                 _cts.Cancel();
                 _cts.Dispose();
                 _cts = new CancellationTokenSource();
-                _highlighTask = new Task(() => HighlightMissingLines(_cts.Token));
+                //_highlighTask = new Task(() => HighlightMissingLines(_cts.Token));
+                _highlighTask?.Dispose();
+                _highlighTask = new Task(() => HighlightParagraph(_cts.Token));
                 _highlighTask.Start();
             }
         }
@@ -216,7 +218,7 @@ namespace Notepad
         {
             try
             {
-                await Task.Delay(1000, cancellationToken);
+                await Task.Delay(50, cancellationToken);
 
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -225,10 +227,11 @@ namespace Notepad
                     var par = MainTextBox.CaretPosition.Paragraph;
                     int caretIndex = par.ContentStart.GetOffsetToPosition(MainTextBox.CaretPosition);
 
+
                     string text = new TextRange(par.ContentStart, par.ContentEnd).Text;
                     var paragraph = HighlightLine(text, caretIndex, out int newCaretIndex);
 
-                    cancellationToken.ThrowIfCancellationRequested();                    
+                    cancellationToken.ThrowIfCancellationRequested();
 
                     MainTextBox.TextChanged -= MainTextBox_TextChanged;
 
@@ -241,9 +244,10 @@ namespace Notepad
                     //    MessageBox.Show(ASCIIEncoding.Default.GetString(ms.ToArray()));
                     //}
 
-                    MainTextBox.TextChanged += MainTextBox_TextChanged;
 
-                    MainTextBox.CaretPosition = par.ContentStart.GetPositionAtOffset(newCaretIndex);
+
+                    MainTextBox.CaretPosition = par.ContentStart.GetPositionAtOffset(caretIndex - (newCaretIndex - caretIndex));
+                    MainTextBox.TextChanged += MainTextBox_TextChanged;
                 }, System.Windows.Threading.DispatcherPriority.Normal, cancellationToken);
             }
             catch (Exception e) { }
@@ -259,38 +263,64 @@ namespace Notepad
             return tempList;
         }
 
-        private readonly string[] Keywords = new string[] { "using", "public", "static", "private", "class", "void", "string", "int", "double", "float", "long", "namespace"};
+        private readonly string[] Keywords = new string[] { "using", "public", "static", "private", "class", "void", "string", "int", "double", "float", "long", "namespace" };
         private Paragraph HighlightLine(string line)
         {
-            var pattern = new Regex(String.Join("|", Keywords));
-            var paragraph = new Paragraph();
-            var sb = new StringBuilder();
-            var matches = pattern.Matches(line);
+            return HighlightLine(line, 0, out _);
+        }
 
+
+        private static TextPointer GetTextPointAt(TextPointer from, int pos)
+        {
+            TextPointer ret = from;
             int i = 0;
-            while (i < line.Length)
-            {
-                if (matches.Select(x => x.Index).Contains(i))
-                {
-                    if (sb.Length > 0)
-                        paragraph.Inlines.Add(new Run(sb.ToString()));
-                    sb.Clear();
-                    paragraph.Inlines.Add(new Run(line.Substring(i, matches.First(x => x.Index == i).Length))
-                    {
-                        Foreground = Brushes.Blue
-                    });
-                    i += matches.First(x => x.Index == i).Length;
-                }
-                else
-                {
-                    sb.Append(line[i]);
-                    i++;
-                }
-            }
-            if (sb.Length > 0)
-                paragraph.Inlines.Add(new Run(sb.ToString()));
 
-            return paragraph;
+            while ((i < pos) && (ret != null))
+            {
+                if ((ret.GetPointerContext(LogicalDirection.Backward) == TextPointerContext.Text) || (ret.GetPointerContext(LogicalDirection.Backward) == TextPointerContext.None))
+                    i++;
+
+                if (ret.GetPositionAtOffset(1, LogicalDirection.Forward) == null)
+                    return ret;
+
+                ret = ret.GetPositionAtOffset(1, LogicalDirection.Forward);
+            }
+
+            return ret;
+        }
+
+        private async void HighlightParagraph(CancellationToken cancellationToken = default)
+        {
+            MainTextBox.TextChanged -= MainTextBox_TextChanged;
+            try
+            {
+                await Task.Delay(1000, cancellationToken);
+            }
+            catch { }
+            Dispatcher.Invoke(() =>
+            {
+                try
+                {
+                    var pattern = new Regex(String.Join("|", Keywords));
+                    var textRange = new TextRange(MainTextBox.CaretPosition.Paragraph.ContentStart, MainTextBox.CaretPosition.Paragraph.ContentEnd);
+                    textRange.ClearAllProperties();
+                    var matches = pattern.Matches(textRange.Text);
+
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    foreach (Match match in matches)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        Dispatcher.Invoke(() =>
+                        {
+                            new TextRange(GetTextPointAt(textRange.Start, match.Index), GetTextPointAt(textRange.Start, match.Index + match.Length)).ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.Blue);
+                        });
+                    }
+                }
+                catch (Exception ex)
+                { }
+            });
+            MainTextBox.TextChanged += MainTextBox_TextChanged;
         }
 
         private Paragraph HighlightLine(string line, int caretIndex, out int newCaretIndex)
@@ -299,37 +329,65 @@ namespace Notepad
             var paragraph = new Paragraph(); // A paragraph where highlighted lines will be added
             var sb = new StringBuilder();
             var matches = pattern.Matches(line);
+            var lastRun = new Run();
             newCaretIndex = caretIndex;
 
-            int i = 0;
-            while (i < line.Length)
-            {
-                if (matches.Select(x => x.Index).Contains(i)) // If index is in matches
-                {
-                    if (sb.Length > 0) // If sb has text
-                    {
-                        paragraph.Inlines.Add(new Run(sb.ToString())); // Add new nonhighlighted text to paragraph
-                        if (i < caretIndex)
-                            newCaretIndex += 2; // Opening and closing tags count as characters
-                    }
-                    sb.Clear();
-                    // Add new highlighted text
-                    paragraph.Inlines.Add(new Run(line.Substring(i, matches.First(x => x.Index == i).Length))
-                    {
-                        Foreground = Brushes.Blue
-                    });
-                    if (i < caretIndex)
-                        newCaretIndex += 2;
-                    i += matches.First(x => x.Index == i).Length;
-                }
-                else
-                {
-                    sb.Append(line[i]);
-                    i++;
-                }
-            }
-            if (sb.Length > 0)
-                paragraph.Inlines.Add(new Run(sb.ToString()));
+            //int i = 0;
+            //while (i < line.Length)
+            //{
+            //    if (matches.Select(x => x.Index).Contains(i)) // If index is in matches
+            //    {
+            //        if (sb.Length > 0) // If sb has text
+            //        {
+            //            lastRun = new Run(sb.ToString());
+            //            paragraph.Inlines.Add(lastRun); // Add new nonhighlighted text to paragraph
+            //            if (i < caretIndex)
+            //                newCaretIndex += 2; // Opening and closing tags count as characters
+            //        }
+            //        sb.Clear();
+            //        // Add new highlighted text
+            //        int tempLength = matches.First(x => x.Index == i).Length;
+
+            //        lastRun = new Run(line.Substring(i, tempLength))
+            //        {
+            //            Foreground = Brushes.Blue
+            //        };
+            //        paragraph.Inlines.Add(lastRun);
+            //        //if (i < caretIndex)
+            //        //{
+            //        //    if (caretIndex >= i && caretIndex < i + tempLength)
+            //        //        newCaretIndex += 2;
+            //        //    else
+            //        //        newCaretIndex++;
+            //        //}
+            //        i += tempLength;
+            //    }
+            //    else
+            //    {
+            //        sb.Append(line[i]);
+            //        i++;
+            //    }
+            //}
+            //if (sb.Length > 0)
+            //{
+            //    lastRun = new Run(sb.ToString());
+            //    paragraph.Inlines.Add(lastRun);
+            //}
+
+            //try
+            //{
+            //    var matchAfterCaret = matches.First(match => caretIndex >= match.Index);
+            //    newCaretIndex = paragraph.ContentStart.GetOffsetToPosition(paragraph.Inlines.First(inline => inline == lastRun).ContentStart) + (caretIndex - matchAfterCaret.Index + 1);
+            //    using (var ms = new MemoryStream())
+            //    {
+            //        new TextRange(paragraph.ContentStart, paragraph.ContentEnd).Save(ms, DataFormats.Xaml);
+            //        //MessageBox.Show(ASCIIEncoding.Default.GetString(ms.ToArray()));
+            //    }
+            //}
+            //catch
+            //{
+            //    newCaretIndex = caretIndex;
+            //}
 
             return paragraph;
         }
