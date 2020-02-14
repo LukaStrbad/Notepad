@@ -12,19 +12,28 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Text.RegularExpressions;
-using Notepad.ExtensionMethods;
+using NotepadCore.ExtensionMethods;
 using System.Threading;
 
-namespace Notepad
+namespace NotepadCore
 {
     /// <summary>
     /// Interaction logic for Find.xaml
     /// </summary>
     public partial class Find : Window
     {
-        readonly MainWindow mw;
-        int currentCase = 0;
-        List<int> occurances;
+        private readonly MainWindow mw;
+        private Match currentMatch;
+        private Regex FindRegex
+        {
+            get
+            {
+                if (RegExCheckBox.IsChecked ?? false)
+                    return new Regex(FindTextBox.Text);
+                return new Regex(Regex.Escape(FindTextBox.Text));
+            }
+        }
+
         private RichTextBox textBox
         {
             get => (mw.Tabs.SelectedContent as TextEditor).MainTextBox;
@@ -37,54 +46,44 @@ namespace Notepad
             mw = Application.Current.Windows[0] as MainWindow;
         }
 
-        private int[] IndexArray(string input, string textToFind)
-        {
-            var ind = new List<int>();
-            for (int i = 0; i < input.Length - textToFind.Length; i++)
-            {
-                if (input.Substring(i) == textToFind)
-                {
-                    ind.Add(i);
-                }
-            }
-            return ind.ToArray();
-        }
-
-        private bool isFirstFind = true;
-
         private void FindButton_Click(object sender, RoutedEventArgs e)
         {
             if (FindTextBox.Text == "") MessageBox.Show("No text to find");
 
-            FindText(isFirstFind);
-
-            if (isFirstFind)
-                isFirstFind = false;
+            FindText();
         }
 
-        private void FindText(bool isFirstFind, bool changeCurrentCase = true)
+        private void FindText()
         {
-            if (isFirstFind)
-            {
-                occurances = (new TextRange(textBox.Document.ContentStart, textBox.Document.ContentEnd)).Text.IndexesOf(FindTextBox.Text);
-                if (changeCurrentCase)
-                    currentCase = 0;
-                else if (currentCase >= occurances.Count)
-                    currentCase = 0;
-                this.isFirstFind = true;
-            }
-            else
-            {
-                if (currentCase < occurances.Count - 1) currentCase++;
-                else currentCase = 0;
-            }
+            var textRange = new TextRange(textBox.Document.ContentStart, textBox.Document.ContentEnd);
 
-            TextPointer temp = null;
+            if (currentMatch == null || !currentMatch.Success)
+                currentMatch = FindRegex.Match(textRange.Text);
+            textBox.Selection.Select(TextEditor.GetTextPointAt(textRange.Start, currentMatch.Index), TextEditor.GetTextPointAt(textRange.Start, currentMatch.Index + currentMatch.Length));
+            currentMatch = currentMatch.NextMatch();
+            //if (isFirstFind)
+            //{
+            //    if (RegExCheckBox.IsChecked ?? false)
+            //        occurances = new Regex(FindTextBox.Text).Matches(textRange.Text);
+            //    else
+            //        occurances = new Regex(Regex.Escape(FindTextBox.Text)).Matches(textRange.Text);
 
-            if (occurances.Count > 0)
-                textBox.Selection.Select(temp.GetPositionAtOffset(occurances[currentCase]), temp.GetPositionAtOffset(occurances[currentCase] + FindTextBox.Text.Length));
+            //    if (changeCurrentCase)
+            //        currentCase = 0;
+            //    else if (currentCase >= occurances.Count)
+            //        currentCase = 0;
+            //    this._isFirstFind = true;
+            //}
             //else
-                //textBox.SelectionLength = 0;
+            //{
+            //    if (currentCase < occurances.Count - 1) currentCase++;
+            //    else currentCase = 0;
+            //}
+
+            //if (occurances.Count > 0)
+            //    textBox.Selection.Select(TextEditor.GetTextPointAt(textRange.Start, occurances[currentCase].Index), TextEditor.GetTextPointAt(textRange.Start, occurances[currentCase].Index + occurances[currentCase].Length));
+            //else
+            //    textBox.Selection.Select(textRange.Start, textRange.Start);
 
             mw.Focus();
             this.Focus();
@@ -94,7 +93,7 @@ namespace Notepad
         {
             //textBox.SelectedText = ReplaceTextBox.Text ?? "";
 
-            FindText(true, false);
+            //FindText(true, false);
         }
 
         private void FindTextBox_TextChanged(object sender, TextChangedEventArgs e)

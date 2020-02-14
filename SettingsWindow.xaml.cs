@@ -15,7 +15,7 @@ using System.Windows.Shapes;
 using System.ComponentModel;
 using System.IO;
 
-namespace Notepad
+namespace NotepadCore
 {
     /// <summary>
     /// Interaction logic for SettingsWindow.xaml

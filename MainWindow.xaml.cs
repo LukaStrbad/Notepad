@@ -16,11 +16,11 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Diagnostics;
 using System.Drawing;
-using Notepad.ExtensionMethods;
+using NotepadCore.ExtensionMethods;
 using Microsoft.Win32;
 using System.ComponentModel;
 
-namespace Notepad
+namespace NotepadCore
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -176,7 +176,8 @@ namespace Notepad
             var userSettings = Settings.Create();
 
             var files = userSettings.FilePaths.ToList();
-            (Tabs.SelectedContent as TextEditor).SaveFile();
+            if (CurrentTextEditor.HasSaveLocation)
+                CurrentTextEditor.SaveFile();
 
 
             if (Tabs.SelectedIndex == 0)
@@ -202,7 +203,6 @@ namespace Notepad
         {
             var userSettings = Settings.Create();
 
-            //File.WriteAllText(documentPath, MainTextBox.Text);
             var textEdit = Tabs.SelectedContent as TextEditor;
             if (textEdit.HasSaveLocation)
                 textEdit.SaveFile();
@@ -301,6 +301,11 @@ namespace Notepad
             //var textEdit = Tabs.SelectedContent as TextEditor;
             //Clipboard.SetDataObject(textEdit.MainTextBox.SelectedText); // copies the text to clipboard
             //textEdit.MainTextBox.Text = textEdit.MainTextBox.Text.Remove(textEdit.MainTextBox.SelectionStart, textEdit.MainTextBox.SelectionLength); // deletes the text
+
+            var textSelection = CurrentTextEditor.MainTextBox.Selection;
+            Clipboard.SetDataObject(textSelection.Text);
+            textSelection.ClearAllProperties();
+            textSelection.Text = "";
         }
 
         private void Copy_Click(object sender, RoutedEventArgs e)

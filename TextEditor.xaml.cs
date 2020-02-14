@@ -1,34 +1,80 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.IO;
-using Notepad.ExtensionMethods;
-using System.Text.RegularExpressions;
-using System.Threading;
 
-namespace Notepad
+namespace NotepadCore
 {
     /// <summary>
-    /// Interaction logic for TextEditor.xaml
+    ///     Interaction logic for TextEditor.xaml
     /// </summary>
     public partial class TextEditor : UserControl
     {
-        private string _documentPath = null;
-        private int _oldNumberOfLines = -1;
-        private Task _highlighTask;
+        private readonly string[] _keywords =
+        {
+            "using", "public", "static", "private", "class", "void", "string", "int", "double", "float", "long",
+            "namespace"
+        };
+
+        private readonly List<Paragraph> _changedLines = new List<Paragraph>();
         private CancellationTokenSource _cts;
-        private List<Paragraph> _changedLines = new List<Paragraph>();
+        private string _documentPath;
+        private Task _highlightTask;
+        private int _oldNumberOfLines = -1;
+
+        private int _tabSize;
+        public TextEditor()
+        {
+            InitializeComponent();
+
+            var userSettings = Settings.Create();
+
+            MainTextBox.Focus();
+
+            ChangeFont();
+
+            TabSize = userSettings.TabSize;
+            ShowLineNumbers = userSettings.ShowLineNumbers;
+
+            _cts = new CancellationTokenSource();
+        }
+
+        public TextEditor(string documentPath)
+        {
+            InitializeComponent();
+
+            var userSettings = Settings.Create();
+
+            _documentPath = documentPath;
+
+            Text = "";
+            try
+            {
+                Text = File.ReadAllText(_documentPath);
+            }
+            catch (FileNotFoundException e)
+            {
+                File.Create(_documentPath);
+            }
+
+            MainTextBox.Focus();
+
+            ChangeFont();
+
+            TabSize = userSettings.TabSize;
+            ShowLineNumbers = userSettings.ShowLineNumbers;
+
+            _cts = new CancellationTokenSource();
+        }
 
         public bool ShowLineNumbers
         {
@@ -74,31 +120,26 @@ namespace Notepad
                 }
             }
         }
+
         public bool HasSaveLocation
         {
             get
             {
-                if (String.IsNullOrEmpty(DocumentPath))
+                if (string.IsNullOrEmpty(DocumentPath))
                     return false;
                 return true;
             }
         }
 
-        public string FileName
-        {
-            get => new FileInfo(DocumentPath).Name;
-        }
+        public string FileName => new FileInfo(DocumentPath).Name;
 
-        private int _tabSize;
         public int TabSize
         {
             get => _tabSize;
             set
             {
                 if (value > 0)
-                {
                     _tabSize = value;
-                }
                 else throw new ArgumentException("Tab size can't be less than zero or zero");
             }
         }
@@ -117,56 +158,17 @@ namespace Notepad
                 //textRange.Text = value ?? "";
 
                 MainTextBox.Document.Blocks.Clear();
-                MainTextBox.Document.Blocks.AddRange(HighlightLines(value.TrimEnd().Split(new string[] { Environment.NewLine }, StringSplitOptions.None)));
+                var paragraphs = value.Trim().Split(new[] {Environment.NewLine}, StringSplitOptions.None)
+                    .Select(a => new Paragraph(new Run(a)));
+                foreach (var paragraph in paragraphs)
+                    HighlightParagraph(paragraph);
+
+                MainTextBox.Document.Blocks.AddRange(paragraphs);
             }
-        }
-
-        public TextEditor()
-        {
-            InitializeComponent();
-
-            var userSettings = Settings.Create();
-
-            MainTextBox.Focus();
-
-            ChangeFont();
-
-            TabSize = userSettings.TabSize;
-            ShowLineNumbers = userSettings.ShowLineNumbers;
-
-            _cts = new CancellationTokenSource();
-        }
-
-        public TextEditor(string documentPath)
-        {
-            InitializeComponent();
-
-            var userSettings = Settings.Create();
-
-            this._documentPath = documentPath;
-
-            Text = "";
-            try
-            {
-                Text = File.ReadAllText(this._documentPath);
-            }
-            catch (FileNotFoundException e)
-            {
-                File.Create(this._documentPath);
-            }
-
-            MainTextBox.Focus();
-
-            ChangeFont();
-
-            TabSize = userSettings.TabSize;
-            ShowLineNumbers = userSettings.ShowLineNumbers;
-
-            _cts = new CancellationTokenSource();
         }
 
         /// <summary>
-        /// Changes the font of the two textboxes
+        ///     Changes the font of the two textboxes
         /// </summary>
         private void ChangeFont()
         {
@@ -182,17 +184,19 @@ namespace Notepad
         }
 
         /// <summary>
-        /// Writes the line numbers when the user control loads
+        ///     Writes the line numbers when the user control loads
         /// </summary>
-        private void UserControl_Loaded(object sender, RoutedEventArgs e) => WriteLineNumbers();
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            WriteLineNumbers();
+        }
 
         /// <summary>
-        /// Writes the line numbers if the new number of lines if different than the old one
+        ///     Writes the line numbers if the new number of lines if different than the old one
         /// </summary>
         private void MainTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-
-            int lineCount = MainTextBox.Document.Blocks.Count;
+            var lineCount = MainTextBox.Document.Blocks.Count;
             if (_oldNumberOfLines != lineCount)
             {
                 WriteLineNumbers();
@@ -207,77 +211,41 @@ namespace Notepad
                 _cts.Cancel();
                 _cts.Dispose();
                 _cts = new CancellationTokenSource();
-                //_highlighTask = new Task(() => HighlightMissingLines(_cts.Token));
-                _highlighTask?.Dispose();
-                _highlighTask = new Task(() => HighlightParagraph(_cts.Token));
-                _highlighTask.Start();
+                //_highlightTask = new Task(() => HighlightMissingLines(_cts.Token));
+                _highlightTask?.Dispose();
+                _highlightTask = new Task(() => HighlightCurrentLine(_cts.Token));
+                _highlightTask.Start();
             }
         }
 
-        private async void HighlightMissingLines(CancellationToken cancellationToken = default)
+        /// <summary>
+        ///     Gets actual TextPointer position that includes FlowDocument tags
+        /// </summary>
+        /// <param name="from">Starting TextPointer position</param>
+        /// <param name="pos">Offset from <paramref name="from" /></param>
+        public static TextPointer GetTextPointAt(TextPointer from, int pos)
         {
-            try
+            var ret = from;
+            var i = 0;
+
+            while (i < pos)
             {
-                await Task.Delay(50, cancellationToken);
+                if (ret.GetTextInRun(LogicalDirection.Forward).StartsWith(Environment.NewLine))
+                    i += 2;
+                if (ret.GetPointerContext(LogicalDirection.Forward) == TextPointerContext.Text)
+                    i++;
 
-                cancellationToken.ThrowIfCancellationRequested();
-
-                Dispatcher.Invoke(() =>
-                {
-                    var par = MainTextBox.CaretPosition.Paragraph;
-                    int caretIndex = par.ContentStart.GetOffsetToPosition(MainTextBox.CaretPosition);
-
-
-                    string text = new TextRange(par.ContentStart, par.ContentEnd).Text;
-                    var paragraph = HighlightLine(text, caretIndex, out int newCaretIndex);
-
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                    MainTextBox.TextChanged -= MainTextBox_TextChanged;
-
-                    par.Inlines.Clear();
-                    par.Inlines.AddRange(paragraph.Inlines.ToArray());
-
-                    //using (var ms = new MemoryStream())
-                    //{
-                    //    new TextRange(par.ContentStart, par.ContentEnd).Save(ms, DataFormats.Rtf);
-                    //    MessageBox.Show(ASCIIEncoding.Default.GetString(ms.ToArray()));
-                    //}
-
-
-
-                    MainTextBox.CaretPosition = par.ContentStart.GetPositionAtOffset(caretIndex - (newCaretIndex - caretIndex));
-                    MainTextBox.TextChanged += MainTextBox_TextChanged;
-                }, System.Windows.Threading.DispatcherPriority.Normal, cancellationToken);
+                ret = ret.GetPositionAtOffset(1, LogicalDirection.Forward);
+                if (ret == null)
+                    return ret;
             }
-            catch (Exception e) { }
-        }
 
-        public List<Paragraph> HighlightLines(params string[] lines)
-        {
-            var tempList = new List<Paragraph>(lines.Length);
-            foreach (var line in lines)
+            return ret;
+
+            while (i < pos && ret != null)
             {
-                tempList.Add(HighlightLine(line));
-            }
-            return tempList;
-        }
-
-        private readonly string[] Keywords = new string[] { "using", "public", "static", "private", "class", "void", "string", "int", "double", "float", "long", "namespace" };
-        private Paragraph HighlightLine(string line)
-        {
-            return HighlightLine(line, 0, out _);
-        }
-
-
-        private static TextPointer GetTextPointAt(TextPointer from, int pos)
-        {
-            TextPointer ret = from;
-            int i = 0;
-
-            while ((i < pos) && (ret != null))
-            {
-                if ((ret.GetPointerContext(LogicalDirection.Backward) == TextPointerContext.Text) || (ret.GetPointerContext(LogicalDirection.Backward) == TextPointerContext.None))
+                if (ret.GetPointerContext(LogicalDirection.Backward) == TextPointerContext.Text ||
+                    ret.GetPointerContext(LogicalDirection.Backward) == TextPointerContext.None)
                     i++;
 
                 if (ret.GetPositionAtOffset(1, LogicalDirection.Forward) == null)
@@ -289,20 +257,24 @@ namespace Notepad
             return ret;
         }
 
-        private async void HighlightParagraph(CancellationToken cancellationToken = default)
+        private async void HighlightCurrentLine(CancellationToken cancellationToken = default)
         {
             MainTextBox.TextChanged -= MainTextBox_TextChanged;
             try
             {
                 await Task.Delay(1000, cancellationToken);
             }
-            catch { }
+            catch
+            {
+            }
+
             Dispatcher.Invoke(() =>
             {
                 try
                 {
-                    var pattern = new Regex(String.Join("|", Keywords));
-                    var textRange = new TextRange(MainTextBox.CaretPosition.Paragraph.ContentStart, MainTextBox.CaretPosition.Paragraph.ContentEnd);
+                    var pattern = new Regex(string.Join("|", _keywords));
+                    var textRange = new TextRange(MainTextBox.CaretPosition.Paragraph.ContentStart,
+                        MainTextBox.CaretPosition.Paragraph.ContentEnd);
                     textRange.ClearAllProperties();
                     var matches = pattern.Matches(textRange.Text);
 
@@ -313,19 +285,41 @@ namespace Notepad
                         cancellationToken.ThrowIfCancellationRequested();
                         Dispatcher.Invoke(() =>
                         {
-                            new TextRange(GetTextPointAt(textRange.Start, match.Index), GetTextPointAt(textRange.Start, match.Index + match.Length)).ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.Blue);
+                            new TextRange(GetTextPointAt(textRange.Start, match.Index),
+                                    GetTextPointAt(textRange.Start, match.Index + match.Length))
+                                .ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.Blue);
                         });
                     }
+
+                    var commentMatch = new Regex("//.*").Match(textRange.Text);
+                    if (commentMatch.Success)
+                        new TextRange(GetTextPointAt(textRange.Start, commentMatch.Index), textRange.End)
+                            .ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.Green);
                 }
                 catch (Exception ex)
-                { }
+                {
+                }
             });
             MainTextBox.TextChanged += MainTextBox_TextChanged;
         }
 
+        private void HighlightParagraph(Paragraph paragraph)
+        {
+            var pattern = new Regex(string.Join("|", _keywords));
+            var textRange = new TextRange(paragraph.ContentStart, paragraph.ContentEnd);
+            textRange.ClearAllProperties();
+            var matches = pattern.Matches(textRange.Text);
+
+            foreach (Match match in matches)
+                new TextRange(GetTextPointAt(textRange.Start, match.Index),
+                        GetTextPointAt(textRange.Start, match.Index + match.Length))
+                    .ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.Blue);
+        }
+
+
         private Paragraph HighlightLine(string line, int caretIndex, out int newCaretIndex)
         {
-            var pattern = new Regex(String.Join("|", Keywords)); // Pattern for keywords
+            var pattern = new Regex(string.Join("|", _keywords)); // Pattern for keywords
             var paragraph = new Paragraph(); // A paragraph where highlighted lines will be added
             var sb = new StringBuilder();
             var matches = pattern.Matches(line);
@@ -394,7 +388,9 @@ namespace Notepad
 
         private void MainTextBox_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            int lineCount = new TextRange(MainTextBox.Document.ContentStart, MainTextBox.Document.ContentEnd).Text.Count(c => c == '\n');
+            var lineCount =
+                new TextRange(MainTextBox.Document.ContentStart, MainTextBox.Document.ContentEnd).Text.Count(c =>
+                    c == '\n');
 
             if (_oldNumberOfLines != lineCount)
             {
@@ -404,7 +400,7 @@ namespace Notepad
         }
 
         /// <summary>
-        /// Synchronizes the scroll of the two textboxes
+        ///     Synchronizes the scroll of the two textboxes
         /// </summary>
         private void ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
@@ -412,36 +408,36 @@ namespace Notepad
         }
 
         /// <summary>
-        /// Writes teh line numbers to the LineTextBox
+        ///     Writes teh line numbers to the LineTextBox
         /// </summary>
         private void WriteLineNumbers()
         {
             var sb = new StringBuilder();
 
-            for (int i = 1; i <= MainTextBox.Document.Blocks.Count; i++)
-            {
-                sb.AppendLine(i.ToString());
-            }
+            for (var i = 1; i <= MainTextBox.Document.Blocks.Count; i++) sb.AppendLine(i.ToString());
 
             if (LineTextBox != null)
                 new TextRange(LineTextBox.Document.ContentStart, LineTextBox.Document.ContentEnd).Text = sb.ToString();
         }
 
         /// <summary>
-        /// For custom tab size
+        ///     For custom tab size
         /// </summary>
         private void MainTextBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Tab)
             {
-                int start = MainTextBox.CaretPosition.Paragraph.ContentStart.GetOffsetToPosition(MainTextBox.CaretPosition);
+                var start =
+                    MainTextBox.CaretPosition.Paragraph.ContentStart.GetOffsetToPosition(MainTextBox.CaretPosition);
 
                 // If UseSpaces is true insert TabSize amount of spaces
                 if (Settings.Create().UseSpaces)
                 {
                     MainTextBox.CaretPosition.InsertTextInRun(new string(' ', TabSize));
 
-                    MainTextBox.CaretPosition = MainTextBox.CaretPosition.Paragraph.ContentStart.GetPositionAtOffset(start + TabSize) ?? MainTextBox.CaretPosition;
+                    MainTextBox.CaretPosition =
+                        MainTextBox.CaretPosition.Paragraph.ContentStart.GetPositionAtOffset(start + TabSize) ??
+                        MainTextBox.CaretPosition;
                     //Text = Text.Insert(, new string(' ', TabSize));
                     //MainTextBox.CaretIndex = carretIndex + TabSize;
                 }
@@ -450,7 +446,8 @@ namespace Notepad
                 {
                     MainTextBox.CaretPosition.InsertTextInRun("\t");
 
-                    MainTextBox.CaretPosition = MainTextBox.CaretPosition.Paragraph.ContentStart.GetPositionAtOffset(start + 1);
+                    MainTextBox.CaretPosition =
+                        MainTextBox.CaretPosition.Paragraph.ContentStart.GetPositionAtOffset(start + 1);
                     //Text = Text.Insert(carretIndex, "\t");
                     //MainTextBox.CaretIndex = carretIndex + 1;
                 }
@@ -460,11 +457,11 @@ namespace Notepad
         }
 
         /// <summary>
-        /// Saves the MainTextBox text to 
+        ///     Saves the MainTextBox text to
         /// </summary
         public void SaveFile()
         {
-            if (String.IsNullOrEmpty(_documentPath))
+            if (string.IsNullOrEmpty(_documentPath))
                 throw new InvalidSaveLocation();
             File.WriteAllText(_documentPath, Text);
         }

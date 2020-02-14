@@ -1,26 +1,23 @@
 ﻿using System;
-using System.IO;
-using System.Windows;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows.Media;
 using System.Xml.Serialization;
-using System.Xml;
 
-namespace Notepad
+namespace NotepadCore
 {
     /// <summary>
-    /// A class that stores user settings
+    ///     A class that stores user settings
     /// </summary>
     public class Settings
     {
-        private Settings() { }
+        private static readonly string SavePath =
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Data\settings.xml");
 
-        private static readonly string SavePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Data\settings.xml");
-
-        private static Settings DefaultUserSettings = new Settings()
+        private static readonly Settings DefaultUserSettings = new Settings
         {
-            FilePaths = new string[] { "" },
+            FilePaths = new[] {""},
             EditorFontFamily = "Consolas",
             EditorFontSize = 12,
             TabSize = 4,
@@ -30,11 +27,16 @@ namespace Notepad
             UseSpaces = true
         };
 
-        private string[] _filePaths;
         private string _editorFontFamily;
         private int _editorFontSize;
-        private int _tabSize;
+
+        private string[] _filePaths;
         private int _selectedFileIndex;
+        private int _tabSize;
+
+        private Settings()
+        {
+        }
 
         public string EditorFontFamily
         {
@@ -89,7 +91,7 @@ namespace Notepad
         }
 
         /// <summary>
-        /// Gets or sets a custom tab size
+        ///     Gets or sets a custom tab size
         /// </summary>
         public int TabSize
         {
@@ -110,46 +112,12 @@ namespace Notepad
         }
 
         /// <summary>
-        /// Gets saved file paths
+        ///     Gets saved file paths
         /// </summary>
         public string[] FilePaths
         {
-            get
-            {
-                return _filePaths.Select(x => x.ToLower()).Distinct().ToArray() ?? DefaultUserSettings.FilePaths;
-            }
+            get { return _filePaths.Select(x => x.ToLower()).Distinct().ToArray() ?? DefaultUserSettings.FilePaths; }
             set => _filePaths = value.Select(x => x.ToLower()).Distinct().ToArray() ?? DefaultUserSettings.FilePaths;
-        }
-
-        /// <summary>
-        /// Removes all occurances of the path
-        /// </summary>
-        /// <param name="path">Path to remove</param>
-        private void RemoveFilePath(string path)
-        {
-            // if there are multiple occurances
-            while (FilePaths.Contains(path))
-                FilePaths = FilePaths.Where(x => x != path).ToArray();
-        }
-
-        /// <summary>
-        /// Removes all occurances of paths in the array
-        /// </summary>
-        /// <param name="paths">Paths to remove</param>
-        public void RemoveFilePaths(params string[] paths)
-        {
-            foreach (var path in paths)
-                RemoveFilePath(path);
-        }
-
-        /// <summary>
-        /// Adds distinct file paths to FilePaths
-        /// </summary>
-        /// <param name="paths"></param>
-        public void AddFiles(params string[] paths)
-        {
-            // adds distincs paths to FilePaths setting
-            FilePaths = new string[][] { FilePaths, paths.ToArray() }.SelectMany(x => x).Distinct().ToArray();
         }
 
         public int SelectedFileIndex
@@ -177,6 +145,37 @@ namespace Notepad
 
         public bool UseSpaces { get; set; } = true;
 
+        /// <summary>
+        ///     Removes all occurances of the path
+        /// </summary>
+        /// <param name="path">Path to remove</param>
+        private void RemoveFilePath(string path)
+        {
+            // if there are multiple occurances
+            while (FilePaths.Contains(path))
+                FilePaths = FilePaths.Where(x => x != path).ToArray();
+        }
+
+        /// <summary>
+        ///     Removes all occurances of paths in the array
+        /// </summary>
+        /// <param name="paths">Paths to remove</param>
+        public void RemoveFilePaths(params string[] paths)
+        {
+            foreach (var path in paths)
+                RemoveFilePath(path);
+        }
+
+        /// <summary>
+        ///     Adds distinct file paths to FilePaths
+        /// </summary>
+        /// <param name="paths"></param>
+        public void AddFiles(params string[] paths)
+        {
+            // adds distincs paths to FilePaths setting
+            FilePaths = new[] {FilePaths, paths.ToArray()}.SelectMany(x => x).Distinct().ToArray();
+        }
+
         public void Save()
         {
             using (var streamWriter = new StreamWriter(SavePath, false))
@@ -190,7 +189,7 @@ namespace Notepad
         {
             var serializer = new XmlSerializer(typeof(Settings));
 
-            string dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
+            var dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
@@ -198,7 +197,7 @@ namespace Notepad
             {
                 using (var streamReader = new StreamReader(SavePath))
                 {
-                    var temp = (Settings)serializer.Deserialize(streamReader);
+                    var temp = (Settings) serializer.Deserialize(streamReader);
                     return temp;
                 }
             }

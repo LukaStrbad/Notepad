@@ -14,7 +14,7 @@ using System.Windows.Shapes;
 using System.IO;
 
 
-namespace Notepad
+namespace NotepadCore
 {
     /// <summary>
     /// Interaction logic for Font.xaml

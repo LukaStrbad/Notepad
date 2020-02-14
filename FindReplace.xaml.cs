@@ -12,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace Notepad
+namespace NotepadCore
 {
     /// <summary>
     /// Interaction logic for FindReplace.xaml

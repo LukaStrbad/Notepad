@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Notepad.ExtensionMethods
+namespace NotepadCore.ExtensionMethods
 {
     public static class StringExtension
     {
