@@ -8,27 +8,27 @@
         Title="Find" Height="220" Width="400" ResizeMode="NoResize" Closed="Window_Closed">
     <Window.Resources>
         <Style TargetType="Label">
-            <Setter Property="Width" Value="70"/>
-            <Setter Property="HorizontalContentAlignment" Value="Right"/>
+            <Setter Property="Width" Value="70" />
+            <Setter Property="HorizontalContentAlignment" Value="Right" />
         </Style>
         <Style TargetType="Button">
-            <Setter Property="Width" Value="70"/>
+            <Setter Property="Width" Value="70" />
         </Style>
     </Window.Resources>
 
     <Canvas>
-        <Label Content="Find: " Margin="10,10"/>
-        <TextBox x:Name="FindTextBox" Width="150" Height="20" Margin="80,13" TextChanged="FindTextBox_TextChanged"/>
+        <Label Content="Find: " Margin="10,10" />
+        <TextBox x:Name="FindTextBox" Width="150" Height="20" Margin="80,13" TextChanged="FindTextBox_TextChanged" />
 
-        <Label Content="Replace: " Margin="10,40"/>
-        <TextBox x:Name="ReplaceTextBox" Width="150" Height="20" Margin="80,43"/>
+        <Label Content="Replace: " Margin="10,40" />
+        <TextBox x:Name="ReplaceTextBox" Width="150" Height="20" Margin="80,43" />
 
-        <CheckBox x:Name="CaseSensitiveCheckBox" Content="Case sensitive" Margin="80,83" IsChecked="True"/>
-        <CheckBox x:Name="RegExCheckBox" Content="Use regular expresisons" Margin="80,103"/>
+        <CheckBox x:Name="CaseSensitiveCheckBox" Content="Case sensitive" Margin="80,83" IsChecked="True" />
+        <CheckBox x:Name="RegExCheckBox" Content="Use regular expresisons" Margin="80,103" />
 
-        <Button x:Name="FindButton" Content="Find Next" Margin="250,13" Click="FindButton_Click"/>
-        <Button x:Name="ReplaceButton" Content="Replace" Margin="250,43" Click="ReplaceButton_Click"/>
+        <Button x:Name="FindButton" Content="Find Next" Margin="250,13" Click="FindButton_Click" />
+        <Button x:Name="ReplaceButton" Content="Replace" Margin="250,43" Click="ReplaceButton_Click" />
 
-        <Label x:Name="NumberOfOccurancesLabel" Margin="10,150" Width="380" HorizontalContentAlignment="Center"/>
+        <Label x:Name="NumberOfOccurancesLabel" Margin="10,150" Width="380" HorizontalContentAlignment="Center" />
     </Canvas>
 </Window>

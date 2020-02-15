@@ -1,39 +1,22 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Diagnostics;
-using System.Drawing;
-using NotepadCore.ExtensionMethods;
 using Microsoft.Win32;
-using System.ComponentModel;
 
 namespace NotepadCore
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    ///     Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        string documentPath = "contents.txt";
+        private string documentPath = "contents.txt";
         private int newFileNumber = 1;
-
-        private TextEditor CurrentTextEditor
-        {
-            get => Tabs.SelectedContent as TextEditor;
-        }
 
         public MainWindow()
         {
@@ -45,24 +28,25 @@ namespace NotepadCore
             if (userSettings.FilePaths.Length != 0)
             {
                 foreach (var i in userSettings.FilePaths)
-                {
                     try
                     {
-                        Tabs.Items.Insert(Tabs.Items.Count - 1, new TabItem()
+                        Tabs.Items.Insert(Tabs.Items.Count - 1, new TabItem
                         {
                             Content = new TextEditor(i),
                             Header = new FileInfo(i).Name
                         });
                     }
-                    catch { }
-                }
+                    catch
+                    {
+                    }
+
                 // Select the tab that was previously selected
                 Tabs.SelectedIndex = userSettings.SelectedFileIndex;
             }
             // else insert an empty tab
             else
             {
-                Tabs.Items.Insert(Tabs.Items.Count - 1, new TabItem()
+                Tabs.Items.Insert(Tabs.Items.Count - 1, new TabItem
                 {
                     Content = new TextEditor(),
                     Header = $"*new file {newFileNumber++}"
@@ -74,16 +58,17 @@ namespace NotepadCore
             ChangeFont();
         }
 
+        private TextEditor CurrentTextEditor => Tabs.SelectedContent as TextEditor;
+
         /// <summary>
-        /// Writes the text from MainTextBox when the window closes
+        ///     Writes the text from MainTextBox when the window closes
         /// </summary>
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             var userSettings = Settings.Create();
 
             // loop through Text Editors and save contents
-            for (int i = 0; i < Tabs.Items.Count - 1; i++)
-            {
+            for (var i = 0; i < Tabs.Items.Count - 1; i++)
                 try
                 {
                     // saves the text from the TextEditor
@@ -92,13 +77,12 @@ namespace NotepadCore
                 catch (InvalidSaveLocation ex)
                 {
                     // select the tab without a save location and ask for a save location
-                    if (!String.IsNullOrEmpty(((Tabs.Items[i] as TabItem).Content as TextEditor).Text))
+                    if (!string.IsNullOrEmpty(((Tabs.Items[i] as TabItem).Content as TextEditor).Text))
                     {
                         Tabs.SelectedIndex = i;
                         FileSave_Click(null, null);
                     }
                 }
-            }
 
             // Save the index of a currently selected tab
             userSettings.SelectedFileIndex = Tabs.SelectedIndex;
@@ -108,7 +92,7 @@ namespace NotepadCore
         }
 
         /// <summary>
-        /// Creates and opens the file
+        ///     Creates and opens the file
         /// </summary>
         private void FileNew_Click(object sender, RoutedEventArgs e)
         {
@@ -118,12 +102,12 @@ namespace NotepadCore
             newDialog.ShowDialog();
             documentPath = newDialog.FileName;
 
-            if (!String.IsNullOrEmpty(documentPath))
+            if (!string.IsNullOrEmpty(documentPath))
             {
                 // Adds new file path
                 userSettings.AddFiles(documentPath);
 
-                Tabs.Items.Insert(Tabs.Items.Count - 1, new TabItem()
+                Tabs.Items.Insert(Tabs.Items.Count - 1, new TabItem
                 {
                     Content = new TextEditor(documentPath),
                     Header = new FileInfo(documentPath).Name
@@ -134,7 +118,7 @@ namespace NotepadCore
         }
 
         /// <summary>
-        /// Opens an existing file
+        ///     Opens an existing file
         /// </summary>
         private void FileOpen_Click(object sender, RoutedEventArgs e)
         {
@@ -144,13 +128,11 @@ namespace NotepadCore
             openDialog.ShowDialog();
             documentPath = openDialog.FileName;
 
-            if (!String.IsNullOrEmpty(documentPath))
-            {
+            if (!string.IsNullOrEmpty(documentPath))
                 // writes the new file path to the constant Path.Document location
                 userSettings.AddFiles(documentPath);
-            }
 
-            if (String.IsNullOrEmpty(CurrentTextEditor.Text))
+            if (string.IsNullOrEmpty(CurrentTextEditor.Text))
             {
                 // if the selected TextEditor is empty, open a new one on the same spot
                 var item = Tabs.SelectedItem as TabItem;
@@ -160,7 +142,7 @@ namespace NotepadCore
             else
             {
                 // else insert a new TextEditor on the end
-                Tabs.Items.Insert(Tabs.Items.Count - 1, new TabItem()
+                Tabs.Items.Insert(Tabs.Items.Count - 1, new TabItem
                 {
                     Content = new TextEditor(documentPath),
                     Header = new FileInfo(documentPath).Name
@@ -168,6 +150,7 @@ namespace NotepadCore
 
                 Tabs.SelectedIndex = Tabs.Items.Count - 2;
             }
+
             userSettings.Save();
         }
 
@@ -197,7 +180,7 @@ namespace NotepadCore
         }
 
         /// <summary>
-        /// Saves the current file
+        ///     Saves the current file
         /// </summary>
         private void FileSave_Click(object sender, RoutedEventArgs e)
         {
@@ -205,13 +188,15 @@ namespace NotepadCore
 
             var textEdit = Tabs.SelectedContent as TextEditor;
             if (textEdit.HasSaveLocation)
+            {
                 textEdit.SaveFile();
+            }
             else
             {
                 var saveDialog = new SaveFileDialog();
                 saveDialog.ShowDialog();
 
-                if (String.IsNullOrEmpty(saveDialog.FileName))
+                if (string.IsNullOrEmpty(saveDialog.FileName))
                     return;
                 textEdit.DocumentPath = saveDialog.FileName; // sets the document path to that one in save file dialog
                 var paths = userSettings.FilePaths.ToList();
@@ -224,7 +209,7 @@ namespace NotepadCore
         }
 
         /// <summary>
-        /// Saves the content of the current file to a new file
+        ///     Saves the content of the current file to a new file
         /// </summary>
         private void FileSaveAs_Click(object sender, RoutedEventArgs e)
         {
@@ -251,9 +236,8 @@ namespace NotepadCore
         }
 
 
-
         /// <summary>
-        /// Opens the ChangeFontDialog
+        ///     Opens the ChangeFontDialog
         /// </summary>
         private void ChangeFontDialog_Click(object sender, RoutedEventArgs e)
         {
@@ -271,7 +255,7 @@ namespace NotepadCore
 
 
         /// <summary>
-        /// Changes the font of the two textboxes according to passed values
+        ///     Changes the font of the two textboxes according to passed values
         /// </summary>
         public void ChangeFont()
         {
@@ -280,15 +264,15 @@ namespace NotepadCore
             foreach (var textEdit in GetTextEditors())
             {
                 //change font of main textbox and line textbox
-                textEdit.MainTextBox.FontFamily = new System.Windows.Media.FontFamily(userSettings.EditorFontFamily);
+                textEdit.MainTextBox.FontFamily = new FontFamily(userSettings.EditorFontFamily);
                 textEdit.MainTextBox.FontSize = userSettings.EditorFontSize;
-                textEdit.LineTextBox.FontFamily = new System.Windows.Media.FontFamily(userSettings.EditorFontFamily);
+                textEdit.LineTextBox.FontFamily = new FontFamily(userSettings.EditorFontFamily);
                 textEdit.LineTextBox.FontSize = userSettings.EditorFontSize;
             }
         }
 
         /// <summary>
-        /// Opens the find/replace dialog. Work in progress
+        ///     Opens the find/replace dialog. Work in progress
         /// </summary>
         private void FindReplace_Click(object sender, RoutedEventArgs e)
         {
@@ -331,10 +315,11 @@ namespace NotepadCore
         }
 
         private void Tabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {// if + tab is selected add a new tab
+        {
+            // if + tab is selected add a new tab
             if (Tabs.SelectedItem == TabAdd)
             {
-                Tabs.Items.Insert(Tabs.Items.Count - 1, new TabItem()
+                Tabs.Items.Insert(Tabs.Items.Count - 1, new TabItem
                 {
                     Content = new TextEditor(),
                     Header = $"*new file {newFileNumber++}"
@@ -346,8 +331,8 @@ namespace NotepadCore
         public List<TextEditor> GetTextEditors()
         {
             return (from object i in Tabs.Items
-                    where (i as TabItem).Content is TextEditor
-                    select (i as TabItem).Content as TextEditor).ToList();
+                where (i as TabItem).Content is TextEditor
+                select (i as TabItem).Content as TextEditor).ToList();
         }
 
         private void Window_Deactivated(object sender, EventArgs e)

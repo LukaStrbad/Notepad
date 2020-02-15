@@ -8,17 +8,24 @@
         x:Name="settingsWindow"
         Title="Settings" Height="350" Width="300">
     <Grid>
-        <CheckBox x:Name="ShowLineNumbersCheckBox" Content="Show line numbers" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-        <CheckBox x:Name="SpacesCheckBox" Content="Use spaces instead of tabs" HorizontalAlignment="Left" Margin="10,35,0,0" VerticalAlignment="Top" Checked="SpacesCheckBox_Checked" Unchecked="SpacesCheckBox_Unchecked"/>
-        
-        <Label x:Name="TabSizeLabel" Content="Tab size: " HorizontalAlignment="Left" Margin="10,60,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="TabSizeTextBox" HorizontalAlignment="Left" Height="23" Margin="70,63,0,0" TextWrapping="Wrap" Text="4" VerticalAlignment="Top" Width="40" TextAlignment="Center" VerticalContentAlignment="Center"/>
+        <CheckBox x:Name="ShowLineNumbersCheckBox" Content="Show line numbers" HorizontalAlignment="Left"
+                  Margin="10,10,0,0" VerticalAlignment="Top" />
+        <CheckBox x:Name="SpacesCheckBox" Content="Use spaces instead of tabs" HorizontalAlignment="Left"
+                  Margin="10,35,0,0" VerticalAlignment="Top" Checked="SpacesCheckBox_Checked"
+                  Unchecked="SpacesCheckBox_Unchecked" />
 
-        <Label x:Name="FontInfo" Content="Font: " Margin="10,95,0,0" Height="20" Padding="0" VerticalContentAlignment="Center" VerticalAlignment="Top"/>
-        <Button Content="Change Font" HorizontalAlignment="Left" Margin="150,95,0,0" VerticalAlignment="Top" Width="75" Click="ChangeFont_Click"/>
+        <Label x:Name="TabSizeLabel" Content="Tab size: " HorizontalAlignment="Left" Margin="10,60,0,0"
+               VerticalAlignment="Top" />
+        <TextBox x:Name="TabSizeTextBox" HorizontalAlignment="Left" Height="23" Margin="70,63,0,0" TextWrapping="Wrap"
+                 Text="4" VerticalAlignment="Top" Width="40" TextAlignment="Center" VerticalContentAlignment="Center" />
 
-        <Button Content="Save changes" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="10" Click="Save_Click"/>
-        
+        <Label x:Name="FontInfo" Content="Font: " Margin="10,95,0,0" Height="20" Padding="0"
+               VerticalContentAlignment="Center" VerticalAlignment="Top" />
+        <Button Content="Change Font" HorizontalAlignment="Left" Margin="150,95,0,0" VerticalAlignment="Top" Width="75"
+                Click="ChangeFont_Click" />
+
+        <Button Content="Save changes" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="10"
+                Click="Save_Click" />
 
 
     </Grid>

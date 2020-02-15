@@ -1,46 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.ComponentModel;
-using System.IO;
 
 namespace NotepadCore
 {
     /// <summary>
-    /// Interaction logic for SettingsWindow.xaml
+    ///     Interaction logic for SettingsWindow.xaml
     /// </summary>
     public partial class SettingsWindow : Window
     {
         private bool _useSpaces = true;
-        public bool UseSpaces
-        {
-            get => _useSpaces;
-            set
-            {
-                _useSpaces = value;
-                if (value)
-                {
-                    TabSizeLabel.IsEnabled = true;
-                    TabSizeTextBox.IsEnabled = true;
-                }
-                else
-                {
-                    TabSizeLabel.IsEnabled = false;
-                    TabSizeTextBox.IsEnabled = false;
-                }
-            }
-        }
 
         private FontWindow fontDialog = new FontWindow();
 
@@ -61,9 +29,34 @@ namespace NotepadCore
             SpacesCheckBox.IsChecked = userSettings.UseSpaces;
         }
 
-        private void SpacesCheckBox_Checked(object sender, RoutedEventArgs e) => UseSpaces = true;
+        public bool UseSpaces
+        {
+            get => _useSpaces;
+            set
+            {
+                _useSpaces = value;
+                if (value)
+                {
+                    TabSizeLabel.IsEnabled = true;
+                    TabSizeTextBox.IsEnabled = true;
+                }
+                else
+                {
+                    TabSizeLabel.IsEnabled = false;
+                    TabSizeTextBox.IsEnabled = false;
+                }
+            }
+        }
 
-        private void SpacesCheckBox_Unchecked(object sender, RoutedEventArgs e) => UseSpaces = false;
+        private void SpacesCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            UseSpaces = true;
+        }
+
+        private void SpacesCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            UseSpaces = false;
+        }
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
@@ -72,10 +65,7 @@ namespace NotepadCore
             // save tab size
             try
             {
-                if (Int32.TryParse(TabSizeTextBox.Text, out int size))
-                {
-                    userSettings.TabSize = size;
-                }
+                if (int.TryParse(TabSizeTextBox.Text, out var size)) userSettings.TabSize = size;
             }
             catch (ArgumentException ex)
             {
@@ -84,18 +74,19 @@ namespace NotepadCore
             }
 
             // save font
-            string fontFamily = Convert.ToString(fontDialog.FontChooseListBox.SelectedItem);
-            int fontSize = Convert.ToInt32(fontDialog.FontSizeChooseListBox.SelectedItem);
+            var fontFamily = Convert.ToString(fontDialog.FontChooseListBox.SelectedItem);
+            var fontSize = Convert.ToInt32(fontDialog.FontSizeChooseListBox.SelectedItem);
 
             userSettings.EditorFontFamily = fontFamily;
             userSettings.EditorFontSize = fontSize;
 
-            var mainWindow = Application.Current.Windows[0] as MainWindow;            
+            var mainWindow = Application.Current.Windows[0] as MainWindow;
 
             // Save ShowLineNumbers boolean
             userSettings.ShowLineNumbers = ShowLineNumbersCheckBox.IsChecked ?? true;
 
-            mainWindow.GetTextEditors().ForEach(textEditor => textEditor.ShowLineNumbers = userSettings.ShowLineNumbers);
+            mainWindow.GetTextEditors()
+                .ForEach(textEditor => textEditor.ShowLineNumbers = userSettings.ShowLineNumbers);
 
             // Save UseSpaces boolean
             userSettings.UseSpaces = SpacesCheckBox.IsChecked ?? true;

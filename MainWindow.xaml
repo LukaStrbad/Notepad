@@ -5,70 +5,71 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NotepadCore"
         mc:Ignorable="d"
-        Title="Notepad" Height="450" Width="800" Language="en-US"  Closing="Window_Closing" FontFamily="Consolas" Deactivated="Window_Deactivated" Activated="Window_Activated" Icon="notepad.png" >
+        Title="Notepad" Height="450" Width="800" Language="en-US" Closing="Window_Closing" FontFamily="Consolas"
+        Deactivated="Window_Deactivated" Activated="Window_Activated" Icon="notepad.png">
 
     <Window.Resources>
         <Style TargetType="TextBox">
-            <Setter Property="FontFamily" Value="Consolas"/>
+            <Setter Property="FontFamily" Value="Consolas" />
         </Style>
     </Window.Resources>
 
     <!-- Shortcut Commands -->
     <Window.CommandBindings>
-        <CommandBinding Command="Save" Executed="FileSave_Click"/>
-        <CommandBinding Command="New" Executed="FileNew_Click"/>
-        <CommandBinding Command="Open" Executed="FileOpen_Click"/>
-        <CommandBinding Command="Find" Executed="FindReplace_Click"/>
-        <CommandBinding Command="Close" Executed="FileClose_Click"/>
+        <CommandBinding Command="Save" Executed="FileSave_Click" />
+        <CommandBinding Command="New" Executed="FileNew_Click" />
+        <CommandBinding Command="Open" Executed="FileOpen_Click" />
+        <CommandBinding Command="Find" Executed="FindReplace_Click" />
+        <CommandBinding Command="Close" Executed="FileClose_Click" />
     </Window.CommandBindings>
 
     <Window.InputBindings>
-        <KeyBinding Key="S" Modifiers="Ctrl" Command="Save"/>
-        <KeyBinding Key="N" Modifiers="Ctrl" Command="New"/>
-        <KeyBinding Key="O" Modifiers="Ctrl" Command="Open"/>
-        <KeyBinding Key="F" Modifiers="Ctrl" Command="Find"/>
-        <KeyBinding Key="W" Modifiers="Ctrl" Command="Close"/>
+        <KeyBinding Key="S" Modifiers="Ctrl" Command="Save" />
+        <KeyBinding Key="N" Modifiers="Ctrl" Command="New" />
+        <KeyBinding Key="O" Modifiers="Ctrl" Command="Open" />
+        <KeyBinding Key="F" Modifiers="Ctrl" Command="Find" />
+        <KeyBinding Key="W" Modifiers="Ctrl" Command="Close" />
     </Window.InputBindings>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="18"/>
-            <RowDefinition/>
+            <RowDefinition Height="18" />
+            <RowDefinition />
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
+            <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
         <Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
             <MenuItem Header="File">
                 <MenuItem Header="New" Click="FileNew_Click" InputGestureText="Ctrl + N" />
-                <MenuItem Header="Open" Click="FileOpen_Click" InputGestureText="Ctrl + O"/>
-                <MenuItem Header="Close" Click="FileClose_Click" InputGestureText="Ctrl + W"/>
-                <Separator/>
+                <MenuItem Header="Open" Click="FileOpen_Click" InputGestureText="Ctrl + O" />
+                <MenuItem Header="Close" Click="FileClose_Click" InputGestureText="Ctrl + W" />
+                <Separator />
                 <MenuItem Header="Save" Click="FileSave_Click" InputGestureText="Ctrl + S" />
-                <MenuItem Header="Save As" Click="FileSaveAs_Click"/>
+                <MenuItem Header="Save As" Click="FileSaveAs_Click" />
             </MenuItem>
 
             <MenuItem Header="Edit">
-                <MenuItem Header="Cut" Click="Cut_Click" InputGestureText="Ctrl + X"/>
-                <MenuItem Header="Copy" Click="Copy_Click" InputGestureText="Ctrl + C"/>
-                <MenuItem Header="Paste" Click="Paste_Click" InputGestureText="Ctrl + V"/>
-                <Separator/>
-                <MenuItem Header="Change Font" Click="ChangeFontDialog_Click"/>
-                <Separator/>
-                <MenuItem Header="Find/Replace" Click="FindReplace_Click" InputGestureText="Ctrl + F"/>
+                <MenuItem Header="Cut" Click="Cut_Click" InputGestureText="Ctrl + X" />
+                <MenuItem Header="Copy" Click="Copy_Click" InputGestureText="Ctrl + C" />
+                <MenuItem Header="Paste" Click="Paste_Click" InputGestureText="Ctrl + V" />
+                <Separator />
+                <MenuItem Header="Change Font" Click="ChangeFontDialog_Click" />
+                <Separator />
+                <MenuItem Header="Find/Replace" Click="FindReplace_Click" InputGestureText="Ctrl + F" />
             </MenuItem>
 
             <MenuItem Header="Options">
-                <MenuItem Header="Settings" Click="Settings_Click"/>
-                <MenuItem Header="About" Click="About_Click"/>
+                <MenuItem Header="Settings" Click="Settings_Click" />
+                <MenuItem Header="About" Click="About_Click" />
             </MenuItem>
 
         </Menu>
 
         <TabControl Grid.Row="1" x:Name="Tabs" Padding="0" SelectionChanged="Tabs_SelectionChanged">
-            <TabItem Header="+" x:Name="TabAdd"/>
+            <TabItem Header="+" x:Name="TabAdd" />
         </TabControl>
 
         <!-- Editing TextBox --><!--

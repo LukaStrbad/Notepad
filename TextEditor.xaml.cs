@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -20,13 +19,25 @@ namespace NotepadCore
     /// </summary>
     public partial class TextEditor : UserControl
     {
-        private readonly string[] _keywords =
+        private readonly List<Paragraph> _changedLines = new List<Paragraph>();
+
+        private readonly (string[] Keywords, SolidColorBrush Brush)[] _keywords =
         {
-            "using", "public", "static", "private", "class", "void", "string", "int", "double", "float", "long",
-            "namespace"
+            (new[]
+            {
+                "abstract", "as", "base", "bool", "break", "byte", "char", "checked", "class", "const", "decimal",
+                "default", "delegate", "double", "enum", "event", "explicit", "extern", "false", "fixed", "float",
+                "implicit", "in", "int", "interface", "internal", "is", "lock", "long", "namespace", "new", "null",
+                "object", "operator", "out", "override", "params", "private", "protected", "public", "readonly", "ref",
+                "return", "sbyte", "sealed", "short", "sizeof", "stackalloc", "static", "string", "struct", "this",
+                "throw",
+                "true", "typeof", "uint", "ulong", "unchecked", "unsafe", "ushort", "using", "virtual", "void",
+                "volatile"
+            }, Brushes.Blue),
+            (new[] {"case", "catch", "continue", "do", "else", "finally", "for", "foreach", "goto", "if", "switch", "try", "while"},
+                Brushes.Purple)
         };
 
-        private readonly List<Paragraph> _changedLines = new List<Paragraph>();
         private CancellationTokenSource _cts;
         private string _documentPath;
         private Task _highlightTask;
@@ -154,10 +165,8 @@ namespace NotepadCore
                 MainTextBox.Document.Blocks.Clear();
                 var paragraphs = value.Trim().Split(new[] {Environment.NewLine}, StringSplitOptions.None)
                     .Select(a => new Paragraph(new Run(a)));
-                foreach (var paragraph in paragraphs)
-                    HighlightParagraph(paragraph);
-
                 MainTextBox.Document.Blocks.AddRange(paragraphs);
+                HighlightAllBlocks();
             }
         }
 
@@ -230,7 +239,7 @@ namespace NotepadCore
                     i++;
 
                 ret = ret.GetPositionAtOffset(1, LogicalDirection.Forward);
-                if (ret == null)
+                if (ret.GetPositionAtOffset(1, LogicalDirection.Forward) == null)
                     return ret;
             }
 
@@ -247,24 +256,29 @@ namespace NotepadCore
             {
                 try
                 {
-                    var pattern = new Regex(string.Join("|", _keywords));
                     var textRange = new TextRange(MainTextBox.CaretPosition.Paragraph.ContentStart,
                         MainTextBox.CaretPosition.Paragraph.ContentEnd);
                     textRange.ClearAllProperties();
-                    var matches = pattern.Matches(textRange.Text);
 
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                    foreach (Match match in matches)
+                    foreach (var tuple in _keywords)
                     {
-                        cancellationToken.ThrowIfCancellationRequested();
-                        Dispatcher.Invoke(() =>
-                        {
+                        var pattern = new Regex($@"(?<!\w)({string.Join("|", tuple.Keywords)})(?!\w)");
+                        foreach (Match match in pattern.Matches(textRange.Text))
+                            Dispatcher.Invoke(() =>
+                            {
+                                new TextRange(GetTextPointAt(textRange.Start, match.Index),
+                                        GetTextPointAt(textRange.Start, match.Index + match.Length))
+                                    .ApplyPropertyValue(TextElement.ForegroundProperty, tuple.Brush);
+                            });
+                    }
+
+                    var stringMatches = new Regex(@"""(\\""|[^""])*""").Matches(textRange.Text);
+                    if (stringMatches.Count > 0)
+                        foreach (Match match in stringMatches)
                             new TextRange(GetTextPointAt(textRange.Start, match.Index),
                                     GetTextPointAt(textRange.Start, match.Index + match.Length))
-                                .ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.Blue);
-                        });
-                    }
+                                .ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.SaddleBrown);
+
 
                     var commentMatch = new Regex("//.*").Match(textRange.Text);
                     if (commentMatch.Success)
@@ -278,8 +292,46 @@ namespace NotepadCore
             MainTextBox.TextChanged += MainTextBox_TextChanged;
         }
 
-        private void HighlightParagraph(Paragraph paragraph)
+        private void HighlightAllBlocks()
         {
+            MainTextBox.TextChanged -= MainTextBox_TextChanged;
+
+            Dispatcher?.Invoke(() =>
+            {
+                for (var i = 0; i < MainTextBox.Document.Blocks.Count; i++)
+                {
+                    var textRange = new TextRange(MainTextBox.Document.Blocks.ElementAt(i).ContentStart,
+                        MainTextBox.Document.Blocks.ElementAt(i).ContentEnd);
+                    textRange.ClearAllProperties();
+
+                    foreach (var tuple in _keywords)
+                    {
+                        var pattern = new Regex($@"(?<!\w)({string.Join("|", tuple.Keywords)})(?!\w)");
+                        foreach (Match match in pattern.Matches(textRange.Text))
+                            Dispatcher.Invoke(() =>
+                            {
+                                new TextRange(GetTextPointAt(textRange.Start, match.Index),
+                                        GetTextPointAt(textRange.Start, match.Index + match.Length))
+                                    .ApplyPropertyValue(TextElement.ForegroundProperty, tuple.Brush);
+                            });
+                    }
+
+                    var stringMatches = new Regex(@"""(\\""|[^""])*""").Matches(textRange.Text);
+                    if (stringMatches.Count > 0)
+                        foreach (Match match in stringMatches)
+                            new TextRange(GetTextPointAt(textRange.Start, match.Index),
+                                    GetTextPointAt(textRange.Start, match.Index + match.Length))
+                                .ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.SaddleBrown);
+
+
+                    var commentMatch = new Regex("//.*").Match(textRange.Text);
+                    if (commentMatch.Success)
+                        new TextRange(GetTextPointAt(textRange.Start, commentMatch.Index), textRange.End)
+                            .ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.Green);
+                }
+            });
+
+            MainTextBox.TextChanged += MainTextBox_TextChanged;
         }
 
 
@@ -297,8 +349,10 @@ namespace NotepadCore
         /// <summary>
         ///     Synchronizes the scroll of the two textboxes
         /// </summary>
-        private void ScrollChanged(object sender, ScrollChangedEventArgs e) =>
+        private void ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
             LineTextBox.ScrollToVerticalOffset(MainTextBox.VerticalOffset);
+        }
 
 
         /// <summary>

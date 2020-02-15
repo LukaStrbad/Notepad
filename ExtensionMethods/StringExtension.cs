@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace NotepadCore.ExtensionMethods
 {
@@ -12,10 +8,10 @@ namespace NotepadCore.ExtensionMethods
         {
             var indexes = new List<int>();
 
-            if (String.IsNullOrEmpty(value))
+            if (string.IsNullOrEmpty(value))
                 return indexes;
 
-            for (int i = 0; ; i += value.Length)
+            for (var i = 0;; i += value.Length)
             {
                 i = str.IndexOf(value, i);
                 if (i == -1)
@@ -27,7 +23,7 @@ namespace NotepadCore.ExtensionMethods
         }
 
         /// <summary>
-        /// Splits the string at specified indexes
+        ///     Splits the string at specified indexes
         /// </summary>
         /// <param name="str">This string</param>
         /// <param name="indexes">Array of indexes</param>
@@ -36,7 +32,7 @@ namespace NotepadCore.ExtensionMethods
         {
             var values = new List<string>(indexes.Length + 1);
 
-            int startIndex = 0;
+            var startIndex = 0;
 
             foreach (var index in indexes)
             {

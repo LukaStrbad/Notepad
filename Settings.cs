@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Media;
@@ -157,7 +156,7 @@ namespace NotepadCore
         }
 
         /// <summary>
-        ///     Removes all occurances of paths in the array
+        ///     Removes all occurrences of paths in the array
         /// </summary>
         /// <param name="paths">Paths to remove</param>
         public void RemoveFilePaths(params string[] paths)
@@ -172,7 +171,7 @@ namespace NotepadCore
         /// <param name="paths"></param>
         public void AddFiles(params string[] paths)
         {
-            // adds distincs paths to FilePaths setting
+            // adds distinct paths to FilePaths setting
             FilePaths = new[] {FilePaths, paths.ToArray()}.SelectMany(x => x).Distinct().ToArray();
         }
 
