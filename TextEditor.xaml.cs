@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -32,6 +33,7 @@ namespace NotepadCore
         private int _oldNumberOfLines = -1;
 
         private int _tabSize;
+
         public TextEditor()
         {
             InitializeComponent();
@@ -121,15 +123,7 @@ namespace NotepadCore
             }
         }
 
-        public bool HasSaveLocation
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(DocumentPath))
-                    return false;
-                return true;
-            }
-        }
+        public bool HasSaveLocation => !string.IsNullOrEmpty(DocumentPath);
 
         public string FileName => new FileInfo(DocumentPath).Name;
 
@@ -241,34 +235,15 @@ namespace NotepadCore
             }
 
             return ret;
-
-            while (i < pos && ret != null)
-            {
-                if (ret.GetPointerContext(LogicalDirection.Backward) == TextPointerContext.Text ||
-                    ret.GetPointerContext(LogicalDirection.Backward) == TextPointerContext.None)
-                    i++;
-
-                if (ret.GetPositionAtOffset(1, LogicalDirection.Forward) == null)
-                    return ret;
-
-                ret = ret.GetPositionAtOffset(1, LogicalDirection.Forward);
-            }
-
-            return ret;
         }
 
         private async void HighlightCurrentLine(CancellationToken cancellationToken = default)
         {
+            if (MainTextBox.CaretPosition.Paragraph == null)
+                return;
             MainTextBox.TextChanged -= MainTextBox_TextChanged;
-            try
-            {
-                await Task.Delay(1000, cancellationToken);
-            }
-            catch
-            {
-            }
 
-            Dispatcher.Invoke(() =>
+            Dispatcher?.Invoke(() =>
             {
                 try
                 {
@@ -305,86 +280,8 @@ namespace NotepadCore
 
         private void HighlightParagraph(Paragraph paragraph)
         {
-            var pattern = new Regex(string.Join("|", _keywords));
-            var textRange = new TextRange(paragraph.ContentStart, paragraph.ContentEnd);
-            textRange.ClearAllProperties();
-            var matches = pattern.Matches(textRange.Text);
-
-            foreach (Match match in matches)
-                new TextRange(GetTextPointAt(textRange.Start, match.Index),
-                        GetTextPointAt(textRange.Start, match.Index + match.Length))
-                    .ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.Blue);
         }
 
-
-        private Paragraph HighlightLine(string line, int caretIndex, out int newCaretIndex)
-        {
-            var pattern = new Regex(string.Join("|", _keywords)); // Pattern for keywords
-            var paragraph = new Paragraph(); // A paragraph where highlighted lines will be added
-            var sb = new StringBuilder();
-            var matches = pattern.Matches(line);
-            var lastRun = new Run();
-            newCaretIndex = caretIndex;
-
-            //int i = 0;
-            //while (i < line.Length)
-            //{
-            //    if (matches.Select(x => x.Index).Contains(i)) // If index is in matches
-            //    {
-            //        if (sb.Length > 0) // If sb has text
-            //        {
-            //            lastRun = new Run(sb.ToString());
-            //            paragraph.Inlines.Add(lastRun); // Add new nonhighlighted text to paragraph
-            //            if (i < caretIndex)
-            //                newCaretIndex += 2; // Opening and closing tags count as characters
-            //        }
-            //        sb.Clear();
-            //        // Add new highlighted text
-            //        int tempLength = matches.First(x => x.Index == i).Length;
-
-            //        lastRun = new Run(line.Substring(i, tempLength))
-            //        {
-            //            Foreground = Brushes.Blue
-            //        };
-            //        paragraph.Inlines.Add(lastRun);
-            //        //if (i < caretIndex)
-            //        //{
-            //        //    if (caretIndex >= i && caretIndex < i + tempLength)
-            //        //        newCaretIndex += 2;
-            //        //    else
-            //        //        newCaretIndex++;
-            //        //}
-            //        i += tempLength;
-            //    }
-            //    else
-            //    {
-            //        sb.Append(line[i]);
-            //        i++;
-            //    }
-            //}
-            //if (sb.Length > 0)
-            //{
-            //    lastRun = new Run(sb.ToString());
-            //    paragraph.Inlines.Add(lastRun);
-            //}
-
-            //try
-            //{
-            //    var matchAfterCaret = matches.First(match => caretIndex >= match.Index);
-            //    newCaretIndex = paragraph.ContentStart.GetOffsetToPosition(paragraph.Inlines.First(inline => inline == lastRun).ContentStart) + (caretIndex - matchAfterCaret.Index + 1);
-            //    using (var ms = new MemoryStream())
-            //    {
-            //        new TextRange(paragraph.ContentStart, paragraph.ContentEnd).Save(ms, DataFormats.Xaml);
-            //        //MessageBox.Show(ASCIIEncoding.Default.GetString(ms.ToArray()));
-            //    }
-            //}
-            //catch
-            //{
-            //    newCaretIndex = caretIndex;
-            //}
-
-            return paragraph;
-        }
 
         private void MainTextBox_SizeChanged(object sender, SizeChangedEventArgs e)
         {
@@ -392,20 +289,17 @@ namespace NotepadCore
                 new TextRange(MainTextBox.Document.ContentStart, MainTextBox.Document.ContentEnd).Text.Count(c =>
                     c == '\n');
 
-            if (_oldNumberOfLines != lineCount)
-            {
-                WriteLineNumbers();
-                _oldNumberOfLines = lineCount;
-            }
+            if (_oldNumberOfLines == lineCount) return;
+            WriteLineNumbers();
+            _oldNumberOfLines = lineCount;
         }
 
         /// <summary>
         ///     Synchronizes the scroll of the two textboxes
         /// </summary>
-        private void ScrollChanged(object sender, ScrollChangedEventArgs e)
-        {
+        private void ScrollChanged(object sender, ScrollChangedEventArgs e) =>
             LineTextBox.ScrollToVerticalOffset(MainTextBox.VerticalOffset);
-        }
+
 
         /// <summary>
         ///     Writes teh line numbers to the LineTextBox
@@ -427,6 +321,8 @@ namespace NotepadCore
         {
             if (e.Key == Key.Tab)
             {
+                if (MainTextBox.CaretPosition.Paragraph == null)
+                    return;
                 var start =
                     MainTextBox.CaretPosition.Paragraph.ContentStart.GetOffsetToPosition(MainTextBox.CaretPosition);
 
@@ -458,7 +354,7 @@ namespace NotepadCore
 
         /// <summary>
         ///     Saves the MainTextBox text to
-        /// </summary
+        /// </summary>
         public void SaveFile()
         {
             if (string.IsNullOrEmpty(_documentPath))
