@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
@@ -46,8 +47,15 @@ namespace NotepadCore
 
             if (_currentMatch == null || !_currentMatch.Success)
                 _currentMatch = FindRegex.Match(textRange.Text);
-            TextBox.Selection.Select(TextEditor.GetTextPointAt(textRange.Start, _currentMatch.Index),
-                TextEditor.GetTextPointAt(textRange.Start, _currentMatch.Index + _currentMatch.Length));
+            int lineNumber = 0;
+            for (; lineNumber < TextBox.Document.Blocks.Count; lineNumber++)
+                if (new TextRange(TextBox.Document.Blocks.ElementAt(lineNumber).ContentStart,
+                        TextBox.Document.Blocks.ElementAt(lineNumber).ContentEnd)
+                    .Contains(TextEditor.GetTextPointAt(textRange.Start, _currentMatch.Index)))
+                    break;
+            TextBox.Selection.Select(TextEditor.GetTextPointAt(textRange.Start, _currentMatch.Index - lineNumber * 2),
+                TextEditor.GetTextPointAt(textRange.Start,
+                    _currentMatch.Index + _currentMatch.Length - lineNumber * 2));
             _currentMatch = _currentMatch.NextMatch();
 
             _mw.Focus();
