@@ -1,4 +1,3 @@
-D:\Programi\C# programi\UI\WPF\NotepadCore\NotepadCore.UnitTests\bin\Debug\netcoreapp3.1\NotepadCore.exe
 D:\Programi\C# programi\UI\WPF\NotepadCore\NotepadCore.UnitTests\bin\Debug\netcoreapp3.1\NUnit3.TestAdapter.dll
 D:\Programi\C# programi\UI\WPF\NotepadCore\NotepadCore.UnitTests\bin\Debug\netcoreapp3.1\NUnit3.TestAdapter.pdb
 D:\Programi\C# programi\UI\WPF\NotepadCore\NotepadCore.UnitTests\bin\Debug\netcoreapp3.1\nunit.engine.dll
@@ -87,11 +86,12 @@ D:\Programi\C# programi\UI\WPF\NotepadCore\NotepadCore.UnitTests\bin\Debug\netco
 D:\Programi\C# programi\UI\WPF\NotepadCore\NotepadCore.UnitTests\bin\Debug\netcoreapp3.1\zh-Hant\Microsoft.TestPlatform.CommunicationUtilities.resources.dll
 D:\Programi\C# programi\UI\WPF\NotepadCore\NotepadCore.UnitTests\bin\Debug\netcoreapp3.1\zh-Hant\Microsoft.TestPlatform.CrossPlatEngine.resources.dll
 D:\Programi\C# programi\UI\WPF\NotepadCore\NotepadCore.UnitTests\bin\Debug\netcoreapp3.1\zh-Hant\Microsoft.VisualStudio.TestPlatform.Common.resources.dll
-D:\Programi\C# programi\UI\WPF\NotepadCore\NotepadCore.UnitTests\bin\Debug\netcoreapp3.1\NotepadCore.dll
-D:\Programi\C# programi\UI\WPF\NotepadCore\NotepadCore.UnitTests\bin\Debug\netcoreapp3.1\NotepadCore.pdb
 D:\Programi\C# programi\UI\WPF\NotepadCore\NotepadCore.UnitTests\obj\Debug\netcoreapp3.1\NotepadCore.UnitTests.csprojAssemblyReference.cache
 D:\Programi\C# programi\UI\WPF\NotepadCore\NotepadCore.UnitTests\obj\Debug\netcoreapp3.1\NotepadCore.UnitTests.AssemblyInfoInputs.cache
 D:\Programi\C# programi\UI\WPF\NotepadCore\NotepadCore.UnitTests\obj\Debug\netcoreapp3.1\NotepadCore.UnitTests.AssemblyInfo.cs
 D:\Programi\C# programi\UI\WPF\NotepadCore\NotepadCore.UnitTests\obj\Debug\netcoreapp3.1\NotepadCore.UnitTests.csproj.CopyComplete
 D:\Programi\C# programi\UI\WPF\NotepadCore\NotepadCore.UnitTests\obj\Debug\netcoreapp3.1\NotepadCore.UnitTests.dll
 D:\Programi\C# programi\UI\WPF\NotepadCore\NotepadCore.UnitTests\obj\Debug\netcoreapp3.1\NotepadCore.UnitTests.pdb
+D:\Programi\C# programi\UI\WPF\NotepadCore\NotepadCore.UnitTests\bin\Debug\netcoreapp3.1\NotepadCore.exe
+D:\Programi\C# programi\UI\WPF\NotepadCore\NotepadCore.UnitTests\bin\Debug\netcoreapp3.1\NotepadCore.dll
+D:\Programi\C# programi\UI\WPF\NotepadCore\NotepadCore.UnitTests\bin\Debug\netcoreapp3.1\NotepadCore.pdb
