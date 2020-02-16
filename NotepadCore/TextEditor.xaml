@@ -30,11 +30,13 @@
         </RichTextBox>
 
         <!-- Line Number Text Box -->
-        <RichTextBox x:Name="LineTextBox" Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" IsReadOnly="True"
+        <RichTextBox x:Name="LineTextBox" x:FieldModifier="public" Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" IsReadOnly="True"
                      ScrollViewer.CanContentScroll="False" Background="#FFABADB3"
                      ScrollViewer.ScrollChanged="ScrollChanged" BorderThickness="0">
             <FlowDocument LineHeight="1" TextAlignment="Right">
-                <Paragraph>test</Paragraph>
+                <Paragraph>
+                    <Run />
+                </Paragraph>
             </FlowDocument>
         </RichTextBox>
     </Grid>

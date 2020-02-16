@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Microsoft.Win32;
+using NotepadCore.Exceptions;
 
 namespace NotepadCore
 {
@@ -74,7 +75,7 @@ namespace NotepadCore
                     // saves the text from the TextEditor
                     ((Tabs.Items[i] as TabItem).Content as TextEditor).SaveFile();
                 }
-                catch (InvalidSaveLocation ex)
+                catch (InvalidSaveLocationException ex)
                 {
                     // select the tab without a save location and ask for a save location
                     if (!string.IsNullOrEmpty(((Tabs.Items[i] as TabItem).Content as TextEditor).Text))

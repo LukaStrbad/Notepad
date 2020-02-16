@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using NotepadCore.Exceptions;
 
 namespace NotepadCore
 {
@@ -158,10 +159,6 @@ namespace NotepadCore
             }
             set
             {
-                //var textRange = new TextRange(MainTextBox.Document.ContentStart,
-                //    MainTextBox.Document.ContentEnd);
-                //textRange.Text = value ?? "";
-
                 MainTextBox.Document.Blocks.Clear();
                 var paragraphs = value.Trim().Split(new[] {Environment.NewLine}, StringSplitOptions.None)
                     .Select(a => new Paragraph(new Run(a)));
@@ -412,7 +409,7 @@ namespace NotepadCore
         public void SaveFile()
         {
             if (string.IsNullOrEmpty(_documentPath))
-                throw new InvalidSaveLocation();
+                throw new InvalidSaveLocationException();
             File.WriteAllText(_documentPath, Text);
         }
 
