@@ -307,7 +307,7 @@ namespace NotepadCore
 
             foreach (var (matches, brush) in highlighter.GetMatches(textRange))
             {
-                foreach (Match match in matches)
+                foreach (var match in matches)
                 {
                     Dispatcher?.Invoke(() =>
                     {
@@ -374,12 +374,10 @@ namespace NotepadCore
             foreach (var paragraph in MainTextBox.Document.Blocks)
             {
                 var textRange = new TextRange(paragraph.ContentStart, paragraph.ContentEnd);
-                if (textRange.IsEmpty)
-                    return;
 
                 foreach (var (matches, brush) in highlighter.GetMatches(textRange))
                 {
-                    foreach (Match match in matches)
+                    foreach (var match in matches)
                     {
                         Dispatcher?.Invoke(() =>
                         {

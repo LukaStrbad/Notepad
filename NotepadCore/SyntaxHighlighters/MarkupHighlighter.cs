@@ -10,20 +10,21 @@ namespace NotepadCore.SyntaxHighlighters
     {
         private static readonly (Regex Pattern, SolidColorBrush Brush)[] Keywords =
         {
-            (new Regex(@"<\/?(?<tag>\w+)( |>?).*?>"), Brushes.Blue)
+            
+            (new Regex(@"(?<=<\/?)\w+(?=( |>?).*?>)"), Brushes.Blue)// (new Regex(@"<\/?(?<tag>\w+)( |>?).*?>"), Brushes.Blue)
         };
 
-        public IEnumerable<(MatchCollection Matches, SolidColorBrush Brush)> GetMatches(TextRange textRange,
+        public IEnumerable<(IEnumerable<Group> Matches, SolidColorBrush Brush)> GetMatches(TextRange textRange,
             bool multiline = false)
         {
-            var matches = new List<(MatchCollection Matches, SolidColorBrush Brush)>(Keywords.Length);
+            var matches = new List<(IEnumerable<Group> Matches, SolidColorBrush Brush)>(Keywords.Length);
 
             foreach (var (pattern, brush) in Keywords)
             {
                 matches.Add((pattern.Matches(textRange.Text), brush));
             }
 
-            return matches.Where(x => x.Matches.Count > 0);
+            return matches.Where(x => x.Matches.Any());
         }
     }
 }

@@ -38,23 +38,17 @@ namespace NotepadCore.SyntaxHighlighters
             (new Regex("//.*"), Brushes.Green)
         };
 
-        public static IEnumerable<(MatchCollection Matches, SolidColorBrush Brush)> GetMatches(TextRange textRange,
-            bool multiline = false)
+        IEnumerable<(IEnumerable<Group> Matches, SolidColorBrush Brush)> IHighlighter.GetMatches(TextRange textRange,
+            bool multiline)
         {
-            var matches = new List<(MatchCollection Matches, SolidColorBrush Brush)>(Keywords.Length);
+            var matches = new List<(IEnumerable<Group> Matches, SolidColorBrush Brush)>(Keywords.Length);
 
             foreach (var (pattern, brush) in Keywords)
             {
                 matches.Add((pattern.Matches(textRange.Text), brush));
             }
 
-            return matches.Where(x => x.Matches.Count > 0);
-        }
-
-        IEnumerable<(MatchCollection Matches, SolidColorBrush Brush)> IHighlighter.GetMatches(TextRange textRange,
-            bool multiline)
-        {
-            return GetMatches(textRange, multiline);
+            return matches.Where(x => x.Matches.Any());
         }
     }
 }
