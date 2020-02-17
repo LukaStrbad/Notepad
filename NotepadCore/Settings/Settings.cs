@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Media;
 using System.Xml.Serialization;
+using NotepadCore.ExtensionMethods;
 
-namespace NotepadCore
+namespace NotepadCore.Settings
 {
     /// <summary>
     ///     A class that stores user settings
@@ -14,13 +16,12 @@ namespace NotepadCore
         private static readonly string SavePath =
             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Data\settings.xml");
 
-        private static readonly Settings DefaultUserSettings = new Settings
+        private static readonly Settings DefaultSettings = new Settings
         {
-            FilePaths = new[] {""},
+            Editors = new[] {new EditorInfo() },
             EditorFontFamily = "Consolas",
             EditorFontSize = 12,
             TabSize = 4,
-            UseTabs = false,
             SelectedFileIndex = 0,
             ShowLineNumbers = true,
             UseSpaces = true
@@ -28,6 +29,7 @@ namespace NotepadCore
 
         private string _editorFontFamily;
         private int _editorFontSize;
+        private EditorInfo[] _editors;
 
         private string[] _filePaths;
         private int _selectedFileIndex;
@@ -35,6 +37,12 @@ namespace NotepadCore
 
         private Settings()
         {
+        }
+
+        public EditorInfo[] Editors
+        {
+            get => _editors.Distinct().ToArray();
+            set => _editors = value.Distinct().ToArray();
         }
 
         public string EditorFontFamily
@@ -48,7 +56,7 @@ namespace NotepadCore
                 }
                 catch
                 {
-                    _editorFontFamily = DefaultUserSettings.EditorFontFamily;
+                    _editorFontFamily = DefaultSettings.EditorFontFamily;
                 }
 
                 return _editorFontFamily;
@@ -76,7 +84,7 @@ namespace NotepadCore
             get
             {
                 if (!(_editorFontSize >= 8 && _editorFontSize <= 96))
-                    _editorFontSize = DefaultUserSettings.EditorFontSize;
+                    _editorFontSize = DefaultSettings.EditorFontSize;
 
                 return _editorFontSize;
             }
@@ -85,7 +93,7 @@ namespace NotepadCore
                 if (value >= 8 && value <= 96)
                     _editorFontSize = value;
                 else
-                    _editorFontSize = DefaultUserSettings.EditorFontSize;
+                    _editorFontSize = DefaultSettings.EditorFontSize;
             }
         }
 
@@ -97,7 +105,7 @@ namespace NotepadCore
             get
             {
                 if (_tabSize <= 0)
-                    _tabSize = DefaultUserSettings.TabSize;
+                    _tabSize = DefaultSettings.TabSize;
 
                 return _tabSize;
             }
@@ -106,39 +114,37 @@ namespace NotepadCore
                 if (value > 0)
                     _tabSize = value;
                 else
-                    _tabSize = DefaultUserSettings.TabSize;
+                    _tabSize = DefaultSettings.TabSize;
             }
         }
 
         /// <summary>
         ///     Gets saved file paths
         /// </summary>
-        public string[] FilePaths
-        {
-            get { return _filePaths.Select(x => x.ToLower()).Distinct().ToArray() ?? DefaultUserSettings.FilePaths; }
-            set => _filePaths = value.Select(x => x.ToLower()).Distinct().ToArray() ?? DefaultUserSettings.FilePaths;
-        }
+        // public string[] FilePaths
+        // {
+        //     get { return _filePaths.Select(x => x.ToLower()).Distinct().ToArray() ?? DefaultUserSettings.FilePaths; }
+        //     set => _filePaths = value.Select(x => x.ToLower()).Distinct().ToArray() ?? DefaultUserSettings.FilePaths;
+        // }
 
         public int SelectedFileIndex
         {
             get
             {
-                if (_selectedFileIndex >= 0 && _selectedFileIndex < FilePaths.Length)
+                if (_selectedFileIndex >= 0 && _selectedFileIndex < Editors.Length)
                     return _selectedFileIndex;
 
-                _selectedFileIndex = DefaultUserSettings.SelectedFileIndex;
+                _selectedFileIndex = DefaultSettings.SelectedFileIndex;
                 return _selectedFileIndex;
             }
             set
             {
-                if (_selectedFileIndex >= 0 && _selectedFileIndex < FilePaths.Length)
+                if (_selectedFileIndex >= 0 && _selectedFileIndex < Editors.Length)
                     _selectedFileIndex = value;
                 else
-                    _selectedFileIndex = DefaultUserSettings.SelectedFileIndex;
+                    _selectedFileIndex = DefaultSettings.SelectedFileIndex;
             }
         }
-
-        public bool UseTabs { get; set; }
 
         public bool ShowLineNumbers { get; set; } = true;
 
@@ -150,9 +156,9 @@ namespace NotepadCore
         /// <param name="path">Path to remove</param>
         private void RemoveFilePath(string path)
         {
-            // if there are multiple occurances
-            while (FilePaths.Contains(path))
-                FilePaths = FilePaths.Where(x => x != path).ToArray();
+            // if there are multiple occurrences
+            while (Editors.Select(x => x.FilePath).Contains(path))
+                Editors = Editors.Where(x => x.FilePath != path).ToArray();
         }
 
         /// <summary>
@@ -172,7 +178,7 @@ namespace NotepadCore
         public void AddFiles(params string[] paths)
         {
             // adds distinct paths to FilePaths setting
-            FilePaths = new[] {FilePaths, paths.ToArray()}.SelectMany(x => x).Distinct().ToArray();
+            Editors = new[] {Editors, paths.Select(x => new EditorInfo(HighlightingLanguage.None, x)).ToArray()}.SelectMany(x => x).Distinct().ToArray();
         }
 
         public void Save()
@@ -204,11 +210,11 @@ namespace NotepadCore
             {
                 using (var streamWriter = new StreamWriter(SavePath))
                 {
-                    serializer.Serialize(streamWriter, DefaultUserSettings);
+                    serializer.Serialize(streamWriter, DefaultSettings);
                 }
             }
 
-            return DefaultUserSettings;
+            return DefaultSettings;
         }
     }
 }

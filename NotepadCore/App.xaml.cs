@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System.Linq;
+using System.Windows;
+using NotepadCore.Settings;
 
 namespace NotepadCore
 {
@@ -11,10 +13,10 @@ namespace NotepadCore
         {
             if (e.Args.Length > 0)
             {
-                var userSettings = Settings.Create();
+                var userSettings = Settings.Settings.Create();
 
                 userSettings.AddFiles(e.Args);
-                userSettings.SelectedFileIndex = userSettings.FilePaths.Length - 1;
+                userSettings.SelectedFileIndex = userSettings.Editors.Length - 1;
                 userSettings.Save();
             }
         }

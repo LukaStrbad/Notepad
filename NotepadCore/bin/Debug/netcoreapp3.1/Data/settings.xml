@@ -1,14 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Editors>
+    <EditorInfo>
+      <HighlightingLanguage>None</HighlightingLanguage>
+      <FilePath>c:\users\luka\desktop\dat.txt</FilePath>
+    </EditorInfo>
+    <EditorInfo>
+      <HighlightingLanguage>CSharp</HighlightingLanguage>
+      <FilePath>C:\Users\Luka\Desktop\Program.cs</FilePath>
+    </EditorInfo>
+    <EditorInfo>
+      <HighlightingLanguage>MarkupLanguage</HighlightingLanguage>
+      <FilePath>D:\Programi\C# programi\UI\WPF\NotepadCore\NotepadCore\bin\Debug\netcoreapp3.1\Data\settings.xml</FilePath>
+    </EditorInfo>
+  </Editors>
   <EditorFontFamily>Consolas</EditorFontFamily>
   <EditorFontSize>12</EditorFontSize>
   <TabSize>4</TabSize>
-  <FilePaths>
-    <string>c:\users\luka\desktop\test.txt</string>
-    <string>c:\users\luka\desktop\dat.txt</string>
-  </FilePaths>
-  <SelectedFileIndex>0</SelectedFileIndex>
-  <UseTabs>false</UseTabs>
+  <SelectedFileIndex>1</SelectedFileIndex>
   <ShowLineNumbers>true</ShowLineNumbers>
   <UseSpaces>true</UseSpaces>
 </Settings>

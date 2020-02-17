@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using Microsoft.Win32;
 using NotepadCore.Exceptions;
+using NotepadCore.Settings;
 
 namespace NotepadCore
 {
@@ -16,25 +17,25 @@ namespace NotepadCore
     /// </summary>
     public partial class MainWindow : Window
     {
-        private string documentPath = "contents.txt";
-        private int newFileNumber = 1;
+        private string _documentPath = "contents.txt";
+        private int _newFileNumber = 1;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            var userSettings = Settings.Create();
+            var userSettings = Settings.Settings.Create();
 
             // if there are files, load them
-            if (userSettings.FilePaths.Length != 0)
+            if (userSettings.Editors.Length != 0)
             {
-                foreach (var i in userSettings.FilePaths)
+                foreach (var i in userSettings.Editors)
                     try
                     {
                         Tabs.Items.Insert(Tabs.Items.Count - 1, new TabItem
                         {
-                            Content = new TextEditor(i),
-                            Header = new FileInfo(i).Name
+                            Content = new TextEditor(i.FilePath) {FileLanguage = i.HighlightingLanguage},
+                            Header = new FileInfo(i.FilePath).Name
                         });
                     }
                     catch
@@ -50,7 +51,7 @@ namespace NotepadCore
                 Tabs.Items.Insert(Tabs.Items.Count - 1, new TabItem
                 {
                     Content = new TextEditor(),
-                    Header = $"*new file {newFileNumber++}"
+                    Header = $"*new file {_newFileNumber++}"
                 });
                 Tabs.SelectedIndex = 0;
             }
@@ -59,14 +60,14 @@ namespace NotepadCore
             ChangeFont();
         }
 
-        private TextEditor CurrentTextEditor => Tabs.SelectedContent as TextEditor;
+        public TextEditor CurrentTextEditor => Tabs.SelectedContent as TextEditor;
 
         /// <summary>
         ///     Writes the text from MainTextBox when the window closes
         /// </summary>
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            var userSettings = Settings.Create();
+            var userSettings = Settings.Settings.Create();
 
             // loop through Text Editors and save contents
             for (var i = 0; i < Tabs.Items.Count - 1; i++)
@@ -97,21 +98,21 @@ namespace NotepadCore
         /// </summary>
         private void FileNew_Click(object sender, RoutedEventArgs e)
         {
-            var userSettings = Settings.Create();
+            var userSettings = Settings.Settings.Create();
 
             var newDialog = new SaveFileDialog();
             newDialog.ShowDialog();
-            documentPath = newDialog.FileName;
+            _documentPath = newDialog.FileName;
 
-            if (!string.IsNullOrEmpty(documentPath))
+            if (!string.IsNullOrEmpty(_documentPath))
             {
                 // Adds new file path
-                userSettings.AddFiles(documentPath);
+                userSettings.AddFiles(_documentPath);
 
                 Tabs.Items.Insert(Tabs.Items.Count - 1, new TabItem
                 {
-                    Content = new TextEditor(documentPath),
-                    Header = new FileInfo(documentPath).Name
+                    Content = new TextEditor(_documentPath),
+                    Header = new FileInfo(_documentPath).Name
                 });
             }
 
@@ -123,30 +124,30 @@ namespace NotepadCore
         /// </summary>
         private void FileOpen_Click(object sender, RoutedEventArgs e)
         {
-            var userSettings = Settings.Create();
+            var userSettings = Settings.Settings.Create();
 
             var openDialog = new OpenFileDialog();
             openDialog.ShowDialog();
-            documentPath = openDialog.FileName;
+            _documentPath = openDialog.FileName;
 
-            if (!string.IsNullOrEmpty(documentPath))
+            if (!string.IsNullOrEmpty(_documentPath))
                 // writes the new file path to the constant Path.Document location
-                userSettings.AddFiles(documentPath);
+                userSettings.AddFiles(_documentPath);
 
             if (string.IsNullOrEmpty(CurrentTextEditor.Text))
             {
                 // if the selected TextEditor is empty, open a new one on the same spot
                 var item = Tabs.SelectedItem as TabItem;
-                item.Content = new TextEditor(documentPath);
-                item.Header = new FileInfo(documentPath).Name;
+                item.Content = new TextEditor(_documentPath);
+                item.Header = new FileInfo(_documentPath).Name;
             }
             else
             {
                 // else insert a new TextEditor on the end
                 Tabs.Items.Insert(Tabs.Items.Count - 1, new TabItem
                 {
-                    Content = new TextEditor(documentPath),
-                    Header = new FileInfo(documentPath).Name
+                    Content = new TextEditor(_documentPath),
+                    Header = new FileInfo(_documentPath).Name
                 });
 
                 Tabs.SelectedIndex = Tabs.Items.Count - 2;
@@ -157,9 +158,9 @@ namespace NotepadCore
 
         private void FileClose_Click(object sender, RoutedEventArgs e)
         {
-            var userSettings = Settings.Create();
+            var userSettings = Settings.Settings.Create();
 
-            var files = userSettings.FilePaths.ToList();
+            var files = userSettings.Editors.ToList();
             if (CurrentTextEditor.HasSaveLocation)
                 CurrentTextEditor.SaveFile();
 
@@ -176,7 +177,7 @@ namespace NotepadCore
                 files.RemoveAt(Tabs.SelectedIndex + 1);
             }
 
-            userSettings.FilePaths = files.ToArray();
+            userSettings.Editors = files.ToArray();
             userSettings.Save();
         }
 
@@ -185,7 +186,7 @@ namespace NotepadCore
         /// </summary>
         private void FileSave_Click(object sender, RoutedEventArgs e)
         {
-            var userSettings = Settings.Create();
+            var userSettings = Settings.Settings.Create();
 
             var textEdit = Tabs.SelectedContent as TextEditor;
             if (textEdit.HasSaveLocation)
@@ -200,9 +201,9 @@ namespace NotepadCore
                 if (string.IsNullOrEmpty(saveDialog.FileName))
                     return;
                 textEdit.DocumentPath = saveDialog.FileName; // sets the document path to that one in save file dialog
-                var paths = userSettings.FilePaths.ToList();
-                paths.Insert(Tabs.SelectedIndex, textEdit.DocumentPath);
-                userSettings.FilePaths = paths.ToArray();
+                var paths = userSettings.Editors.ToList();
+                paths.Insert(Tabs.SelectedIndex, new EditorInfo(HighlightingLanguage.None, textEdit.DocumentPath));
+                userSettings.Editors = paths.ToArray();
                 (Tabs.Items[Tabs.SelectedIndex] as TabItem).Header = textEdit.FileName;
 
                 userSettings.Save();
@@ -214,7 +215,7 @@ namespace NotepadCore
         /// </summary>
         private void FileSaveAs_Click(object sender, RoutedEventArgs e)
         {
-            var userSettings = Settings.Create();
+            var userSettings = Settings.Settings.Create();
 
             var textEditor = Tabs.SelectedContent as TextEditor;
             if (textEditor.HasSaveLocation) textEditor.SaveFile();
@@ -227,9 +228,9 @@ namespace NotepadCore
             textEditor.Text = textEditorText;
 
             // change file paths
-            var files = userSettings.FilePaths.ToList();
+            var files = userSettings.Editors.ToList();
             files.RemoveAt(Tabs.SelectedIndex);
-            userSettings.FilePaths = files.ToArray();
+            userSettings.Editors = files.ToArray();
 
             userSettings.Save();
 
@@ -242,7 +243,7 @@ namespace NotepadCore
         /// </summary>
         private void ChangeFontDialog_Click(object sender, RoutedEventArgs e)
         {
-            var userSettings = Settings.Create();
+            var userSettings = Settings.Settings.Create();
 
             var fontDialog = new FontWindow();
             fontDialog.ShowDialog();
@@ -260,7 +261,7 @@ namespace NotepadCore
         /// </summary>
         public void ChangeFont()
         {
-            var userSettings = Settings.Create();
+            var userSettings = Settings.Settings.Create();
 
             foreach (var textEdit in GetTextEditors())
             {
@@ -323,7 +324,7 @@ namespace NotepadCore
                 Tabs.Items.Insert(Tabs.Items.Count - 1, new TabItem
                 {
                     Content = new TextEditor(),
-                    Header = $"*new file {newFileNumber++}"
+                    Header = $"*new file {_newFileNumber++}"
                 });
                 Tabs.SelectedIndex--;
             }
@@ -348,7 +349,7 @@ namespace NotepadCore
 
         private void About_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("");
+            MessageBox.Show("Icon made by https://www.flaticon.com/authors/smashicons from www.flaticon.com");
             // Icon made by https://www.flaticon.com/authors/smashicons from www.flaticon.com
         }
     }

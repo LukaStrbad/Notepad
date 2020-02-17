@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="C:\Users\Luka\.nuget\packages\microsoft.net.test.sdk\16.4.0\build\netcoreapp2.1" t="Include">
+      <e p="Microsoft.NET.Test.Sdk.Program.cs" t="Include" />
+    </e>
+    <e p="C:\Users\Luka\.nuget\packages\microsoft.testplatform.testhost\16.4.0\build\netcoreapp2.1\x64\testhost.dll" t="Include" />
+    <e p="C:\Users\Luka\.nuget\packages\microsoft.testplatform.testhost\16.4.0\build\netcoreapp2.1\x64\testhost.exe" t="Include" />
+    <e p="C:\Users\Luka\.nuget\packages\nunit3testadapter\3.15.1\build\netcoreapp2.0\nunit.engine.api.dll" t="Include" />
+    <e p="C:\Users\Luka\.nuget\packages\nunit3testadapter\3.15.1\build\netcoreapp2.0\nunit.engine.dll" t="Include" />
+    <e p="C:\Users\Luka\.nuget\packages\nunit3testadapter\3.15.1\build\netcoreapp2.0\NUnit3.TestAdapter.dll" t="Include" />
+    <e p="C:\Users\Luka\.nuget\packages\nunit3testadapter\3.15.1\build\netcoreapp2.0\NUnit3.TestAdapter.pdb" t="Include" />
+    <e p="C:\Users\Luka\.Rider2019.3\system\extResources" t="IncludeRecursive" />
+    <e p="C:\Users\Luka\.Rider2019.3\system\resharper-host\local\Transient\ReSharperHost\v193\SolutionCaches\_NotepadCore.853973871.00" t="ExcludeRecursive" />
+    <e p="D:\Programi\C# programi\UI\WPF\NotepadCore" t="IncludeFlat">
+      <e p="NotepadCore" t="IncludeRecursive">
+        <e p="App.xaml" t="Include" />
+        <e p="App.xaml.cs" t="Include" />
+        <e p="AssemblyInfo.cs" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="Exceptions" t="Include">
+          <e p="InvalidSaveLocationException.cs" t="Include" />
+        </e>
+        <e p="ExtensionMethods" t="Include">
+          <e p="IEnumerableExtensions.cs" t="Include" />
+          <e p="StringExtension.cs" t="Include" />
+        </e>
+        <e p="Find.xaml" t="Include" />
+        <e p="Find.xaml.cs" t="Include" />
+        <e p="FindReplace.xaml" t="Include" />
+        <e p="FindReplace.xaml.cs" t="Include" />
+        <e p="FontWindow.xaml" t="Include" />
+        <e p="FontWindow.xaml.cs" t="Include" />
+        <e p="Icons" t="Include">
+          <e p="notepad.svg" t="Include" />
+          <e p="notepad_icon.png" t="Include" />
+        </e>
+        <e p="MainWindow.xaml" t="Include" />
+        <e p="MainWindow.xaml.cs" t="Include" />
+        <e p="notepad.png" t="Include" />
+        <e p="NotepadCore.csproj" t="IncludeRecursive" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.1" t="Include">
+              <e p="App.g.cs" t="Include" />
+              <e p="Find.g.cs" t="Include" />
+              <e p="FindReplace.g.cs" t="Include" />
+              <e p="FontWindow.g.cs" t="Include" />
+              <e p="MainWindow.g.cs" t="Include" />
+              <e p="NotepadCore.AssemblyInfo.cs" t="Include" />
+              <e p="SettingsWindow.g.cs" t="Include" />
+              <e p="TextEditor.g.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="Properties" t="Include">
+          <e p="PublishProfiles" t="Include">
+            <e p="FolderProfile.pubxml" t="Include" />
+          </e>
+        </e>
+        <e p="Settings" t="Include">
+          <e p="EditorInfo.cs" t="Include" />
+          <e p="Settings.cs" t="Include" />
+        </e>
+        <e p="SettingsWindow.xaml" t="Include" />
+        <e p="SettingsWindow.xaml.cs" t="Include" />
+        <e p="SyntaxHighlighters" t="Include">
+          <e p="CSharpHighlighter.cs" t="Include" />
+          <e p="EmptyHighlighter.cs" t="Include" />
+          <e p="IHighlighter.cs" t="Include" />
+          <e p="MarkupHighlighter.cs" t="Include" />
+        </e>
+        <e p="TextEditor.xaml" t="Include" />
+        <e p="TextEditor.xaml.cs" t="Include" />
+      </e>
+      <e p="NotepadCore.sln" t="IncludeFlat" />
+      <e p="NotepadCore.UnitTests" t="IncludeRecursive">
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="NotepadCore.UnitTests.csproj" t="IncludeRecursive" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.1" t="Include">
+              <e p="NotepadCore.UnitTests.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="testFile.txt" t="Include" />
+        <e p="TextEditorTests.cs" t="Include" />
+      </e>
+      <e p="packages" t="ExcludeRecursive" />
+    </e>
+  </component>
+</project>

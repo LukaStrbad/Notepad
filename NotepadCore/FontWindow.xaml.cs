@@ -15,7 +15,7 @@ namespace NotepadCore
         {
             InitializeComponent();
 
-            var userSettings = Settings.Create();
+            var userSettings = Settings.Settings.Create();
 
             // write font sizes from 8 to 96
             for (var i = 8; i <= 96; i++) FontSizeChooseListBox.Items.Add(i.ToString());

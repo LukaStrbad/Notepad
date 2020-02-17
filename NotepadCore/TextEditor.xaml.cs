@@ -11,7 +11,9 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Navigation;
 using NotepadCore.Exceptions;
+using NotepadCore.SyntaxHighlighters;
 
 namespace NotepadCore
 {
@@ -43,14 +45,31 @@ namespace NotepadCore
         private string _documentPath;
         private Task _highlightTask;
         private int _oldNumberOfLines = -1;
+        private HighlightingLanguage _fileLanguage;
 
         private int _tabSize;
+
+        public HighlightingLanguage FileLanguage
+        {
+            get => _fileLanguage;
+            set
+            {
+                LanguageComboBox.SelectedItem = value;
+                _fileLanguage = value;
+
+                var userSettings = Settings.Settings.Create();
+                foreach (var editor in userSettings.Editors)
+                    if (editor.FilePath?.ToLower() == _documentPath?.ToLower() && _documentPath != null)
+                        editor.HighlightingLanguage = value;
+                userSettings?.Save();
+            }
+        }
 
         public TextEditor()
         {
             InitializeComponent();
 
-            var userSettings = Settings.Create();
+            var userSettings = Settings.Settings.Create();
 
             MainTextBox.Focus();
 
@@ -59,6 +78,10 @@ namespace NotepadCore
             TabSize = userSettings.TabSize;
             ShowLineNumbers = userSettings.ShowLineNumbers;
 
+            FileLanguage = HighlightingLanguage.None;
+
+            LanguageComboBox.SelectedIndex = 0;
+
             _cts = new CancellationTokenSource();
         }
 
@@ -66,7 +89,7 @@ namespace NotepadCore
         {
             InitializeComponent();
 
-            var userSettings = Settings.Create();
+            var userSettings = Settings.Settings.Create();
 
             _documentPath = documentPath;
 
@@ -86,6 +109,19 @@ namespace NotepadCore
 
             TabSize = userSettings.TabSize;
             ShowLineNumbers = userSettings.ShowLineNumbers;
+
+            var fileInfo = new FileInfo(_documentPath);
+
+            FileLanguage = fileInfo.Extension switch
+            {
+                ".cs" => HighlightingLanguage.CSharp,
+                _ => HighlightingLanguage.None
+            };
+
+            if (fileInfo.Extension.EndsWith("ml"))
+                FileLanguage = HighlightingLanguage.MarkupLanguage;
+
+            LanguageComboBox.SelectedItem = FileLanguage;
 
             _cts = new CancellationTokenSource();
         }
@@ -163,7 +199,13 @@ namespace NotepadCore
                 var paragraphs = value.Trim().Split(new[] {Environment.NewLine}, StringSplitOptions.None)
                     .Select(a => new Paragraph(new Run(a)));
                 MainTextBox.Document.Blocks.AddRange(paragraphs);
-                HighlightAllBlocks();
+                try
+                {
+                    HighlightAllBlocks();
+                }
+                catch
+                {
+                }
             }
         }
 
@@ -172,7 +214,7 @@ namespace NotepadCore
         /// </summary>
         private void ChangeFont()
         {
-            var userSettings = Settings.Create();
+            var userSettings = Settings.Settings.Create();
 
             var ff = new FontFamily(userSettings.EditorFontFamily);
 
@@ -206,6 +248,8 @@ namespace NotepadCore
             if (!_changedLines.Contains(MainTextBox.CaretPosition.Paragraph))
                 _changedLines.Add(MainTextBox.CaretPosition.Paragraph);
 
+            HighlightCurrentLine();
+            return;
             if (_cts != null)
             {
                 _cts.Cancel();
@@ -243,12 +287,39 @@ namespace NotepadCore
             return ret;
         }
 
-        private async void HighlightCurrentLine(CancellationToken cancellationToken = default)
+        private void HighlightCurrentLine(CancellationToken cancellationToken = default)
         {
+            if (FileLanguage == HighlightingLanguage.None) return;
             if (MainTextBox.CaretPosition.Paragraph == null)
                 return;
             MainTextBox.TextChanged -= MainTextBox_TextChanged;
 
+            var textRange = new TextRange(MainTextBox.CaretPosition.Paragraph.ContentStart,
+                MainTextBox.CaretPosition.Paragraph.ContentEnd);
+            textRange.ClearAllProperties();
+
+            IHighlighter highlighter = FileLanguage switch
+            {
+                HighlightingLanguage.CSharp => new CSharpHighlighter(),
+                HighlightingLanguage.MarkupLanguage => new MarkupHighlighter(),
+                _ => new EmptyHighlighter()
+            };
+
+            foreach (var (matches, brush) in highlighter.GetMatches(textRange))
+            {
+                foreach (Match match in matches)
+                {
+                    Dispatcher?.Invoke(() =>
+                    {
+                        new TextRange(GetTextPointAt(textRange.Start, match.Index),
+                                GetTextPointAt(textRange.Start, match.Index + match.Length))
+                            .ApplyPropertyValue(TextElement.ForegroundProperty, brush);
+                    });
+                }
+            }
+
+            MainTextBox.TextChanged += MainTextBox_TextChanged;
+            return;
             Dispatcher?.Invoke(() =>
             {
                 try
@@ -291,44 +362,34 @@ namespace NotepadCore
 
         private void HighlightAllBlocks()
         {
-            MainTextBox.TextChanged -= MainTextBox_TextChanged;
+            if (MainTextBox.Document == null) return;
 
-            Dispatcher?.Invoke(() =>
+            IHighlighter highlighter = FileLanguage switch
             {
-                for (var i = 0; i < MainTextBox.Document.Blocks.Count; i++)
+                HighlightingLanguage.CSharp => new CSharpHighlighter(),
+                HighlightingLanguage.MarkupLanguage => new MarkupHighlighter(),
+                _ => new EmptyHighlighter()
+            };
+
+            foreach (var paragraph in MainTextBox.Document.Blocks)
+            {
+                var textRange = new TextRange(paragraph.ContentStart, paragraph.ContentEnd);
+                if (textRange.IsEmpty)
+                    return;
+
+                foreach (var (matches, brush) in highlighter.GetMatches(textRange))
                 {
-                    var textRange = new TextRange(MainTextBox.Document.Blocks.ElementAt(i).ContentStart,
-                        MainTextBox.Document.Blocks.ElementAt(i).ContentEnd);
-                    textRange.ClearAllProperties();
-
-                    foreach (var tuple in _keywords)
+                    foreach (Match match in matches)
                     {
-                        var pattern = new Regex($@"(?<!\w)({string.Join("|", tuple.Keywords)})(?!\w)");
-                        foreach (Match match in pattern.Matches(textRange.Text))
-                            Dispatcher.Invoke(() =>
-                            {
-                                new TextRange(GetTextPointAt(textRange.Start, match.Index),
-                                        GetTextPointAt(textRange.Start, match.Index + match.Length))
-                                    .ApplyPropertyValue(TextElement.ForegroundProperty, tuple.Brush);
-                            });
-                    }
-
-                    var stringMatches = new Regex(@"""(\\""|[^""])*""").Matches(textRange.Text);
-                    if (stringMatches.Count > 0)
-                        foreach (Match match in stringMatches)
+                        Dispatcher?.Invoke(() =>
+                        {
                             new TextRange(GetTextPointAt(textRange.Start, match.Index),
                                     GetTextPointAt(textRange.Start, match.Index + match.Length))
-                                .ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.SaddleBrown);
-
-
-                    var commentMatch = new Regex("//.*").Match(textRange.Text);
-                    if (commentMatch.Success)
-                        new TextRange(GetTextPointAt(textRange.Start, commentMatch.Index), textRange.End)
-                            .ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.Green);
+                                .ApplyPropertyValue(TextElement.ForegroundProperty, brush);
+                        });
+                    }
                 }
-            });
-
-            MainTextBox.TextChanged += MainTextBox_TextChanged;
+            }
         }
 
 
@@ -378,7 +439,7 @@ namespace NotepadCore
                     MainTextBox.CaretPosition.Paragraph.ContentStart.GetOffsetToPosition(MainTextBox.CaretPosition);
 
                 // If UseSpaces is true insert TabSize amount of spaces
-                if (Settings.Create().UseSpaces)
+                if (Settings.Settings.Create().UseSpaces)
                 {
                     MainTextBox.CaretPosition.InsertTextInRun(new string(' ', TabSize));
 
@@ -417,5 +478,27 @@ namespace NotepadCore
         {
             e.Handled = true;
         }
+
+        private void LanguageComboBox_OnSelectionChanged(object sender, RoutedEventArgs e)
+        {
+            FileLanguage = (HighlightingLanguage) LanguageComboBox.SelectedItem;
+            MainTextBox.TextChanged -= MainTextBox_TextChanged;
+            try
+            {
+                HighlightAllBlocks();
+            }
+            catch
+            {
+            }
+
+            MainTextBox.TextChanged += MainTextBox_TextChanged;
+        }
+    }
+
+    public enum HighlightingLanguage
+    {
+        None,
+        CSharp,
+        MarkupLanguage
     }
 }

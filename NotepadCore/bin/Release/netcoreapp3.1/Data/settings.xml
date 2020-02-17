@@ -5,9 +5,9 @@
   <TabSize>4</TabSize>
   <FilePaths>
     <string>data\contents.txt</string>
-    <string>C:\Users\Luka\Desktop\test.txt</string>
+    <string>c:\users\luka\desktop\test.txt</string>
   </FilePaths>
-  <SelectedFileIndex>0</SelectedFileIndex>
+  <SelectedFileIndex>1</SelectedFileIndex>
   <UseTabs>false</UseTabs>
   <ShowLineNumbers>true</ShowLineNumbers>
   <UseSpaces>true</UseSpaces>

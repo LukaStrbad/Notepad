@@ -4,12 +4,20 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:NotepadCore"
+             xmlns:System="clr-namespace:System;assembly=System.Runtime"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800" Loaded="UserControl_Loaded" LostFocus="UserControl_LostFocus">
-
+    <UserControl.Resources>
+        <ObjectDataProvider x:Key="DataFromEnum" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="local:HighlightingLanguage"></x:Type>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />
+            <RowDefinition Height="20" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="50" />
@@ -17,7 +25,7 @@
         </Grid.ColumnDefinitions>
 
         <!-- Editing TextBox -->
-        <RichTextBox x:Name="MainTextBox" x:FieldModifier="public" Grid.Row="1" Grid.RowSpan="2" Grid.Column="1"
+        <RichTextBox x:Name="MainTextBox" x:FieldModifier="public" Grid.Row="0" Grid.Column="1"
                      HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" AcceptsReturn="True"
                      TextChanged="MainTextBox_TextChanged" ScrollViewer.ScrollChanged="ScrollChanged"
                      BorderThickness="0" Keyboard.PreviewKeyDown="MainTextBox_KeyDown"
@@ -30,7 +38,7 @@
         </RichTextBox>
 
         <!-- Line Number Text Box -->
-        <RichTextBox x:Name="LineTextBox" x:FieldModifier="public" Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" IsReadOnly="True"
+        <RichTextBox x:Name="LineTextBox" x:FieldModifier="public" Grid.Row="0" Grid.Column="0" IsReadOnly="True"
                      ScrollViewer.CanContentScroll="False" Background="#FFABADB3"
                      ScrollViewer.ScrollChanged="ScrollChanged" BorderThickness="0">
             <FlowDocument LineHeight="1" TextAlignment="Right">
@@ -39,5 +47,12 @@
                 </Paragraph>
             </FlowDocument>
         </RichTextBox>
+
+        <StatusBar Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+            <StatusBarItem Padding="0" Margin="0">
+                <ComboBox x:Name="LanguageComboBox" SelectedIndex="0" FontSize="10" Padding="0" Margin="0"
+                           ItemsSource="{Binding Source={StaticResource DataFromEnum}}" SelectionChanged="LanguageComboBox_OnSelectionChanged" />
+            </StatusBarItem>
+        </StatusBar>
     </Grid>
 </UserControl>
