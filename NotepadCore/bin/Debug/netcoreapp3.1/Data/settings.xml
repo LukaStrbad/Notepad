@@ -13,11 +13,15 @@
       <HighlightingLanguage>MarkupLanguage</HighlightingLanguage>
       <FilePath>D:\Programi\C# programi\UI\WPF\NotepadCore\NotepadCore\bin\Debug\netcoreapp3.1\Data\settings.xml</FilePath>
     </EditorInfo>
+    <EditorInfo>
+      <HighlightingLanguage>CSharp</HighlightingLanguage>
+      <FilePath>D:\Programi\C# programi\Console\Test Core\Program.cs</FilePath>
+    </EditorInfo>
   </Editors>
   <EditorFontFamily>Consolas</EditorFontFamily>
   <EditorFontSize>12</EditorFontSize>
   <TabSize>4</TabSize>
-  <SelectedFileIndex>2</SelectedFileIndex>
+  <SelectedFileIndex>3</SelectedFileIndex>
   <ShowLineNumbers>true</ShowLineNumbers>
   <UseSpaces>true</UseSpaces>
 </Settings>

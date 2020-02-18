@@ -67,6 +67,7 @@
         <e p="SyntaxHighlighters" t="Include">
           <e p="CSharpHighlighter.cs" t="Include" />
           <e p="EmptyHighlighter.cs" t="Include" />
+          <e p="HighlightingLanguage.cs" t="Include" />
           <e p="IHighlighter.cs" t="Include" />
           <e p="MarkupHighlighter.cs" t="Include" />
         </e>

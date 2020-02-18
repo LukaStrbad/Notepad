@@ -18,7 +18,7 @@ namespace NotepadCore.SyntaxHighlighters
             "object", "operator", "out", "override", "params", "private", "protected", "public", "readonly", "ref",
             "return", "sbyte", "sealed", "short", "sizeof", "stackalloc", "static", "string", "struct", "this",
             "throw",
-            "true", "typeof", "uint", "ulong", "unchecked", "unsafe", "ushort", "using", "virtual", "void",
+            "true", "typeof", "uint", "ulong", "unchecked", "unsafe", "ushort", "using", "var", "virtual", "void",
             "volatile"
         };
 
@@ -28,9 +28,8 @@ namespace NotepadCore.SyntaxHighlighters
             "while"
         };
 
-        private static readonly (Regex Pattern, SolidColorBrush Brush)[] Keywords =
+        private new static (Regex Pattern, SolidColorBrush Brush)[] Keywords => new []
         {
-            // var pattern = new Regex($@"(?<!\w)({string.Join("|", tuple.Keywords)})(?!\w)");
             (new Regex($@"(?<!\w)({string.Join("|", _keywords1)})(?!\w)"), Brushes.Blue),
             (new Regex($@"(?<!\w)({string.Join("|", _keywords2)})(?!\w)"),
                 Brushes.Purple),
@@ -41,14 +40,21 @@ namespace NotepadCore.SyntaxHighlighters
         IEnumerable<(IEnumerable<Group> Matches, SolidColorBrush Brush)> IHighlighter.GetMatches(TextRange textRange,
             bool multiline)
         {
+            if (multiline) return GetMultilineMatches(textRange);
+            
             var matches = new List<(IEnumerable<Group> Matches, SolidColorBrush Brush)>(Keywords.Length);
-
+        
             foreach (var (pattern, brush) in Keywords)
             {
                 matches.Add((pattern.Matches(textRange.Text), brush));
             }
-
+        
             return matches.Where(x => x.Matches.Any());
+        }
+
+        IEnumerable<(IEnumerable<Group> Matches, SolidColorBrush Brush)> GetMultilineMatches(TextRange textRange)
+        {
+            return null;
         }
     }
 }

@@ -9,6 +9,7 @@ using System.Windows.Media;
 using Microsoft.Win32;
 using NotepadCore.Exceptions;
 using NotepadCore.Settings;
+using NotepadCore.SyntaxHighlighters;
 
 namespace NotepadCore
 {

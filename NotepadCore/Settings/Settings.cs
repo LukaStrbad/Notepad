@@ -5,13 +5,14 @@ using System.Linq;
 using System.Windows.Media;
 using System.Xml.Serialization;
 using NotepadCore.ExtensionMethods;
+using NotepadCore.SyntaxHighlighters;
 
 namespace NotepadCore.Settings
 {
     /// <summary>
     ///     A class that stores user settings
     /// </summary>
-    public class Settings
+    public sealed class Settings
     {
         private static readonly string SavePath =
             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Data\settings.xml");
@@ -31,7 +32,6 @@ namespace NotepadCore.Settings
         private int _editorFontSize;
         private EditorInfo[] _editors;
 
-        private string[] _filePaths;
         private int _selectedFileIndex;
         private int _tabSize;
 

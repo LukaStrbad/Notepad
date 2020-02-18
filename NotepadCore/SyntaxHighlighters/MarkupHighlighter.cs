@@ -14,8 +14,8 @@ namespace NotepadCore.SyntaxHighlighters
             (new Regex(@"(?<=<\/?)\w+(?=( |>?).*?>)"), Brushes.Blue)// (new Regex(@"<\/?(?<tag>\w+)( |>?).*?>"), Brushes.Blue)
         };
 
-        public IEnumerable<(IEnumerable<Group> Matches, SolidColorBrush Brush)> GetMatches(TextRange textRange,
-            bool multiline = false)
+        IEnumerable<(IEnumerable<Group> Matches, SolidColorBrush Brush)> IHighlighter.GetMatches(TextRange textRange,
+            bool multiline)
         {
             var matches = new List<(IEnumerable<Group> Matches, SolidColorBrush Brush)>(Keywords.Length);
 

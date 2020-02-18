@@ -24,23 +24,6 @@ namespace NotepadCore
     {
         private readonly List<Paragraph> _changedLines = new List<Paragraph>();
 
-        private readonly (string[] Keywords, SolidColorBrush Brush)[] _keywords =
-        {
-            (new[]
-            {
-                "abstract", "as", "base", "bool", "break", "byte", "char", "checked", "class", "const", "decimal",
-                "default", "delegate", "double", "enum", "event", "explicit", "extern", "false", "fixed", "float",
-                "implicit", "in", "int", "interface", "internal", "is", "lock", "long", "namespace", "new", "null",
-                "object", "operator", "out", "override", "params", "private", "protected", "public", "readonly", "ref",
-                "return", "sbyte", "sealed", "short", "sizeof", "stackalloc", "static", "string", "struct", "this",
-                "throw",
-                "true", "typeof", "uint", "ulong", "unchecked", "unsafe", "ushort", "using", "virtual", "void",
-                "volatile"
-            }, Brushes.Blue),
-            (new[] {"case", "catch", "continue", "do", "else", "finally", "for", "foreach", "goto", "if", "switch", "try", "while"},
-                Brushes.Purple)
-        };
-
         private CancellationTokenSource _cts;
         private string _documentPath;
         private Task _highlightTask;
@@ -64,6 +47,14 @@ namespace NotepadCore
                 userSettings?.Save();
             }
         }
+
+        private IHighlighter Highlighter =>
+            FileLanguage switch
+            {
+                HighlightingLanguage.CSharp => new CSharpHighlighter(),
+                HighlightingLanguage.MarkupLanguage => new MarkupHighlighter(),
+                _ => new EmptyHighlighter()
+            };
 
         public TextEditor()
         {
@@ -298,14 +289,7 @@ namespace NotepadCore
                 MainTextBox.CaretPosition.Paragraph.ContentEnd);
             textRange.ClearAllProperties();
 
-            IHighlighter highlighter = FileLanguage switch
-            {
-                HighlightingLanguage.CSharp => new CSharpHighlighter(),
-                HighlightingLanguage.MarkupLanguage => new MarkupHighlighter(),
-                _ => new EmptyHighlighter()
-            };
-
-            foreach (var (matches, brush) in highlighter.GetMatches(textRange))
+            foreach (var (matches, brush) in Highlighter.GetMatches(textRange))
             {
                 foreach (var match in matches)
                 {
@@ -320,74 +304,29 @@ namespace NotepadCore
 
             MainTextBox.TextChanged += MainTextBox_TextChanged;
             return;
-            Dispatcher?.Invoke(() =>
-            {
-                try
-                {
-                    var textRange = new TextRange(MainTextBox.CaretPosition.Paragraph.ContentStart,
-                        MainTextBox.CaretPosition.Paragraph.ContentEnd);
-                    textRange.ClearAllProperties();
-
-                    foreach (var tuple in _keywords)
-                    {
-                        var pattern = new Regex($@"(?<!\w)({string.Join("|", tuple.Keywords)})(?!\w)");
-                        foreach (Match match in pattern.Matches(textRange.Text))
-                            Dispatcher.Invoke(() =>
-                            {
-                                new TextRange(GetTextPointAt(textRange.Start, match.Index),
-                                        GetTextPointAt(textRange.Start, match.Index + match.Length))
-                                    .ApplyPropertyValue(TextElement.ForegroundProperty, tuple.Brush);
-                            });
-                    }
-
-                    var stringMatches = new Regex(@"""(\\""|[^""])*""").Matches(textRange.Text);
-                    if (stringMatches.Count > 0)
-                        foreach (Match match in stringMatches)
-                            new TextRange(GetTextPointAt(textRange.Start, match.Index),
-                                    GetTextPointAt(textRange.Start, match.Index + match.Length))
-                                .ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.SaddleBrown);
-
-
-                    var commentMatch = new Regex("//.*").Match(textRange.Text);
-                    if (commentMatch.Success)
-                        new TextRange(GetTextPointAt(textRange.Start, commentMatch.Index), textRange.End)
-                            .ApplyPropertyValue(TextElement.ForegroundProperty, Brushes.Green);
-                }
-                catch (Exception ex)
-                {
-                }
-            });
-            MainTextBox.TextChanged += MainTextBox_TextChanged;
         }
 
         private void HighlightAllBlocks()
         {
-            if (MainTextBox.Document == null) return;
+            if (MainTextBox == null) return;
 
-            IHighlighter highlighter = FileLanguage switch
+            Dispatcher?.Invoke(() =>
             {
-                HighlightingLanguage.CSharp => new CSharpHighlighter(),
-                HighlightingLanguage.MarkupLanguage => new MarkupHighlighter(),
-                _ => new EmptyHighlighter()
-            };
-
-            foreach (var paragraph in MainTextBox.Document.Blocks)
-            {
-                var textRange = new TextRange(paragraph.ContentStart, paragraph.ContentEnd);
-
-                foreach (var (matches, brush) in highlighter.GetMatches(textRange))
+                foreach (var paragraph in MainTextBox.Document.Blocks.ToArray())
                 {
-                    foreach (var match in matches)
+                    var textRange = new TextRange(paragraph.ContentStart, paragraph.ContentEnd);
+
+                    foreach (var (matches, brush) in Highlighter.GetMatches(textRange))
                     {
-                        Dispatcher?.Invoke(() =>
+                        foreach (var match in matches)
                         {
                             new TextRange(GetTextPointAt(textRange.Start, match.Index),
                                     GetTextPointAt(textRange.Start, match.Index + match.Length))
                                 .ApplyPropertyValue(TextElement.ForegroundProperty, brush);
-                        });
+                        }
                     }
                 }
-            }
+            });
         }
 
 
@@ -405,10 +344,8 @@ namespace NotepadCore
         /// <summary>
         ///     Synchronizes the scroll of the two textboxes
         /// </summary>
-        private void ScrollChanged(object sender, ScrollChangedEventArgs e)
-        {
+        private void ScrollChanged(object sender, ScrollChangedEventArgs e) =>
             LineTextBox.ScrollToVerticalOffset(MainTextBox.VerticalOffset);
-        }
 
 
         /// <summary>
@@ -491,12 +428,5 @@ namespace NotepadCore
 
             MainTextBox.TextChanged += MainTextBox_TextChanged;
         }
-    }
-
-    public enum HighlightingLanguage
-    {
-        None,
-        CSharp,
-        MarkupLanguage
     }
 }
