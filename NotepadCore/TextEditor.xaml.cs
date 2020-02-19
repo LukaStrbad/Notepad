@@ -309,7 +309,18 @@ namespace NotepadCore
         private void HighlightAllBlocks()
         {
             if (MainTextBox == null) return;
+            var textRange = new TextRange(MainTextBox.Document.ContentStart, MainTextBox.Document.ContentEnd);
+            foreach (var (matches, brush) in Highlighter.GetMatches(textRange))
+            {
+                foreach (var match in matches)
+                {
+                    new TextRange(GetTextPointAt(textRange.Start, match.Index),
+                            GetTextPointAt(textRange.Start, match.Index + match.Length))
+                        .ApplyPropertyValue(TextElement.ForegroundProperty, brush);
+                }
+            }
 
+            return;
             Dispatcher?.Invoke(() =>
             {
                 foreach (var paragraph in MainTextBox.Document.Blocks.ToArray())
