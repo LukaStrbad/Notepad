@@ -60,7 +60,7 @@
         </e>
         <e p="Settings" t="Include">
           <e p="EditorInfo.cs" t="Include" />
-          <e p="Settings.cs" t="Include" />
+          <e p="UserSettings.cs" t="Include" />
         </e>
         <e p="SettingsWindow.xaml" t="Include" />
         <e p="SettingsWindow.xaml.cs" t="Include" />
@@ -85,6 +85,7 @@
             </e>
           </e>
         </e>
+        <e p="SettingsTests.cs" t="Include" />
         <e p="testFile.txt" t="Include" />
         <e p="TextEditorTests.cs" t="Include" />
       </e>

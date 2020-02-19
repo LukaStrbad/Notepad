@@ -15,7 +15,7 @@ namespace NotepadCore.SyntaxHighlighters
         /// <param name="textRange"></param>
         /// <param name="multiline"></param>
         /// <returns></returns>
-        IEnumerable<(IEnumerable<Group> Matches, SolidColorBrush Brush)> GetMatches(TextRange textRange,
+        IEnumerable<((int Index, int Length) Match, SolidColorBrush Brush)> GetMatches(TextRange textRange,
             bool multiline = false);
     }
 }

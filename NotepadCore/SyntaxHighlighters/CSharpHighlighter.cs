@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
+using NotepadCore.ExtensionMethods;
 
 namespace NotepadCore.SyntaxHighlighters
 {
@@ -28,7 +29,7 @@ namespace NotepadCore.SyntaxHighlighters
             "while"
         };
 
-        private new static (Regex Pattern, SolidColorBrush Brush)[] Keywords => new []
+        private new static (Regex Pattern, SolidColorBrush Brush)[] Keywords => new[]
         {
             (new Regex($@"(?<!\w)({string.Join("|", _keywords1)})(?!\w)"), Brushes.Blue),
             (new Regex($@"(?<!\w)({string.Join("|", _keywords2)})(?!\w)"),
@@ -37,24 +38,41 @@ namespace NotepadCore.SyntaxHighlighters
             (new Regex("//.*"), Brushes.Green)
         };
 
-        IEnumerable<(IEnumerable<Group> Matches, SolidColorBrush Brush)> IHighlighter.GetMatches(TextRange textRange,
+        IEnumerable<((int Index, int Length) Match, SolidColorBrush Brush)> IHighlighter.GetMatches(TextRange textRange,
             bool multiline)
         {
-            if (multiline) return GetMultilineMatches(textRange);
-            
-            var matches = new List<(IEnumerable<Group> Matches, SolidColorBrush Brush)>(Keywords.Length);
-        
-            foreach (var (pattern, brush) in Keywords)
+            if (multiline)
             {
-                matches.Add((pattern.Matches(textRange.Text), brush));
+                foreach (var match in GetMultilineMatches(textRange))
+                    yield return match;
             }
-        
-            return matches.Where(x => x.Matches.Any());
+            else
+            {
+                var matches = new List<(IEnumerable<Group> Matches, SolidColorBrush Brush)>(Keywords.Length);
+
+                foreach (var (pattern, brush) in Keywords)
+                {
+                    foreach (Match match in pattern.Matches(textRange.Text))
+                    {
+                        yield return ((match.Index, match.Length), brush);
+                    }
+                }
+            }
         }
 
-        IEnumerable<(IEnumerable<Group> Matches, SolidColorBrush Brush)> GetMultilineMatches(TextRange textRange)
+        private IEnumerable<((int Index, int Length) Match, SolidColorBrush Brush)> GetMultilineMatches(
+            TextRange textRange)
         {
-            return null;
+            var indexes = textRange.Text.IndexesOf(Environment.NewLine);
+
+            foreach (var (pattern, brush) in Keywords)
+            {
+                foreach (Match match in pattern.Matches(textRange.Text))
+                {
+                    int offset = indexes.Count(x => x < match.Index) * 2;
+                    yield return ((match.Index - offset, match.Length), brush);
+                }
+            }
         }
     }
 }

@@ -40,7 +40,7 @@ namespace NotepadCore
                 LanguageComboBox.SelectedItem = value;
                 _fileLanguage = value;
 
-                var userSettings = Settings.Settings.Create();
+                var userSettings = Settings.UserSettings.Create();
                 foreach (var editor in userSettings.Editors)
                     if (editor.FilePath?.ToLower() == _documentPath?.ToLower() && _documentPath != null)
                         editor.HighlightingLanguage = value;
@@ -60,7 +60,7 @@ namespace NotepadCore
         {
             InitializeComponent();
 
-            var userSettings = Settings.Settings.Create();
+            var userSettings = Settings.UserSettings.Create();
 
             MainTextBox.Focus();
 
@@ -80,7 +80,7 @@ namespace NotepadCore
         {
             InitializeComponent();
 
-            var userSettings = Settings.Settings.Create();
+            var userSettings = Settings.UserSettings.Create();
 
             _documentPath = documentPath;
 
@@ -205,7 +205,7 @@ namespace NotepadCore
         /// </summary>
         private void ChangeFont()
         {
-            var userSettings = Settings.Settings.Create();
+            var userSettings = Settings.UserSettings.Create();
 
             var ff = new FontFamily(userSettings.EditorFontFamily);
 
@@ -289,17 +289,14 @@ namespace NotepadCore
                 MainTextBox.CaretPosition.Paragraph.ContentEnd);
             textRange.ClearAllProperties();
 
-            foreach (var (matches, brush) in Highlighter.GetMatches(textRange))
+            foreach (var (match, brush) in Highlighter.GetMatches(textRange))
             {
-                foreach (var match in matches)
-                {
                     Dispatcher?.Invoke(() =>
                     {
                         new TextRange(GetTextPointAt(textRange.Start, match.Index),
                                 GetTextPointAt(textRange.Start, match.Index + match.Length))
                             .ApplyPropertyValue(TextElement.ForegroundProperty, brush);
                     });
-                }
             }
 
             MainTextBox.TextChanged += MainTextBox_TextChanged;
@@ -310,34 +307,12 @@ namespace NotepadCore
         {
             if (MainTextBox == null) return;
             var textRange = new TextRange(MainTextBox.Document.ContentStart, MainTextBox.Document.ContentEnd);
-            foreach (var (matches, brush) in Highlighter.GetMatches(textRange))
+            foreach (var (match, brush) in Highlighter.GetMatches(textRange, true))
             {
-                foreach (var match in matches)
-                {
-                    new TextRange(GetTextPointAt(textRange.Start, match.Index),
-                            GetTextPointAt(textRange.Start, match.Index + match.Length))
-                        .ApplyPropertyValue(TextElement.ForegroundProperty, brush);
-                }
+                new TextRange(GetTextPointAt(textRange.Start, match.Index),
+                        GetTextPointAt(textRange.Start, match.Index + match.Length))
+                    .ApplyPropertyValue(TextElement.ForegroundProperty, brush);
             }
-
-            return;
-            Dispatcher?.Invoke(() =>
-            {
-                foreach (var paragraph in MainTextBox.Document.Blocks.ToArray())
-                {
-                    var textRange = new TextRange(paragraph.ContentStart, paragraph.ContentEnd);
-
-                    foreach (var (matches, brush) in Highlighter.GetMatches(textRange))
-                    {
-                        foreach (var match in matches)
-                        {
-                            new TextRange(GetTextPointAt(textRange.Start, match.Index),
-                                    GetTextPointAt(textRange.Start, match.Index + match.Length))
-                                .ApplyPropertyValue(TextElement.ForegroundProperty, brush);
-                        }
-                    }
-                }
-            });
         }
 
 
@@ -385,7 +360,7 @@ namespace NotepadCore
                     MainTextBox.CaretPosition.Paragraph.ContentStart.GetOffsetToPosition(MainTextBox.CaretPosition);
 
                 // If UseSpaces is true insert TabSize amount of spaces
-                if (Settings.Settings.Create().UseSpaces)
+                if (Settings.UserSettings.Create().UseSpaces)
                 {
                     MainTextBox.CaretPosition.InsertTextInRun(new string(' ', TabSize));
 

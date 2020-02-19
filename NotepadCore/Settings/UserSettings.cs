@@ -12,12 +12,12 @@ namespace NotepadCore.Settings
     /// <summary>
     ///     A class that stores user settings
     /// </summary>
-    public sealed class Settings
+    public sealed class UserSettings
     {
         private static readonly string SavePath =
             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Data\settings.xml");
 
-        private static readonly Settings DefaultSettings = new Settings
+        private static readonly UserSettings DefaultUserSettings = new UserSettings
         {
             Editors = new[] {new EditorInfo() },
             EditorFontFamily = "Consolas",
@@ -35,7 +35,7 @@ namespace NotepadCore.Settings
         private int _selectedFileIndex;
         private int _tabSize;
 
-        private Settings()
+        private UserSettings()
         {
         }
 
@@ -56,7 +56,7 @@ namespace NotepadCore.Settings
                 }
                 catch
                 {
-                    _editorFontFamily = DefaultSettings.EditorFontFamily;
+                    _editorFontFamily = DefaultUserSettings.EditorFontFamily;
                 }
 
                 return _editorFontFamily;
@@ -84,7 +84,7 @@ namespace NotepadCore.Settings
             get
             {
                 if (!(_editorFontSize >= 8 && _editorFontSize <= 96))
-                    _editorFontSize = DefaultSettings.EditorFontSize;
+                    _editorFontSize = DefaultUserSettings.EditorFontSize;
 
                 return _editorFontSize;
             }
@@ -93,7 +93,7 @@ namespace NotepadCore.Settings
                 if (value >= 8 && value <= 96)
                     _editorFontSize = value;
                 else
-                    _editorFontSize = DefaultSettings.EditorFontSize;
+                    _editorFontSize = DefaultUserSettings.EditorFontSize;
             }
         }
 
@@ -105,7 +105,7 @@ namespace NotepadCore.Settings
             get
             {
                 if (_tabSize <= 0)
-                    _tabSize = DefaultSettings.TabSize;
+                    _tabSize = DefaultUserSettings.TabSize;
 
                 return _tabSize;
             }
@@ -114,7 +114,7 @@ namespace NotepadCore.Settings
                 if (value > 0)
                     _tabSize = value;
                 else
-                    _tabSize = DefaultSettings.TabSize;
+                    _tabSize = DefaultUserSettings.TabSize;
             }
         }
 
@@ -134,7 +134,7 @@ namespace NotepadCore.Settings
                 if (_selectedFileIndex >= 0 && _selectedFileIndex < Editors.Length)
                     return _selectedFileIndex;
 
-                _selectedFileIndex = DefaultSettings.SelectedFileIndex;
+                _selectedFileIndex = DefaultUserSettings.SelectedFileIndex;
                 return _selectedFileIndex;
             }
             set
@@ -142,7 +142,7 @@ namespace NotepadCore.Settings
                 if (_selectedFileIndex >= 0 && _selectedFileIndex < Editors.Length)
                     _selectedFileIndex = value;
                 else
-                    _selectedFileIndex = DefaultSettings.SelectedFileIndex;
+                    _selectedFileIndex = DefaultUserSettings.SelectedFileIndex;
             }
         }
 
@@ -185,14 +185,14 @@ namespace NotepadCore.Settings
         {
             using (var streamWriter = new StreamWriter(SavePath, false))
             {
-                var serializer = new XmlSerializer(typeof(Settings));
+                var serializer = new XmlSerializer(typeof(UserSettings));
                 serializer.Serialize(streamWriter, this);
             }
         }
 
-        public static Settings Create()
+        public static UserSettings Create()
         {
-            var serializer = new XmlSerializer(typeof(Settings));
+            var serializer = new XmlSerializer(typeof(UserSettings));
 
             var dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
             if (!Directory.Exists(dir))
@@ -202,7 +202,7 @@ namespace NotepadCore.Settings
             {
                 using (var streamReader = new StreamReader(SavePath))
                 {
-                    var temp = (Settings) serializer.Deserialize(streamReader);
+                    var temp = (UserSettings) serializer.Deserialize(streamReader);
                     return temp;
                 }
             }
@@ -210,11 +210,11 @@ namespace NotepadCore.Settings
             {
                 using (var streamWriter = new StreamWriter(SavePath))
                 {
-                    serializer.Serialize(streamWriter, DefaultSettings);
+                    serializer.Serialize(streamWriter, DefaultUserSettings);
                 }
             }
 
-            return DefaultSettings;
+            return DefaultUserSettings;
         }
     }
 }

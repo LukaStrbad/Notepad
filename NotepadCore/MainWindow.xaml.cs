@@ -25,7 +25,7 @@ namespace NotepadCore
         {
             InitializeComponent();
 
-            var userSettings = Settings.Settings.Create();
+            var userSettings = Settings.UserSettings.Create();
 
             // if there are files, load them
             if (userSettings.Editors.Length != 0)
@@ -68,7 +68,7 @@ namespace NotepadCore
         /// </summary>
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            var userSettings = Settings.Settings.Create();
+            var userSettings = Settings.UserSettings.Create();
 
             // loop through Text Editors and save contents
             for (var i = 0; i < Tabs.Items.Count - 1; i++)
@@ -99,7 +99,7 @@ namespace NotepadCore
         /// </summary>
         private void FileNew_Click(object sender, RoutedEventArgs e)
         {
-            var userSettings = Settings.Settings.Create();
+            var userSettings = Settings.UserSettings.Create();
 
             var newDialog = new SaveFileDialog();
             newDialog.ShowDialog();
@@ -125,7 +125,7 @@ namespace NotepadCore
         /// </summary>
         private void FileOpen_Click(object sender, RoutedEventArgs e)
         {
-            var userSettings = Settings.Settings.Create();
+            var userSettings = Settings.UserSettings.Create();
 
             var openDialog = new OpenFileDialog();
             openDialog.ShowDialog();
@@ -159,7 +159,7 @@ namespace NotepadCore
 
         private void FileClose_Click(object sender, RoutedEventArgs e)
         {
-            var userSettings = Settings.Settings.Create();
+            var userSettings = Settings.UserSettings.Create();
 
             var files = userSettings.Editors.ToList();
             if (CurrentTextEditor.HasSaveLocation)
@@ -187,7 +187,7 @@ namespace NotepadCore
         /// </summary>
         private void FileSave_Click(object sender, RoutedEventArgs e)
         {
-            var userSettings = Settings.Settings.Create();
+            var userSettings = Settings.UserSettings.Create();
 
             var textEdit = Tabs.SelectedContent as TextEditor;
             if (textEdit.HasSaveLocation)
@@ -216,7 +216,7 @@ namespace NotepadCore
         /// </summary>
         private void FileSaveAs_Click(object sender, RoutedEventArgs e)
         {
-            var userSettings = Settings.Settings.Create();
+            var userSettings = Settings.UserSettings.Create();
 
             var textEditor = Tabs.SelectedContent as TextEditor;
             if (textEditor.HasSaveLocation) textEditor.SaveFile();
@@ -244,7 +244,7 @@ namespace NotepadCore
         /// </summary>
         private void ChangeFontDialog_Click(object sender, RoutedEventArgs e)
         {
-            var userSettings = Settings.Settings.Create();
+            var userSettings = Settings.UserSettings.Create();
 
             var fontDialog = new FontWindow();
             fontDialog.ShowDialog();
@@ -262,7 +262,7 @@ namespace NotepadCore
         /// </summary>
         public void ChangeFont()
         {
-            var userSettings = Settings.Settings.Create();
+            var userSettings = Settings.UserSettings.Create();
 
             foreach (var textEdit in GetTextEditors())
             {

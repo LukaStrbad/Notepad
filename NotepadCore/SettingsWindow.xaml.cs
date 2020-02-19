@@ -16,7 +16,7 @@ namespace NotepadCore
         {
             InitializeComponent();
 
-            var userSettings = Settings.Settings.Create();
+            var userSettings = Settings.UserSettings.Create();
 
             SpacesCheckBox.IsChecked = true; // TODO: implement storage
 
@@ -60,7 +60,7 @@ namespace NotepadCore
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            var userSettings = Settings.Settings.Create();
+            var userSettings = Settings.UserSettings.Create();
 
             // save tab size
             try

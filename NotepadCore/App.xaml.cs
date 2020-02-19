@@ -13,7 +13,7 @@ namespace NotepadCore
         {
             if (e.Args.Length > 0)
             {
-                var userSettings = Settings.Settings.Create();
+                var userSettings = Settings.UserSettings.Create();
 
                 userSettings.AddFiles(e.Args);
                 userSettings.SelectedFileIndex = userSettings.Editors.Length - 1;
