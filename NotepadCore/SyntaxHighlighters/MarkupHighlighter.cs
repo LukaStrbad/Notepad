@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Documents;
 using System.Windows.Media;
+using NotepadCore.ExtensionMethods;
 
 namespace NotepadCore.SyntaxHighlighters
 {
@@ -11,17 +13,20 @@ namespace NotepadCore.SyntaxHighlighters
         private static readonly (Regex Pattern, SolidColorBrush Brush)[] Keywords =
         {
             
-            (new Regex(@"(?<=<\/?)\w+(?=( |>?).*?>)"), Brushes.Blue)// (new Regex(@"<\/?(?<tag>\w+)( |>?).*?>"), Brushes.Blue)
+            (new Regex(@"(?<=<\/?)\w+(?=( |>?).*?>)"), Brushes.Blue),
+            (new Regex(@"<!--(.|\n)*?-->"), Brushes.Green)
         };
 
-        IEnumerable<((int Index, int Length) Match, SolidColorBrush Brush)> IHighlighter.GetMatches(TextRange textRange,
-            bool multiline)
+        IEnumerable<((int Index, int Length) Match, SolidColorBrush Brush)> IHighlighter.GetMatches(TextRange textRange)
         {
+            var newLines = textRange.Text.IndexesOf(Environment.NewLine);
+            
             foreach (var (pattern, brush) in Keywords)
             {
                 foreach (Match match in pattern.Matches(textRange.Text))
                 {
-                    yield return ((match.Index, match.Length), brush);
+                    int offset = newLines.Count(x => x < match.Index) * Environment.NewLine.Length;
+                    yield return ((match.Index - offset, match.Length), brush);
                 }
             }
         }

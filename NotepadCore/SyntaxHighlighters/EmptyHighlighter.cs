@@ -7,7 +7,7 @@ namespace NotepadCore.SyntaxHighlighters
 {
     public class EmptyHighlighter : IHighlighter
     {
-        public IEnumerable<((int Index, int Length) Match, SolidColorBrush Brush)> GetMatches(TextRange textRange, bool multiline = false)
+        public IEnumerable<((int Index, int Length) Match, SolidColorBrush Brush)> GetMatches(TextRange textRange)
         {
             return null;
         }

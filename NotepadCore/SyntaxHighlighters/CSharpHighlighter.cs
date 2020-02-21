@@ -38,16 +38,15 @@ namespace NotepadCore.SyntaxHighlighters
             (new Regex(@$"//.*|/\*(.|{Environment.NewLine})*?\*/"), Brushes.Green)
         };
 
-        IEnumerable<((int Index, int Length) Match, SolidColorBrush Brush)> IHighlighter.GetMatches(TextRange textRange,
-            bool multiline)
+        IEnumerable<((int Index, int Length) Match, SolidColorBrush Brush)> IHighlighter.GetMatches(TextRange textRange)
         {
-            var indexes = textRange.Text.IndexesOf(Environment.NewLine);
+            var newLines = textRange.Text.IndexesOf(Environment.NewLine);
 
             foreach (var (pattern, brush) in Keywords)
             {
                 foreach (Match match in pattern.Matches(textRange.Text))
                 {
-                    int offset = indexes.Count(x => x < match.Index) * Environment.NewLine.Length;
+                    int offset = newLines.Count(x => x < match.Index) * Environment.NewLine.Length;
                     yield return ((match.Index - offset, match.Length), brush);
                 }
             }
