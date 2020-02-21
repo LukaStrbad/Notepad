@@ -69,8 +69,6 @@ namespace NotepadCore
             TabSize = userSettings.TabSize;
             ShowLineNumbers = userSettings.ShowLineNumbers;
 
-            FileLanguage = HighlightingLanguage.None;
-
             LanguageComboBox.SelectedIndex = 0;
 
             _cts = new CancellationTokenSource();
@@ -100,17 +98,6 @@ namespace NotepadCore
 
             TabSize = userSettings.TabSize;
             ShowLineNumbers = userSettings.ShowLineNumbers;
-
-            var fileInfo = new FileInfo(_documentPath);
-
-            FileLanguage = fileInfo.Extension switch
-            {
-                ".cs" => HighlightingLanguage.CSharp,
-                _ => HighlightingLanguage.None
-            };
-
-            if (fileInfo.Extension.EndsWith("ml"))
-                FileLanguage = HighlightingLanguage.MarkupLanguage;
 
             LanguageComboBox.SelectedItem = FileLanguage;
 
@@ -221,6 +208,20 @@ namespace NotepadCore
         /// </summary>
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
+            if (!string.IsNullOrEmpty(_documentPath))
+            {
+                var fileInfo = new FileInfo(_documentPath);
+
+                FileLanguage = fileInfo.Extension switch
+                {
+                    ".cs" => HighlightingLanguage.CSharp,
+                    _ => HighlightingLanguage.None
+                };
+
+                if (fileInfo.Extension.EndsWith("ml"))
+                    FileLanguage = HighlightingLanguage.MarkupLanguage;
+            }
+
             WriteLineNumbers();
         }
 

@@ -99,7 +99,7 @@ namespace NotepadCore
         /// </summary>
         private void FileNew_Click(object sender, RoutedEventArgs e)
         {
-            var userSettings = Settings.UserSettings.Create();
+            var userSettings = UserSettings.Create();
 
             var newDialog = new SaveFileDialog();
             newDialog.ShowDialog();
@@ -115,6 +115,8 @@ namespace NotepadCore
                     Content = new TextEditor(_documentPath),
                     Header = new FileInfo(_documentPath).Name
                 });
+                userSettings.SelectedFileIndex = userSettings.Editors.Length - 1;
+                Tabs.SelectedIndex = userSettings.Editors.Length - 1;
             }
 
             userSettings.Save();
@@ -129,6 +131,8 @@ namespace NotepadCore
 
             var openDialog = new OpenFileDialog();
             openDialog.ShowDialog();
+            if (string.IsNullOrEmpty(openDialog.FileName))
+                return;
             _documentPath = openDialog.FileName;
 
             if (!string.IsNullOrEmpty(_documentPath))
