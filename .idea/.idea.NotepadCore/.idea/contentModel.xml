@@ -86,6 +86,7 @@
           </e>
         </e>
         <e p="SettingsTests.cs" t="Include" />
+        <e p="StringExtensionTests.cs" t="Include" />
         <e p="testFile.txt" t="Include" />
         <e p="TextEditorTests.cs" t="Include" />
       </e>

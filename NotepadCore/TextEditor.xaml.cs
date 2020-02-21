@@ -307,7 +307,7 @@ namespace NotepadCore
         {
             if (MainTextBox == null) return;
             var textRange = new TextRange(MainTextBox.Document.ContentStart, MainTextBox.Document.ContentEnd);
-            foreach (var (match, brush) in Highlighter.GetMatches(textRange, true))
+            foreach (var (match, brush) in Highlighter.GetMatches(textRange))
             {
                 new TextRange(GetTextPointAt(textRange.Start, match.Index),
                         GetTextPointAt(textRange.Start, match.Index + match.Length))
