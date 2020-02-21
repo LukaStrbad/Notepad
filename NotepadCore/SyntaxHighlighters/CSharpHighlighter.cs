@@ -35,33 +35,11 @@ namespace NotepadCore.SyntaxHighlighters
             (new Regex($@"(?<!\w)({string.Join("|", _keywords2)})(?!\w)"),
                 Brushes.Purple),
             (new Regex(@"""(\\""|[^""])*"""), Brushes.SaddleBrown),
-            (new Regex("//.*"), Brushes.Green)
+            (new Regex(@$"//.*|/\*(.|{Environment.NewLine})*?\*/"), Brushes.Green)
         };
 
         IEnumerable<((int Index, int Length) Match, SolidColorBrush Brush)> IHighlighter.GetMatches(TextRange textRange,
             bool multiline)
-        {
-            if (multiline)
-            {
-                foreach (var match in GetMultilineMatches(textRange))
-                    yield return match;
-            }
-            else
-            {
-                var matches = new List<(IEnumerable<Group> Matches, SolidColorBrush Brush)>(Keywords.Length);
-
-                foreach (var (pattern, brush) in Keywords)
-                {
-                    foreach (Match match in pattern.Matches(textRange.Text))
-                    {
-                        yield return ((match.Index, match.Length), brush);
-                    }
-                }
-            }
-        }
-
-        private IEnumerable<((int Index, int Length) Match, SolidColorBrush Brush)> GetMultilineMatches(
-            TextRange textRange)
         {
             var indexes = textRange.Text.IndexesOf(Environment.NewLine);
 
@@ -69,7 +47,7 @@ namespace NotepadCore.SyntaxHighlighters
             {
                 foreach (Match match in pattern.Matches(textRange.Text))
                 {
-                    int offset = indexes.Count(x => x < match.Index) * 2;
+                    int offset = indexes.Count(x => x < match.Index) * Environment.NewLine.Length;
                     yield return ((match.Index - offset, match.Length), brush);
                 }
             }
