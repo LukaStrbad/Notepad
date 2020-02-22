@@ -128,7 +128,6 @@ namespace NotepadCore
         private void FileOpen_Click(object sender, RoutedEventArgs e)
         {
             var userSettings = Settings.UserSettings.Create();
-
             var openDialog = new OpenFileDialog();
             openDialog.ShowDialog();
             if (string.IsNullOrEmpty(openDialog.FileName))

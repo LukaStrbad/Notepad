@@ -54,6 +54,7 @@
           </e>
         </e>
         <e p="Properties" t="Include">
+          <e p="Annotations.cs" t="Include" />
           <e p="PublishProfiles" t="Include">
             <e p="FolderProfile.pubxml" t="Include" />
           </e>
