@@ -52,7 +52,7 @@
         <StatusBar Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
             <StatusBarItem Padding="0" Margin="0">
                 <ComboBox x:Name="LanguageComboBox" SelectedIndex="0" FontSize="10" Padding="0" Margin="0"
-                           ItemsSource="{Binding Source={StaticResource DataFromEnum}}" SelectionChanged="LanguageComboBox_OnSelectionChanged" />
+                           ItemsSource="{Binding Source={StaticResource DataFromEnum}}" SelectedItem="{Binding FileLanguage, Mode=TwoWay}" SelectionChanged="LanguageComboBox_OnSelectionChanged" />
             </StatusBarItem>
         </StatusBar>
     </Grid>

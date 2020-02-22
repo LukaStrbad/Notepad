@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Navigation;
+using NotepadCore.Annotations;
 using NotepadCore.Exceptions;
 using NotepadCore.SyntaxHighlighters;
 
@@ -20,13 +22,11 @@ namespace NotepadCore
     /// <summary>
     ///     Interaction logic for TextEditor.xaml
     /// </summary>
-    public partial class TextEditor : UserControl
+    public partial class TextEditor : UserControl, INotifyPropertyChanged
     {
         private readonly List<Paragraph> _changedLines = new List<Paragraph>();
 
-        private CancellationTokenSource _cts;
         private string _documentPath;
-        private Task _highlightTask;
         private int _oldNumberOfLines = -1;
         private HighlightingLanguage _fileLanguage;
 
@@ -37,12 +37,15 @@ namespace NotepadCore
             get => _fileLanguage;
             set
             {
-                LanguageComboBox.SelectedItem = value;
+                // Save new FileLanguage value and notify that property has been changed
                 _fileLanguage = value;
+                OnPropertyChanged();
 
+                // Save FileLanguage for current editor
                 var userSettings = Settings.UserSettings.Create();
                 foreach (var editor in userSettings.Editors)
-                    if (editor.FilePath?.ToLower() == _documentPath?.ToLower() && _documentPath != null)
+                    if (editor.FilePath?.ToLower() == _documentPath?.ToLower() && _documentPath != null
+                    ) // Find current editor
                         editor.HighlightingLanguage = value;
                 userSettings?.Save();
             }
@@ -59,6 +62,7 @@ namespace NotepadCore
         public TextEditor()
         {
             InitializeComponent();
+            LanguageComboBox.DataContext = this;
 
             var userSettings = Settings.UserSettings.Create();
 
@@ -70,13 +74,12 @@ namespace NotepadCore
             ShowLineNumbers = userSettings.ShowLineNumbers;
 
             LanguageComboBox.SelectedIndex = 0;
-
-            _cts = new CancellationTokenSource();
         }
 
         public TextEditor(string documentPath)
         {
             InitializeComponent();
+            LanguageComboBox.DataContext = this;
 
             var userSettings = Settings.UserSettings.Create();
 
@@ -100,8 +103,6 @@ namespace NotepadCore
             ShowLineNumbers = userSettings.ShowLineNumbers;
 
             LanguageComboBox.SelectedItem = FileLanguage;
-
-            _cts = new CancellationTokenSource();
         }
 
         public bool ShowLineNumbers
@@ -241,17 +242,6 @@ namespace NotepadCore
                 _changedLines.Add(MainTextBox.CaretPosition.Paragraph);
 
             HighlightCurrentLine();
-            return;
-            if (_cts != null)
-            {
-                _cts.Cancel();
-                _cts.Dispose();
-                _cts = new CancellationTokenSource();
-                //_highlightTask = new Task(() => HighlightMissingLines(_cts.Token));
-                _highlightTask?.Dispose();
-                _highlightTask = new Task(() => HighlightCurrentLine(_cts.Token));
-                _highlightTask.Start();
-            }
         }
 
         /// <summary>
@@ -292,12 +282,12 @@ namespace NotepadCore
 
             foreach (var (match, brush) in Highlighter.GetMatches(textRange))
             {
-                    Dispatcher?.Invoke(() =>
-                    {
-                        new TextRange(GetTextPointAt(textRange.Start, match.Index),
-                                GetTextPointAt(textRange.Start, match.Index + match.Length))
-                            .ApplyPropertyValue(TextElement.ForegroundProperty, brush);
-                    });
+                Dispatcher?.Invoke(() =>
+                {
+                    new TextRange(GetTextPointAt(textRange.Start, match.Index),
+                            GetTextPointAt(textRange.Start, match.Index + match.Length))
+                        .ApplyPropertyValue(TextElement.ForegroundProperty, brush);
+                });
             }
 
             MainTextBox.TextChanged += MainTextBox_TextChanged;
@@ -308,6 +298,8 @@ namespace NotepadCore
         {
             if (MainTextBox == null) return;
             var textRange = new TextRange(MainTextBox.Document.ContentStart, MainTextBox.Document.ContentEnd);
+            textRange.ClearAllProperties();
+            
             foreach (var (match, brush) in Highlighter.GetMatches(textRange))
             {
                 new TextRange(GetTextPointAt(textRange.Start, match.Index),
@@ -403,7 +395,6 @@ namespace NotepadCore
 
         private void LanguageComboBox_OnSelectionChanged(object sender, RoutedEventArgs e)
         {
-            FileLanguage = (HighlightingLanguage) LanguageComboBox.SelectedItem;
             MainTextBox.TextChanged -= MainTextBox_TextChanged;
             try
             {
@@ -411,9 +402,18 @@ namespace NotepadCore
             }
             catch
             {
+                // ignored
             }
 
             MainTextBox.TextChanged += MainTextBox_TextChanged;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
