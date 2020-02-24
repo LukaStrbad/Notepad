@@ -6,7 +6,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -24,8 +23,6 @@ namespace NotepadCore
     /// </summary>
     public partial class TextEditor : UserControl, INotifyPropertyChanged
     {
-        private readonly List<Paragraph> _changedLines = new List<Paragraph>();
-
         private string _documentPath;
         private int _oldNumberOfLines = -1;
         private HighlightingLanguage _fileLanguage;
@@ -47,7 +44,7 @@ namespace NotepadCore
                     if (editor.FilePath?.ToLower() == _documentPath?.ToLower() && _documentPath != null
                     ) // Find current editor
                         editor.HighlightingLanguage = value;
-                userSettings?.Save();
+                userSettings.Save();
             }
         }
 
@@ -73,16 +70,11 @@ namespace NotepadCore
             TabSize = userSettings.TabSize;
             ShowLineNumbers = userSettings.ShowLineNumbers;
 
-            LanguageComboBox.SelectedIndex = 0;
+            FileLanguage = HighlightingLanguage.None;
         }
 
-        public TextEditor(string documentPath)
+        public TextEditor(string documentPath) : this()
         {
-            InitializeComponent();
-            LanguageComboBox.DataContext = this;
-
-            var userSettings = Settings.UserSettings.Create();
-
             _documentPath = documentPath;
 
             Text = "";
@@ -94,13 +86,6 @@ namespace NotepadCore
             {
                 File.Create(_documentPath);
             }
-
-            MainTextBox.Focus();
-
-            ChangeFont();
-
-            TabSize = userSettings.TabSize;
-            ShowLineNumbers = userSettings.ShowLineNumbers;
         }
 
         public bool ShowLineNumbers
@@ -236,10 +221,6 @@ namespace NotepadCore
                 _oldNumberOfLines = lineCount;
             }
 
-            if (!_changedLines.Contains(MainTextBox.CaretPosition.Paragraph))
-                _changedLines.Add(MainTextBox.CaretPosition.Paragraph);
-
-            
             HighlightCurrentLine();
         }
 
@@ -268,7 +249,7 @@ namespace NotepadCore
             return ret;
         }
 
-        private void HighlightCurrentLine(CancellationToken cancellationToken = default)
+        private void HighlightCurrentLine()
         {
             if (FileLanguage == HighlightingLanguage.None) return;
             if (MainTextBox.CaretPosition.Paragraph == null)
@@ -290,14 +271,14 @@ namespace NotepadCore
             }
 
             MainTextBox.TextChanged += MainTextBox_TextChanged;
-            return;
         }
 
-        private void HighlightAllBlocks()
+        private void HighlightAllBlocks(TextPointer start = null, TextPointer end = null)
         {
             if (MainTextBox == null) return;
             MainTextBox.TextChanged -= MainTextBox_TextChanged;
-            var textRange = new TextRange(MainTextBox.Document.ContentStart, MainTextBox.Document.ContentEnd);
+            var textRange = new TextRange(start ?? MainTextBox.Document.ContentStart,
+                end ?? MainTextBox.Document.ContentEnd);
             textRange.ClearAllProperties();
             try
             {
@@ -308,7 +289,9 @@ namespace NotepadCore
                         .ApplyPropertyValue(TextElement.ForegroundProperty, brush);
                 }
             }
-            catch{}
+            catch
+            {
+            }
 
             MainTextBox.TextChanged += MainTextBox_TextChanged;
         }
