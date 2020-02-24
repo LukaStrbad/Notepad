@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using NotepadCore.Settings;
 using NotepadCore.SyntaxHighlighters;
@@ -34,6 +35,20 @@ namespace NotepadCore.UnitTests
             {
                 Assert.That(propertyInfo.GetValue(userSettings) == propertyInfo.GetValue(loadedSettings));
             }
+        }
+
+        [Test]
+        public static void AddFiles_AddsCorrectValues()
+        {
+            var userSettings = UserSettings.Create();
+            userSettings.Editors = null;
+            
+            var paths = new[] {"test.txt", "test.txt", "test2.txt"};
+            
+            userSettings.AddFiles(paths);
+
+            var savedPaths = userSettings.Editors.Select(x => x.FilePath);
+            Assert.That(savedPaths.Contains("test.txt") && savedPaths.Contains("test2.txt"));
         }
     }
 }

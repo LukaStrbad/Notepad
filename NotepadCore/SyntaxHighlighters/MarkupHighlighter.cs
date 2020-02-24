@@ -13,8 +13,9 @@ namespace NotepadCore.SyntaxHighlighters
         private static readonly (Regex Pattern, SolidColorBrush Brush)[] Keywords =
         {
             
-            (new Regex(@"(?<=<\/?)\w+(?=( |>?).*?>)"), Brushes.Blue),
-            (new Regex(@"<!--(.|\n)*?-->"), Brushes.Green)
+            (new Regex(@"(?<=<\/?)\w+(?=( |>?).*?>)"), Brushes.Blue), // Tags
+            (new Regex(@"""(\\""|[^""])*"""), Brushes.Brown), // Strings,
+            (new Regex(@"<!--(.|\n)*?-->"), Brushes.Green) // Comments
         };
 
         IEnumerable<((int Index, int Length) Match, SolidColorBrush Brush)> IHighlighter.GetMatches(TextRange textRange)

@@ -34,8 +34,8 @@ namespace NotepadCore.SyntaxHighlighters
             (new Regex($@"(?<!\w)({string.Join("|", _keywords1)})(?!\w)"), Brushes.Blue),
             (new Regex($@"(?<!\w)({string.Join("|", _keywords2)})(?!\w)"),
                 Brushes.Purple),
-            (new Regex(@"""(\\""|[^""])*"""), Brushes.SaddleBrown),
-            (new Regex(@$"//.*|/\*(.|{Environment.NewLine})*?\*/"), Brushes.Green)
+            (new Regex(@"""(\\""|[^""])*"""), Brushes.Brown), // Strings
+            (new Regex(@$"//.*|/\*(.|{Environment.NewLine})*?\*/"), Brushes.Green) // Comments
         };
 
         IEnumerable<((int Index, int Length) Match, SolidColorBrush Brush)> IHighlighter.GetMatches(TextRange textRange)

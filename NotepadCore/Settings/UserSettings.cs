@@ -19,7 +19,7 @@ namespace NotepadCore.Settings
 
         private static readonly UserSettings DefaultUserSettings = new UserSettings
         {
-            Editors = new[] {new EditorInfo() },
+            Editors = new EditorInfo[] { new EditorInfo(),  },
             EditorFontFamily = "Consolas",
             EditorFontSize = 12,
             TabSize = 4,
@@ -41,8 +41,13 @@ namespace NotepadCore.Settings
 
         public EditorInfo[] Editors
         {
-            get => _editors.Distinct().ToArray();
-            set => _editors = value.Distinct().ToArray();
+            get
+            {
+                if (_editors == null)
+                    _editors = new EditorInfo[] { };
+                return _editors.Distinct().ToArray();
+            }
+            set => _editors = value?.Distinct().ToArray() ?? new[]{new EditorInfo(), };
         }
 
         public string EditorFontFamily

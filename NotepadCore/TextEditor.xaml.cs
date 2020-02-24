@@ -101,8 +101,6 @@ namespace NotepadCore
 
             TabSize = userSettings.TabSize;
             ShowLineNumbers = userSettings.ShowLineNumbers;
-
-            LanguageComboBox.SelectedItem = FileLanguage;
         }
 
         public bool ShowLineNumbers
@@ -241,6 +239,7 @@ namespace NotepadCore
             if (!_changedLines.Contains(MainTextBox.CaretPosition.Paragraph))
                 _changedLines.Add(MainTextBox.CaretPosition.Paragraph);
 
+            
             HighlightCurrentLine();
         }
 
@@ -297,15 +296,21 @@ namespace NotepadCore
         private void HighlightAllBlocks()
         {
             if (MainTextBox == null) return;
+            MainTextBox.TextChanged -= MainTextBox_TextChanged;
             var textRange = new TextRange(MainTextBox.Document.ContentStart, MainTextBox.Document.ContentEnd);
             textRange.ClearAllProperties();
-            
-            foreach (var (match, brush) in Highlighter.GetMatches(textRange))
+            try
             {
-                new TextRange(GetTextPointAt(textRange.Start, match.Index),
-                        GetTextPointAt(textRange.Start, match.Index + match.Length))
-                    .ApplyPropertyValue(TextElement.ForegroundProperty, brush);
+                foreach (var (match, brush) in Highlighter.GetMatches(textRange))
+                {
+                    new TextRange(GetTextPointAt(textRange.Start, match.Index),
+                            GetTextPointAt(textRange.Start, match.Index + match.Length))
+                        .ApplyPropertyValue(TextElement.ForegroundProperty, brush);
+                }
             }
+            catch{}
+
+            MainTextBox.TextChanged += MainTextBox_TextChanged;
         }
 
 

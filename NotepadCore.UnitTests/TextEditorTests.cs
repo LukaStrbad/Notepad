@@ -53,7 +53,7 @@ namespace NotepadCore.UnitTests
         {
             var textEditor = new TextEditor(DocumentPath);
             string text = File.ReadAllText(DocumentPath);
-            Assert.That(textEditor.Text == text);
+            Assert.That(textEditor.Text.TrimEnd() == text.TrimEnd());
         }
     }
 }
