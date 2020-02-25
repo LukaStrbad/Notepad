@@ -373,7 +373,8 @@ namespace NotepadCore
         {
             if (string.IsNullOrEmpty(_documentPath))
                 throw new InvalidSaveLocationException();
-            File.WriteAllText(_documentPath, Text);
+            using var sw = new StreamWriter(_documentPath);
+            sw.Write(Text);
         }
 
         private void UserControl_LostFocus(object sender, RoutedEventArgs e)

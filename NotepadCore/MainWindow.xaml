@@ -56,8 +56,6 @@
                 <MenuItem Header="Copy" Click="Copy_Click" InputGestureText="Ctrl + C" />
                 <MenuItem Header="Paste" Click="Paste_Click" InputGestureText="Ctrl + V" />
                 <Separator />
-                <MenuItem Header="Change Font" Click="ChangeFontDialog_Click" />
-                <Separator />
                 <MenuItem Header="Find/Replace" Click="FindReplace_Click" InputGestureText="Ctrl + F" />
             </MenuItem>
 

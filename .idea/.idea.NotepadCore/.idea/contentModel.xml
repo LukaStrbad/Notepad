@@ -27,8 +27,6 @@
         </e>
         <e p="Find.xaml" t="Include" />
         <e p="Find.xaml.cs" t="Include" />
-        <e p="FindReplace.xaml" t="Include" />
-        <e p="FindReplace.xaml.cs" t="Include" />
         <e p="FontWindow.xaml" t="Include" />
         <e p="FontWindow.xaml.cs" t="Include" />
         <e p="Icons" t="Include">

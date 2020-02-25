@@ -127,7 +127,7 @@ namespace NotepadCore
         /// </summary>
         private void FileOpen_Click(object sender, RoutedEventArgs e)
         {
-            var userSettings = Settings.UserSettings.Create();
+            var userSettings = UserSettings.Create();
             var openDialog = new OpenFileDialog();
             openDialog.ShowDialog();
             if (string.IsNullOrEmpty(openDialog.FileName))
@@ -138,9 +138,10 @@ namespace NotepadCore
                 // writes the new file path to the constant Path.Document location
                 userSettings.AddFiles(_documentPath);
 
-            if (string.IsNullOrEmpty(CurrentTextEditor.Text))
+            // If the selected TextEditor is empty or contains only whitespace and doesn't have save location
+            // Open a new one on the same spot
+            if (string.IsNullOrWhiteSpace(CurrentTextEditor.Text) && !CurrentTextEditor.HasSaveLocation)
             {
-                // if the selected TextEditor is empty, open a new one on the same spot
                 var item = Tabs.SelectedItem as TabItem;
                 item.Content = new TextEditor(_documentPath);
                 item.Header = new FileInfo(_documentPath).Name;
@@ -162,12 +163,28 @@ namespace NotepadCore
 
         private void FileClose_Click(object sender, RoutedEventArgs e)
         {
-            var userSettings = Settings.UserSettings.Create();
+            var userSettings = UserSettings.Create();
+            
+            if (!string.IsNullOrWhiteSpace(CurrentTextEditor.Text) && !CurrentTextEditor.HasSaveLocation &&
+                                                          Tabs.Items.Count == 2)
+            {
+                FileSave_Click(sender, e);
+                userSettings.RemoveFilePaths(CurrentTextEditor.DocumentPath);
+                userSettings.Save();
+                Tabs.Items[Tabs.SelectedIndex] = EmptyTab;
+                Tabs.SelectedIndex = 0;
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(CurrentTextEditor.Text) && !CurrentTextEditor.HasSaveLocation &&
+                Tabs.Items.Count == 2)
+                return;
+
+            
 
             var files = userSettings.Editors.ToList();
             if (CurrentTextEditor.HasSaveLocation)
                 CurrentTextEditor.SaveFile();
-
 
             if (Tabs.SelectedIndex == 0)
             {
@@ -190,12 +207,11 @@ namespace NotepadCore
         /// </summary>
         private void FileSave_Click(object sender, RoutedEventArgs e)
         {
-            var userSettings = Settings.UserSettings.Create();
+            var userSettings = UserSettings.Create();
 
-            var textEdit = Tabs.SelectedContent as TextEditor;
-            if (textEdit.HasSaveLocation)
+            if (CurrentTextEditor.HasSaveLocation)
             {
-                textEdit.SaveFile();
+                CurrentTextEditor.SaveFile();
             }
             else
             {
@@ -204,11 +220,14 @@ namespace NotepadCore
 
                 if (string.IsNullOrEmpty(saveDialog.FileName))
                     return;
-                textEdit.DocumentPath = saveDialog.FileName; // sets the document path to that one in save file dialog
+                CurrentTextEditor.DocumentPath =
+                    saveDialog.FileName; // sets the document path to that one in save file dialog
                 var paths = userSettings.Editors.ToList();
-                paths.Insert(Tabs.SelectedIndex, new EditorInfo(HighlightingLanguage.None, textEdit.DocumentPath));
+                paths.Insert(Tabs.SelectedIndex,
+                    new EditorInfo(HighlightingLanguage.None, CurrentTextEditor.DocumentPath));
                 userSettings.Editors = paths.ToArray();
-                (Tabs.Items[Tabs.SelectedIndex] as TabItem).Header = textEdit.FileName;
+                (Tabs.Items[Tabs.SelectedIndex] as TabItem).Header = CurrentTextEditor.FileName;
+                CurrentTextEditor.SaveFile(); // TODO: fix
 
                 userSettings.Save();
             }
@@ -219,7 +238,7 @@ namespace NotepadCore
         /// </summary>
         private void FileSaveAs_Click(object sender, RoutedEventArgs e)
         {
-            var userSettings = Settings.UserSettings.Create();
+            var userSettings = UserSettings.Create();
 
             var textEditor = Tabs.SelectedContent as TextEditor;
             if (textEditor.HasSaveLocation) textEditor.SaveFile();
@@ -325,14 +344,16 @@ namespace NotepadCore
             // if + tab is selected add a new tab
             if (Tabs.SelectedItem == TabAdd)
             {
-                Tabs.Items.Insert(Tabs.Items.Count - 1, new TabItem
-                {
-                    Content = new TextEditor(),
-                    Header = $"*new file {_newFileNumber++}"
-                });
+                Tabs.Items.Insert(Tabs.Items.Count - 1, EmptyTab);
                 Tabs.SelectedIndex--;
             }
         }
+
+        private TabItem EmptyTab => new TabItem
+        {
+            Content = new TextEditor(),
+            Header = $"*new file {_newFileNumber++}"
+        };
 
         public List<TextEditor> GetTextEditors()
         {
