@@ -164,9 +164,9 @@ namespace NotepadCore
         private void FileClose_Click(object sender, RoutedEventArgs e)
         {
             var userSettings = UserSettings.Create();
-            
+
             if (!string.IsNullOrWhiteSpace(CurrentTextEditor.Text) && !CurrentTextEditor.HasSaveLocation &&
-                                                          Tabs.Items.Count == 2)
+                Tabs.Items.Count == 2)
             {
                 FileSave_Click(sender, e);
                 userSettings.RemoveFilePaths(CurrentTextEditor.DocumentPath);
@@ -180,7 +180,6 @@ namespace NotepadCore
                 Tabs.Items.Count == 2)
                 return;
 
-            
 
             var files = userSettings.Editors.ToList();
             if (CurrentTextEditor.HasSaveLocation)
@@ -226,8 +225,15 @@ namespace NotepadCore
                 paths.Insert(Tabs.SelectedIndex,
                     new EditorInfo(HighlightingLanguage.None, CurrentTextEditor.DocumentPath));
                 userSettings.Editors = paths.ToArray();
-                (Tabs.Items[Tabs.SelectedIndex] as TabItem).Header = CurrentTextEditor.FileName;
-                CurrentTextEditor.SaveFile(); // TODO: fix
+                ((TabItem) Tabs.Items[Tabs.SelectedIndex]).Header = CurrentTextEditor.FileName;
+                try
+                {
+                    CurrentTextEditor.SaveFile();
+                }
+                catch
+                {
+                    // ignored
+                }
 
                 userSettings.Save();
             }
@@ -241,7 +247,8 @@ namespace NotepadCore
             var userSettings = UserSettings.Create();
 
             var textEditor = Tabs.SelectedContent as TextEditor;
-            if (textEditor.HasSaveLocation) textEditor.SaveFile();
+            if (textEditor.HasSaveLocation)
+                textEditor.SaveFile();
 
             var textEditorText = textEditor.Text;
 
@@ -257,25 +264,7 @@ namespace NotepadCore
 
             userSettings.Save();
 
-            (Tabs.SelectedItem as TabItem).Header = textEditor.FileName;
-        }
-
-
-        /// <summary>
-        ///     Opens the ChangeFontDialog
-        /// </summary>
-        private void ChangeFontDialog_Click(object sender, RoutedEventArgs e)
-        {
-            var userSettings = Settings.UserSettings.Create();
-
-            var fontDialog = new FontWindow();
-            fontDialog.ShowDialog();
-
-            userSettings.EditorFontFamily = fontDialog.fontFamily;
-            userSettings.EditorFontSize = fontDialog.fontSize;
-            userSettings.Save();
-
-            ChangeFont();
+            ((TabItem) Tabs.SelectedItem).Header = textEditor.FileName;
         }
 
 
@@ -284,7 +273,7 @@ namespace NotepadCore
         /// </summary>
         public void ChangeFont()
         {
-            var userSettings = Settings.UserSettings.Create();
+            var userSettings = UserSettings.Create();
 
             foreach (var textEdit in GetTextEditors())
             {
@@ -301,7 +290,6 @@ namespace NotepadCore
         /// </summary>
         private void FindReplace_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: add tab support
             new Find().Show();
         }
 
@@ -369,7 +357,7 @@ namespace NotepadCore
 
         private void Window_Activated(object sender, EventArgs e)
         {
-            (Tabs.SelectedContent as TextEditor).MainTextBox.Focus();
+            CurrentTextEditor.MainTextBox.Focus();
         }
 
         private void About_Click(object sender, RoutedEventArgs e)
