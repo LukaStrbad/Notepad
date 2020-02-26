@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.Win32;
 using NotepadCore.Exceptions;
@@ -37,7 +38,7 @@ namespace NotepadCore
                         {
                             Content = new TextEditor(i.FilePath) {FileLanguage = i.HighlightingLanguage},
                             Header = new FileInfo(i.FilePath).Name
-                        });
+            });
                     }
                     catch
                     {
@@ -364,6 +365,11 @@ namespace NotepadCore
         {
             MessageBox.Show("Icon made by https://www.flaticon.com/authors/smashicons from www.flaticon.com");
             // Icon made by https://www.flaticon.com/authors/smashicons from www.flaticon.com
+        }
+
+        private void AddTab_Click(object sender, ExecutedRoutedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
     }
 }

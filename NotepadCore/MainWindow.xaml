@@ -21,6 +21,7 @@
         <CommandBinding Command="Open" Executed="FileOpen_Click" />
         <CommandBinding Command="Find" Executed="FindReplace_Click" />
         <CommandBinding Command="Close" Executed="FileClose_Click" />
+        <CommandBinding Command="AddTab" Executed="AddTab_Click" />
     </Window.CommandBindings>
 
     <Window.InputBindings>
@@ -29,6 +30,7 @@
         <KeyBinding Key="O" Modifiers="Ctrl" Command="Open" />
         <KeyBinding Key="F" Modifiers="Ctrl" Command="Find" />
         <KeyBinding Key="W" Modifiers="Ctrl" Command="Close" />
+        <KeyBinding Key="T" Modifiers="Ctrl" Command="AddTab"/>
     </Window.InputBindings>
 
     <Grid>
