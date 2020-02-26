@@ -30,8 +30,7 @@
         <e p="FontWindow.xaml" t="Include" />
         <e p="FontWindow.xaml.cs" t="Include" />
         <e p="Icons" t="Include">
-          <e p="notepad.svg" t="Include" />
-          <e p="notepad_icon.png" t="Include" />
+          <e p="notepad.png" t="Include" />
         </e>
         <e p="MainWindow.xaml" t="Include" />
         <e p="MainWindow.xaml.cs" t="Include" />
@@ -42,7 +41,6 @@
             <e p="netcoreapp3.1" t="Include">
               <e p="App.g.cs" t="Include" />
               <e p="Find.g.cs" t="Include" />
-              <e p="FindReplace.g.cs" t="Include" />
               <e p="FontWindow.g.cs" t="Include" />
               <e p="MainWindow.g.cs" t="Include" />
               <e p="NotepadCore.AssemblyInfo.cs" t="Include" />

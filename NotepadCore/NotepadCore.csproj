@@ -11,7 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="notepad.png" />
+    <None Remove="Icons\notepad.png" />
+    <Resource Include="Icons\notepad.png" />
   </ItemGroup>
 
 </Project>

@@ -25,7 +25,7 @@ namespace NotepadCore
         {
             InitializeComponent();
 
-            var userSettings = Settings.UserSettings.Create();
+            var userSettings = UserSettings.Create();
 
             // if there are files, load them
             if (userSettings.Editors.Length != 0)
@@ -68,7 +68,7 @@ namespace NotepadCore
         /// </summary>
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            var userSettings = Settings.UserSettings.Create();
+            var userSettings = UserSettings.Create();
 
             // loop through Text Editors and save contents
             for (var i = 0; i < Tabs.Items.Count - 1; i++)
