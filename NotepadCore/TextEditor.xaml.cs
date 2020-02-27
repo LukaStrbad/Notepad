@@ -127,13 +127,13 @@ namespace NotepadCore
                 }
                 else
                 {
-                    File.Create(value);
                     _documentPath = value;
                 }
             }
         }
 
-        public bool HasSaveLocation => !string.IsNullOrEmpty(DocumentPath);
+        // Returns true if file exists
+        public bool HasSaveLocation => File.Exists(DocumentPath ?? "");
 
         public string FileName => new FileInfo(DocumentPath).Name;
 
@@ -363,7 +363,7 @@ namespace NotepadCore
                 }
 
                 e.Handled = true;
-            }
+            } 
         }
 
         /// <summary>

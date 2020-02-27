@@ -38,7 +38,7 @@ namespace NotepadCore
                         {
                             Content = new TextEditor(i.FilePath) {FileLanguage = i.HighlightingLanguage},
                             Header = new FileInfo(i.FilePath).Name
-            });
+                        });
                     }
                     catch
                     {
@@ -60,6 +60,8 @@ namespace NotepadCore
 
             // Changes the font according to settings
             ChangeFont();
+
+            InputBindings.Add(new KeyBinding(ApplicationCommands.Open, Key.T, ModifierKeys.Control));
         }
 
         public TextEditor CurrentTextEditor => Tabs.SelectedContent as TextEditor;
@@ -291,6 +293,7 @@ namespace NotepadCore
         /// </summary>
         private void FindReplace_Click(object sender, RoutedEventArgs e)
         {
+            MessageBox.Show(sender.ToString());
             new Find().Show();
         }
 
@@ -333,14 +336,18 @@ namespace NotepadCore
             // if + tab is selected add a new tab
             if (Tabs.SelectedItem == TabAdd)
             {
+                var userSettings = UserSettings.Create();
+                
                 Tabs.Items.Insert(Tabs.Items.Count - 1, EmptyTab);
+                userSettings.AddFiles(((TextEditor)EmptyTab.Content).DocumentPath);
+                userSettings.Save();
                 Tabs.SelectedIndex--;
             }
         }
 
         private TabItem EmptyTab => new TabItem
         {
-            Content = new TextEditor(),
+            Content = new TextEditor {DocumentPath = ""},
             Header = $"*new file {_newFileNumber++}"
         };
 
@@ -367,9 +374,10 @@ namespace NotepadCore
             // Icon made by https://www.flaticon.com/authors/smashicons from www.flaticon.com
         }
 
-        private void AddTab_Click(object sender, ExecutedRoutedEventArgs e)
+        private void MainWindow_OnKeyDown(object sender, KeyEventArgs e)
         {
-            throw new NotImplementedException();
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) && e.Key == Key.T)
+                Tabs.SelectedIndex = Tabs.Items.Count - 1;
         }
     }
 }

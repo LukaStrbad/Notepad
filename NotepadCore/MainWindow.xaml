@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:NotepadCore"
         mc:Ignorable="d"
         Title="Notepad" Height="450" Width="800" Language="en-US" Closing="Window_Closing" FontFamily="Consolas"
-        Deactivated="Window_Deactivated" Activated="Window_Activated" Icon="Icons\notepad.png">
+        Deactivated="Window_Deactivated" Activated="Window_Activated" Icon="Icons\notepad.png" KeyDown="MainWindow_OnKeyDown">
 
     <Window.Resources>
         <Style TargetType="TextBox">
@@ -21,7 +21,6 @@
         <CommandBinding Command="Open" Executed="FileOpen_Click" />
         <CommandBinding Command="Find" Executed="FindReplace_Click" />
         <CommandBinding Command="Close" Executed="FileClose_Click" />
-        <CommandBinding Command="AddTab" Executed="AddTab_Click" />
     </Window.CommandBindings>
 
     <Window.InputBindings>
@@ -30,7 +29,6 @@
         <KeyBinding Key="O" Modifiers="Ctrl" Command="Open" />
         <KeyBinding Key="F" Modifiers="Ctrl" Command="Find" />
         <KeyBinding Key="W" Modifiers="Ctrl" Command="Close" />
-        <KeyBinding Key="T" Modifiers="Ctrl" Command="AddTab"/>
     </Window.InputBindings>
 
     <Grid>
@@ -71,13 +69,6 @@
         <TabControl Grid.Row="1" x:Name="Tabs" Padding="0" SelectionChanged="Tabs_SelectionChanged">
             <TabItem Header="+" x:Name="TabAdd" />
         </TabControl>
-
-        <!-- Editing TextBox --><!--
-        <TextBox x:Name="MainTextBox" x:FieldModifier="public" Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" TextChanged="MainTextBox_TextChanged" ScrollViewer.ScrollChanged="ScrollChanged" BorderThickness="0" Keyboard.PreviewKeyDown="MainTextBox_KeyDown" TextWrapping="Wrap" SizeChanged="MainTextBox_SizeChanged" Visibility="Hidden" />
-
-        --><!--Line Number Text Box--><!--
-        <TextBox x:Name="LineTextBox" Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" IsReadOnly="True" TextAlignment="Right" ScrollViewer.CanContentScroll="False" Background="#FFABADB3" ScrollViewer.ScrollChanged="ScrollChanged" Visibility="Hidden"/>-->
-
 
     </Grid>
 </Window>
