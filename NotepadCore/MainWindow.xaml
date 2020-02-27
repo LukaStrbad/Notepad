@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:NotepadCore"
         mc:Ignorable="d"
         Title="Notepad" Height="450" Width="800" Language="en-US" Closing="Window_Closing" FontFamily="Consolas"
-        Deactivated="Window_Deactivated" Activated="Window_Activated" Icon="Icons\notepad.png" KeyDown="MainWindow_OnKeyDown">
+        Deactivated="Window_Deactivated" Activated="Window_Activated" Icon="Icons\notepad.png"
+        PreviewKeyDown="MainWindow_OnKeyDown" >
 
     <Window.Resources>
         <Style TargetType="TextBox">

@@ -92,6 +92,7 @@ namespace NotepadCore
 
             // Save the index of a currently selected tab
             userSettings.SelectedFileIndex = Tabs.SelectedIndex;
+            userSettings.RemoveInvalidFilePaths();
             userSettings.Save();
 
             Application.Current.Shutdown();
@@ -337,9 +338,9 @@ namespace NotepadCore
             if (Tabs.SelectedItem == TabAdd)
             {
                 var userSettings = UserSettings.Create();
-                
+
                 Tabs.Items.Insert(Tabs.Items.Count - 1, EmptyTab);
-                userSettings.AddFiles(((TextEditor)EmptyTab.Content).DocumentPath);
+                userSettings.AddFiles(((TextEditor) EmptyTab.Content).DocumentPath);
                 userSettings.Save();
                 Tabs.SelectedIndex--;
             }
@@ -373,11 +374,11 @@ namespace NotepadCore
             MessageBox.Show("Icon made by https://www.flaticon.com/authors/smashicons from www.flaticon.com");
             // Icon made by https://www.flaticon.com/authors/smashicons from www.flaticon.com
         }
-
+        
         private void MainWindow_OnKeyDown(object sender, KeyEventArgs e)
         {
             if (Keyboard.IsKeyDown(Key.LeftCtrl) && e.Key == Key.T)
-                Tabs.SelectedIndex = Tabs.Items.Count - 1;
+                Tabs.SelectedItem = TabAdd;
         }
     }
 }

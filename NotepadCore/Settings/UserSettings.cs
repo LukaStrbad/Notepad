@@ -176,6 +176,11 @@ namespace NotepadCore.Settings
                 RemoveFilePath(path);
         }
 
+        public void RemoveInvalidFilePaths()
+        {
+            Editors = Editors.Where(x => File.Exists(x.FilePath)).ToArray();
+        }
+
         /// <summary>
         ///     Adds distinct file paths to FilePaths
         /// </summary>
