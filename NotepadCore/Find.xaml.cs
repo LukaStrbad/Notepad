@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using NotepadCore.ExtensionMethods;
 
 namespace NotepadCore
 {
@@ -77,19 +78,14 @@ namespace NotepadCore
         {
             var textRange = new TextRange(TextBox.Document.ContentStart, TextBox.Document.ContentEnd);
 
-            int lineNumber = 0;
-            // Calculate line number of current match
-            for (; lineNumber < TextBox.Document.Blocks.Count; lineNumber++)
-            {
-                if (new TextRange(TextBox.Document.Blocks.ElementAt(lineNumber).ContentStart,
-                        TextBox.Document.Blocks.ElementAt(lineNumber).ContentEnd)
-                    .Contains(TextEditor.GetTextPointAt(textRange.Start, _currentMatch.Index)))
-                    break;
-            }
+            // Calculate offset that is caused by new lines
+            var newLines = textRange.Text.IndexesOf(Environment.NewLine);
+            int offset = newLines.Count(x => x < _currentMatch.Index) * Environment.NewLine.Length;
 
-            TextBox.Selection.Select(TextEditor.GetTextPointAt(textRange.Start, _currentMatch.Index - lineNumber * 2),
+            // Select text according to the offset
+            TextBox.Selection.Select(TextEditor.GetTextPointAt(textRange.Start, _currentMatch.Index - offset),
                 TextEditor.GetTextPointAt(textRange.Start,
-                    _currentMatch.Index + _currentMatch.Length - lineNumber * 2));
+                    _currentMatch.Index - offset + _currentMatch.Length));
             SetNextMatch();
 
             _mw.Focus();
