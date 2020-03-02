@@ -404,5 +404,21 @@ namespace NotepadCore
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        private void MainTextBox_OnSelectionChanged(object sender, RoutedEventArgs e)
+        {
+            TextPointer tp1 = MainTextBox.Selection.Start.GetLineStartPosition(0);
+            TextPointer tp2 = MainTextBox.Selection.Start;
+
+            int column = tp1.GetOffsetToPosition(tp2);
+
+            int someBigNumber = int.MaxValue;
+            int lineMoved, currentLineNumber;
+            MainTextBox.Selection.Start.GetLineStartPosition(-someBigNumber, out lineMoved);
+            currentLineNumber = -lineMoved;
+
+
+            LineColumnLabel.Content = $"ln: {currentLineNumber}, col: {column}";
+        }
     }
 }

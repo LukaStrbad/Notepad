@@ -15,6 +15,7 @@
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
     </UserControl.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -30,7 +31,7 @@
                      HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" AcceptsReturn="True"
                      TextChanged="MainTextBox_TextChanged" ScrollViewer.ScrollChanged="ScrollChanged"
                      BorderThickness="0" Keyboard.PreviewKeyDown="MainTextBox_KeyDown"
-                     SizeChanged="MainTextBox_SizeChanged" Visibility="Visible">
+                     SizeChanged="MainTextBox_SizeChanged" Visibility="Visible" SelectionChanged="MainTextBox_OnSelectionChanged">
             <FlowDocument LineHeight="1">
                 <Paragraph>
                     <Run />
@@ -49,12 +50,16 @@
             </FlowDocument>
         </RichTextBox>
 
+        <!-- Bottom status bar -->
         <StatusBar Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
-            <StatusBarItem Padding="0" Margin="0">
-                <ComboBox x:Name="LanguageComboBox" SelectedIndex="0" FontSize="10" Padding="0" Margin="0"
+            <StatusBarItem Style="{StaticResource StatusBarItemStyle}">
+                <ComboBox x:Name="LanguageComboBox" SelectedIndex="0" FontSize="10" Padding="2"
                           ItemsSource="{Binding Source={StaticResource DataFromEnum}}"
                           SelectedItem="{Binding FileLanguage, Mode=TwoWay}"
                           SelectionChanged="LanguageComboBox_OnSelectionChanged" />
+            </StatusBarItem>
+            <StatusBarItem Style="{StaticResource StatusBarItemStyle}">
+                <Label x:Name="LineColumnLabel" FontSize="10" Padding="2" />
             </StatusBarItem>
         </StatusBar>
     </Grid>
