@@ -9,9 +9,5 @@ namespace NotepadCore.Exceptions
         public InvalidSaveLocationException()
         {
         }
-
-        public InvalidSaveLocationException(string message) : base(message)
-        {
-        }
     }
 }

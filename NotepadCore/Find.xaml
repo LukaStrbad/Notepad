@@ -29,6 +29,6 @@
         <Button x:Name="FindButton" Content="Find Next" Margin="250,13" Click="FindButton_Click" />
         <Button x:Name="ReplaceButton" Content="Replace" Margin="250,43" Click="ReplaceButton_Click" />
 
-        <Label x:Name="NumberOfOccurancesLabel" Margin="10,150" Width="380" HorizontalContentAlignment="Center" />
+        <Label x:Name="NumberOfOccurencesLabel" Margin="10,150" Width="380" HorizontalContentAlignment="Center" />
     </Canvas>
 </Window>

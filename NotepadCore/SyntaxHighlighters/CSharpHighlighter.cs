@@ -40,12 +40,16 @@ namespace NotepadCore.SyntaxHighlighters
 
         IEnumerable<((int Index, int Length) Match, SolidColorBrush Brush)> IHighlighter.GetMatches(TextRange textRange)
         {
+            // Gets all indexes of new lines in text
             var newLines = textRange.Text.IndexesOf(Environment.NewLine);
 
+            // Loop through all keywords
             foreach (var (pattern, brush) in Keywords)
             {
+                // Loop through all matches for a specific pattern
                 foreach (Match match in pattern.Matches(textRange.Text))
                 {
+                    // Calculate offset because of new lines
                     int offset = newLines.Count(x => x < match.Index) * Environment.NewLine.Length;
                     yield return ((match.Index - offset, match.Length), brush);
                 }

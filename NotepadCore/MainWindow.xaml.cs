@@ -294,7 +294,6 @@ namespace NotepadCore
         /// </summary>
         private void FindReplace_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show(sender.ToString());
             new Find().Show();
         }
 
