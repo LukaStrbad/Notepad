@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Windows;
+﻿using System.Windows;
 using NotepadCore.Settings;
 
 namespace NotepadCore
@@ -11,12 +10,12 @@ namespace NotepadCore
     {
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            if (e.Args.Length > 0)
+            if (e.Args.Length > 0) // Check if there are args
             {
-                var userSettings = Settings.UserSettings.Create();
-
-                userSettings.AddFiles(e.Args);
-                userSettings.SelectedFileIndex = userSettings.Editors.Length - 1;
+                var userSettings = UserSettings.Create();
+                
+                userSettings.AddFiles(e.Args); // Add all files to user settings
+                userSettings.SelectedFileIndex = userSettings.Editors.Length - 1; // Change selected index to last added file
                 userSettings.Save();
             }
         }

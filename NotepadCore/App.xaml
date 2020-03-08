@@ -6,7 +6,7 @@
              Startup="Application_Startup">
     <Application.Resources>
         <Style x:Key="StatusBarItemStyle" TargetType="StatusBarItem">
-            <Setter Property="Margin" Value="5,0,5,0" />
+            <Setter Property="Margin" Value="5,0" />
             <Setter Property="Padding" Value="0" />
         </Style>
     </Application.Resources>
