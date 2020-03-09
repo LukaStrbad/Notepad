@@ -2,7 +2,7 @@
 
 namespace NotepadCore.ExtensionMethods
 {
-    public static class StringExtension
+    public static class StringExtensions
     {
         public static List<int> IndexesOf(this string str, string value)
         {
