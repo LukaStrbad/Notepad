@@ -56,7 +56,7 @@ namespace NotepadCore
             _currentMatch = FindRegex.Match(textRange.Text);
         }
 
-        private RichTextBox TextBox => ((TextEditor) _mw.Tabs.SelectedContent).MainTextBox;
+        private RichTextBox TextBox => ((TextEditor)_mw.Tabs.SelectedContent).MainTextBox;
 
         private void FindButton_Click(object sender, RoutedEventArgs e)
         {
@@ -83,9 +83,8 @@ namespace NotepadCore
             int offset = newLines.Count(x => x < _currentMatch.Index) * Environment.NewLine.Length;
 
             // Select text according to the offset
-            TextBox.Selection.Select(TextEditor.GetTextPointAt(textRange.Start, _currentMatch.Index - offset),
-                TextEditor.GetTextPointAt(textRange.Start,
-                    _currentMatch.Index - offset + _currentMatch.Length));
+            TextBox.Selection.Select(textRange.Start.GetTextPointerAtOffset(_currentMatch.Index - offset),
+                textRange.Start.GetTextPointerAtOffset(_currentMatch.Index - offset + _currentMatch.Length));
             SetNextMatch();
 
             _mw.Focus();
