@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Navigation;
 using NotepadCore.Annotations;
 using NotepadCore.Exceptions;
+using NotepadCore.ExtensionMethods;
 using NotepadCore.SyntaxHighlighters;
 
 namespace NotepadCore
@@ -158,7 +159,7 @@ namespace NotepadCore
             set
             {
                 MainTextBox.Document.Blocks.Clear();
-                var paragraphs = value.Trim().Split(new[] {Environment.NewLine}, StringSplitOptions.None)
+                var paragraphs = value.Trim().Split(new[] { Environment.NewLine }, StringSplitOptions.None)
                     .Select(a => new Paragraph(new Run(a)));
                 MainTextBox.Document.Blocks.AddRange(paragraphs);
                 try
@@ -224,31 +225,6 @@ namespace NotepadCore
             HighlightCurrentLine();
         }
 
-        /// <summary>
-        ///     Gets actual TextPointer position that includes FlowDocument tags
-        /// </summary>
-        /// <param name="from">Starting TextPointer position</param>
-        /// <param name="pos">Offset from <paramref name="from" /></param>
-        public static TextPointer GetTextPointAt(TextPointer from, int pos)
-        {
-            var ret = from;
-            var i = 0;
-
-            while (i < pos)
-            {
-                if (ret.GetTextInRun(LogicalDirection.Forward).StartsWith(Environment.NewLine))
-                    i += 2;
-                if (ret.GetPointerContext(LogicalDirection.Forward) == TextPointerContext.Text)
-                    i++;
-
-                ret = ret.GetPositionAtOffset(1, LogicalDirection.Forward);
-                if (ret.GetPositionAtOffset(1, LogicalDirection.Forward) == null)
-                    return ret;
-            }
-
-            return ret;
-        }
-
         private void HighlightCurrentLine()
         {
             if (FileLanguage == HighlightingLanguage.None) return;
@@ -264,8 +240,8 @@ namespace NotepadCore
             {
                 Dispatcher?.Invoke(() =>
                 {
-                    new TextRange(GetTextPointAt(textRange.Start, match.Index),
-                            GetTextPointAt(textRange.Start, match.Index + match.Length))
+                    new TextRange(textRange.Start.GetTextPointerAtOffset(match.Index),
+                            textRange.Start.GetTextPointerAtOffset(match.Index + match.Length))
                         .ApplyPropertyValue(TextElement.ForegroundProperty, brush);
                 });
             }
@@ -284,8 +260,8 @@ namespace NotepadCore
             {
                 foreach (var (match, brush) in Highlighter.GetMatches(textRange))
                 {
-                    new TextRange(GetTextPointAt(textRange.Start, match.Index),
-                            GetTextPointAt(textRange.Start, match.Index + match.Length))
+                    new TextRange(textRange.Start.GetTextPointerAtOffset(match.Index),
+                            textRange.Start.GetTextPointerAtOffset(match.Index + match.Length))
                         .ApplyPropertyValue(TextElement.ForegroundProperty, brush);
                 }
             }
@@ -363,7 +339,7 @@ namespace NotepadCore
                 }
 
                 e.Handled = true;
-            } 
+            }
         }
 
         /// <summary>
@@ -407,10 +383,11 @@ namespace NotepadCore
 
         private void MainTextBox_OnSelectionChanged(object sender, RoutedEventArgs e)
         {
-            TextPointer tp1 = MainTextBox.Selection.Start.GetLineStartPosition(0);
-            TextPointer tp2 = MainTextBox.Selection.Start;
+            var tp1 = MainTextBox.Selection.Start.GetLineStartPosition(0);
+            var tp2 = MainTextBox.Selection.Start;
 
-            int column = tp1.GetOffsetToPosition(tp2);
+            //int column = tp1.GetOffsetToPosition(tp2);
+            int column = tp1.GetOffsetAtTextPointer(tp2);
 
             int someBigNumber = int.MaxValue;
             int lineMoved, currentLineNumber;
