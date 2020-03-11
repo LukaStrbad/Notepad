@@ -9,12 +9,6 @@
         Deactivated="Window_Deactivated" Activated="Window_Activated" Icon="Icons\notepad.png"
         PreviewKeyDown="MainWindow_OnKeyDown" >
 
-    <Window.Resources>
-        <Style TargetType="TextBox">
-            <Setter Property="FontFamily" Value="Consolas" />
-        </Style>
-    </Window.Resources>
-
     <!-- Shortcut Commands -->
     <Window.CommandBindings>
         <CommandBinding Command="Save" Executed="FileSave_Click" />
@@ -42,7 +36,7 @@
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
-        <Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+        <Menu Grid.Row="0">
             <MenuItem Header="File">
                 <MenuItem Header="New" Click="FileNew_Click" InputGestureText="Ctrl + N" />
                 <MenuItem Header="Open" Click="FileOpen_Click" InputGestureText="Ctrl + O" />
@@ -70,6 +64,5 @@
         <TabControl Grid.Row="1" x:Name="Tabs" Padding="0" SelectionChanged="Tabs_SelectionChanged">
             <TabItem Header="+" x:Name="TabAdd" />
         </TabControl>
-
     </Grid>
 </Window>

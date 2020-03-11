@@ -19,7 +19,6 @@ namespace NotepadCore
     /// </summary>
     public partial class MainWindow : Window
     {
-        private string _documentPath = "contents.txt";
         private int _newFileNumber = 1;
 
         public MainWindow()
@@ -107,17 +106,17 @@ namespace NotepadCore
 
             var newDialog = new SaveFileDialog();
             newDialog.ShowDialog();
-            _documentPath = newDialog.FileName;
+            string documentPath = newDialog.FileName;
 
-            if (!string.IsNullOrEmpty(_documentPath))
+            if (!string.IsNullOrEmpty(documentPath))
             {
                 // Adds new file path
-                userSettings.AddFiles(_documentPath);
+                userSettings.AddFiles(documentPath);
 
                 Tabs.Items.Insert(Tabs.Items.Count - 1, new TabItem
                 {
-                    Content = new TextEditor(_documentPath),
-                    Header = new FileInfo(_documentPath).Name
+                    Content = new TextEditor(documentPath),
+                    Header = new FileInfo(documentPath).Name
                 });
                 userSettings.SelectedFileIndex = userSettings.Editors.Length - 1;
                 Tabs.SelectedIndex = userSettings.Editors.Length - 1;
@@ -136,27 +135,27 @@ namespace NotepadCore
             openDialog.ShowDialog();
             if (string.IsNullOrEmpty(openDialog.FileName))
                 return;
-            _documentPath = openDialog.FileName;
+            string documentPath = openDialog.FileName;
 
-            if (!string.IsNullOrEmpty(_documentPath))
+            if (!string.IsNullOrEmpty(documentPath))
                 // writes the new file path to the constant Path.Document location
-                userSettings.AddFiles(_documentPath);
+                userSettings.AddFiles(documentPath);
 
             // If the selected TextEditor is empty or contains only whitespace and doesn't have save location
             // Open a new one on the same spot
             if (string.IsNullOrWhiteSpace(CurrentTextEditor.Text) && !CurrentTextEditor.HasSaveLocation)
             {
                 var item = Tabs.SelectedItem as TabItem;
-                item.Content = new TextEditor(_documentPath);
-                item.Header = new FileInfo(_documentPath).Name;
+                item.Content = new TextEditor(documentPath);
+                item.Header = new FileInfo(documentPath).Name;
             }
             else
             {
                 // else insert a new TextEditor on the end
                 Tabs.Items.Insert(Tabs.Items.Count - 1, new TabItem
                 {
-                    Content = new TextEditor(_documentPath),
-                    Header = new FileInfo(_documentPath).Name
+                    Content = new TextEditor(documentPath),
+                    Header = new FileInfo(documentPath).Name
                 });
 
                 Tabs.SelectedIndex = Tabs.Items.Count - 2;
