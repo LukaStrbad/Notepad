@@ -165,6 +165,7 @@ namespace NotepadCore
         {
             var userSettings = UserSettings.Create();
 
+            // If the file doesn't have a save location ask the user to save the file
             if (!string.IsNullOrWhiteSpace(CurrentTextEditor.Text) && !CurrentTextEditor.HasSaveLocation &&
                 Tabs.Items.Count == 2)
             {
@@ -176,23 +177,32 @@ namespace NotepadCore
                 return;
             }
 
+            // If the file is empty and doesn't have a save location do nothing
             if (string.IsNullOrWhiteSpace(CurrentTextEditor.Text) && !CurrentTextEditor.HasSaveLocation &&
                 Tabs.Items.Count == 2)
                 return;
 
+            // If there are more than 2 tabs
 
+            // Save the file if it has a save location
             var files = userSettings.Editors.ToList();
             if (CurrentTextEditor.HasSaveLocation)
                 CurrentTextEditor.SaveFile();
+            // If it doesn't have a save location but has some text ask the user to save the file
+            else if (!string.IsNullOrWhiteSpace(CurrentTextEditor.Text))
+                FileSave_Click(sender, e);
 
             if (Tabs.SelectedIndex == 0)
             {
+                // Remove the first tab/file to account for the negative index
                 Tabs.Items.RemoveAt(0);
                 files.RemoveAt(0);
             }
             else
             {
+                // If it's not the first tab select the previous tab
                 Tabs.SelectedIndex--; // 
+                // Remove the tab that was requested to be closed
                 Tabs.Items.RemoveAt(Tabs.SelectedIndex + 1);
                 files.RemoveAt(Tabs.SelectedIndex + 1);
             }
