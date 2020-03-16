@@ -63,7 +63,7 @@ namespace NotepadCore
             InputBindings.Add(new KeyBinding(ApplicationCommands.Open, Key.T, ModifierKeys.Control));
         }
 
-        public TextEditor CurrentTextEditor => Tabs.SelectedContent as TextEditor;
+        public TextEditor CurrentTextEditor => (TextEditor)Tabs.SelectedContent;
 
         /// <summary>
         ///     Writes the text from MainTextBox when the window closes
@@ -106,17 +106,16 @@ namespace NotepadCore
 
             var newDialog = new SaveFileDialog();
             newDialog.ShowDialog();
-            string documentPath = newDialog.FileName;
 
-            if (!string.IsNullOrEmpty(documentPath))
+            if (!string.IsNullOrEmpty(newDialog.FileName))
             {
                 // Adds new file path
-                userSettings.AddFiles(documentPath);
+                userSettings.AddFiles(newDialog.FileName);
 
                 Tabs.Items.Insert(Tabs.Items.Count - 1, new TabItem
                 {
-                    Content = new TextEditor(documentPath),
-                    Header = new FileInfo(documentPath).Name
+                    Content = new TextEditor(newDialog.FileName),
+                    Header = new FileInfo(newDialog.FileName).Name
                 });
                 userSettings.SelectedFileIndex = userSettings.Editors.Length - 1;
                 Tabs.SelectedIndex = userSettings.Editors.Length - 1;
