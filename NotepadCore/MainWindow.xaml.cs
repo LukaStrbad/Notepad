@@ -35,7 +35,7 @@ namespace NotepadCore
                     {
                         Tabs.Items.Insert(Tabs.Items.Count - 1, new TabItem
                         {
-                            Content = new TextEditor(i.FilePath) {FileLanguage = i.HighlightingLanguage},
+                            Content = new TextEditor(i.FilePath) { FileLanguage = i.HighlightingLanguage },
                             Header = new FileInfo(i.FilePath).Name
                         });
                     }
@@ -134,27 +134,25 @@ namespace NotepadCore
             openDialog.ShowDialog();
             if (string.IsNullOrEmpty(openDialog.FileName))
                 return;
-            string documentPath = openDialog.FileName;
 
-            if (!string.IsNullOrEmpty(documentPath))
-                // writes the new file path to the constant Path.Document location
-                userSettings.AddFiles(documentPath);
+            // writes the new file path to the constant Path.Document location
+            userSettings.AddFiles(openDialog.FileName);
 
             // If the selected TextEditor is empty or contains only whitespace and doesn't have save location
             // Open a new one on the same spot
             if (string.IsNullOrWhiteSpace(CurrentTextEditor.Text) && !CurrentTextEditor.HasSaveLocation)
             {
                 var item = Tabs.SelectedItem as TabItem;
-                item.Content = new TextEditor(documentPath);
-                item.Header = new FileInfo(documentPath).Name;
+                item.Content = new TextEditor(openDialog.FileName);
+                item.Header = new FileInfo(openDialog.FileName).Name;
             }
             else
             {
                 // else insert a new TextEditor on the end
                 Tabs.Items.Insert(Tabs.Items.Count - 1, new TabItem
                 {
-                    Content = new TextEditor(documentPath),
-                    Header = new FileInfo(documentPath).Name
+                    Content = new TextEditor(openDialog.FileName),
+                    Header = new FileInfo(openDialog.FileName).Name
                 });
 
                 Tabs.SelectedIndex = Tabs.Items.Count - 2;
@@ -227,7 +225,7 @@ namespace NotepadCore
                 paths.Insert(Tabs.SelectedIndex,
                     new EditorInfo(HighlightingLanguage.None, CurrentTextEditor.DocumentPath));
                 userSettings.Editors = paths.ToArray();
-                ((TabItem) Tabs.Items[Tabs.SelectedIndex]).Header = CurrentTextEditor.FileName;
+                ((TabItem)Tabs.Items[Tabs.SelectedIndex]).Header = CurrentTextEditor.FileName;
                 try
                 {
                     CurrentTextEditor.SaveFile();
@@ -266,7 +264,7 @@ namespace NotepadCore
 
             userSettings.Save();
 
-            ((TabItem) Tabs.SelectedItem).Header = textEditor.FileName;
+            ((TabItem)Tabs.SelectedItem).Header = textEditor.FileName;
         }
 
 
@@ -337,7 +335,7 @@ namespace NotepadCore
                 var userSettings = UserSettings.Create();
 
                 Tabs.Items.Insert(Tabs.Items.Count - 1, EmptyTab);
-                userSettings.AddFiles(((TextEditor) EmptyTab.Content).DocumentPath);
+                userSettings.AddFiles(((TextEditor)EmptyTab.Content).DocumentPath);
                 userSettings.Save();
                 Tabs.SelectedIndex--;
             }
@@ -345,15 +343,15 @@ namespace NotepadCore
 
         private TabItem EmptyTab => new TabItem
         {
-            Content = new TextEditor {DocumentPath = ""},
+            Content = new TextEditor { DocumentPath = "" },
             Header = $"*new file {_newFileNumber++}"
         };
 
         public List<TextEditor> GetTextEditors()
         {
             return (from object i in Tabs.Items
-                where (i as TabItem).Content is TextEditor
-                select (i as TabItem).Content as TextEditor).ToList();
+                    where (i as TabItem).Content is TextEditor
+                    select (i as TabItem).Content as TextEditor).ToList();
         }
 
         private void Window_Deactivated(object sender, EventArgs e)
@@ -371,7 +369,7 @@ namespace NotepadCore
             MessageBox.Show("Icon made by https://www.flaticon.com/authors/smashicons from www.flaticon.com");
             // Icon made by https://www.flaticon.com/authors/smashicons from www.flaticon.com
         }
-        
+
         private void MainWindow_OnKeyDown(object sender, KeyEventArgs e)
         {
             if (Keyboard.IsKeyDown(Key.LeftCtrl) && e.Key == Key.T)
