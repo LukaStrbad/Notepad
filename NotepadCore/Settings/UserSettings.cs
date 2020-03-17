@@ -188,7 +188,7 @@ namespace NotepadCore.Settings
         public void AddFiles(params string[] paths)
         {
             // Add files to the end of the array
-            AddFiles(paths.Length - 1, paths);
+            AddFiles(Editors.Length, paths);
         }
 
         public void AddFiles(int index, params string[] paths)
@@ -196,7 +196,7 @@ namespace NotepadCore.Settings
             var editors = Editors.ToList();
             
             // Adds distinct paths at specified index
-            for (int i = 0; i < editors.Count; i++)
+            for (int i = 0; i < paths.Length; i++)
             {
                 editors.Insert(i + index, new EditorInfo(HighlightingLanguage.None, paths[i]));
             }
