@@ -45,9 +45,9 @@ namespace NotepadCore.Settings
             {
                 if (_editors == null)
                     _editors = new EditorInfo[] { };
-                return _editors.Distinct().ToArray();
+                return _editors.Distinct(editor => editor.FilePath.ToLower()).ToArray();
             }
-            set => _editors = value?.Distinct().ToArray() ?? new[]{new EditorInfo(), };
+            set => _editors = value?.Distinct(editor => editor.FilePath.ToLower()).ToArray() ?? new[]{new EditorInfo(), };
         }
 
         public string EditorFontFamily
@@ -187,8 +187,21 @@ namespace NotepadCore.Settings
         /// <param name="paths"></param>
         public void AddFiles(params string[] paths)
         {
-            // adds distinct paths to FilePaths setting
-            Editors = new[] {Editors, paths.Select(x => new EditorInfo(HighlightingLanguage.None, x)).ToArray()}.SelectMany(x => x).Distinct().ToArray();
+            // Add files to the end of the array
+            AddFiles(paths.Length - 1, paths);
+        }
+
+        public void AddFiles(int index, params string[] paths)
+        {
+            var editors = Editors.ToList();
+            
+            // Adds distinct paths at specified index
+            for (int i = 0; i < editors.Count; i++)
+            {
+                editors.Insert(i + index, new EditorInfo(HighlightingLanguage.None, paths[i]));
+            }
+
+            Editors = editors.ToArray();
         }
 
         public void Save()
