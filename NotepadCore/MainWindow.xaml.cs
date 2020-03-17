@@ -256,25 +256,26 @@ namespace NotepadCore
         {
             var userSettings = UserSettings.Create();
 
-            var textEditor = Tabs.SelectedContent as TextEditor;
-            if (textEditor.HasSaveLocation)
-                textEditor.SaveFile();
-
-            var textEditorText = textEditor.Text;
+            if (CurrentTextEditor.HasSaveLocation)
+                CurrentTextEditor.SaveFile();
 
             var saveDialog = new SaveFileDialog();
             saveDialog.ShowDialog();
-            textEditor.DocumentPath = saveDialog.FileName;
-            textEditor.Text = textEditorText;
 
-            // change file paths
-            var files = userSettings.Editors.ToList();
-            files.RemoveAt(Tabs.SelectedIndex);
-            userSettings.Editors = files.ToArray();
+            // If file path is empty return
+            if (string.IsNullOrEmpty(saveDialog.FileName))
+                return;
+            
+            // Remove the current file path from settings
+            userSettings.RemoveFilePaths(CurrentTextEditor.DocumentPath);
+            
+            // Assign the new file path to the current text editor and insert the file path at a specified index
+            CurrentTextEditor.DocumentPath = saveDialog.FileName;
+            userSettings.AddFiles(Tabs.SelectedIndex, saveDialog.FileName);
 
             userSettings.Save();
 
-            ((TabItem)Tabs.SelectedItem).Header = textEditor.FileName;
+            ((TabItem)Tabs.SelectedItem).Header = CurrentTextEditor.FileName;
         }
 
 
@@ -287,7 +288,7 @@ namespace NotepadCore
 
             foreach (var textEdit in GetTextEditors())
             {
-                //change font of main textbox and line textbox
+                // Change font of main textbox and line textbox
                 textEdit.MainTextBox.FontFamily = new FontFamily(userSettings.EditorFontFamily);
                 textEdit.MainTextBox.FontSize = userSettings.EditorFontSize;
                 textEdit.LineTextBox.FontFamily = new FontFamily(userSettings.EditorFontFamily);
@@ -300,41 +301,18 @@ namespace NotepadCore
         /// </summary>
         private void FindReplace_Click(object sender, RoutedEventArgs e)
         {
+            // Exits the method if a Find window is running
+            if (Application.Current.Windows.OfType<Find>().Any())
+                return;
+
+            // Show Find dialog
             new Find().Show();
         }
-
-        private void Cut_Click(object sender, RoutedEventArgs e)
-        {
-            //var textEdit = Tabs.SelectedContent as TextEditor;
-            //Clipboard.SetDataObject(textEdit.MainTextBox.SelectedText); // copies the text to clipboard
-            //textEdit.MainTextBox.Text = textEdit.MainTextBox.Text.Remove(textEdit.MainTextBox.SelectionStart, textEdit.MainTextBox.SelectionLength); // deletes the text
-
-            var textSelection = CurrentTextEditor.MainTextBox.Selection;
-            Clipboard.SetDataObject(textSelection.Text);
-            textSelection.ClearAllProperties();
-            textSelection.Text = "";
-        }
-
-        private void Copy_Click(object sender, RoutedEventArgs e)
-        {
-            //var textEdit = Tabs.SelectedContent as TextEditor;
-            //Clipboard.SetDataObject(textEdit.MainTextBox.SelectedText); // copies the text to clipboard
-        }
-
-        private void Paste_Click(object sender, RoutedEventArgs e)
-        {
-            //var textEdit = Tabs.SelectedContent as TextEditor;
-            //int caretIndex = textEdit.MainTextBox.CaretIndex;
-            //textEdit.MainTextBox.Text = textEdit.MainTextBox.Text.Insert(textEdit.MainTextBox.CaretIndex, Clipboard.GetText()); // puts the text from the clipboard
-            //textEdit.MainTextBox.CaretIndex = caretIndex + Clipboard.GetText().Length;
-        }
-
+        
         private void Settings_Click(object sender, RoutedEventArgs e)
         {
-            // show SettingsWindow
-            var settingsWindow = new SettingsWindow();
-
-            settingsWindow.ShowDialog();
+            // Show SettingsWindow dialog
+            new SettingsWindow().ShowDialog();
         }
 
         private void Tabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -345,7 +323,7 @@ namespace NotepadCore
                 var userSettings = UserSettings.Create();
 
                 Tabs.Items.Insert(Tabs.Items.Count - 1, EmptyTab);
-                userSettings.AddFiles(((TextEditor)EmptyTab.Content).DocumentPath);
+                userSettings.AddFiles("");
                 userSettings.Save();
                 Tabs.SelectedIndex--;
             }
