@@ -85,8 +85,8 @@ namespace NotepadCore
             // Save ShowLineNumbers boolean
             userSettings.ShowLineNumbers = ShowLineNumbersCheckBox.IsChecked ?? true;
 
-            mainWindow.GetTextEditors()
-                .ForEach(textEditor => textEditor.ShowLineNumbers = userSettings.ShowLineNumbers);
+            foreach (var textEditor in mainWindow.GetTextEditors())
+                textEditor.ShowLineNumbers = userSettings.ShowLineNumbers;
 
             // Save UseSpaces boolean
             userSettings.UseSpaces = SpacesCheckBox.IsChecked ?? true;

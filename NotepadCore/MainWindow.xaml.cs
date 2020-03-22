@@ -332,14 +332,16 @@ namespace NotepadCore
         private TabItem EmptyTab => new TabItem
         {
             Content = new TextEditor { DocumentPath = "" },
-            Header = $"*new file {_newFileNumber++}"
+            Header = $"new file {_newFileNumber++}"
         };
 
-        public List<TextEditor> GetTextEditors()
+        public IEnumerable<TextEditor> GetTextEditors()
         {
-            return (from object i in Tabs.Items
-                    where (i as TabItem).Content is TextEditor
-                    select (i as TabItem).Content as TextEditor).ToList();
+            foreach (object item in Tabs.Items)
+            {
+                if ((item as TabItem)?.Content is TextEditor textEditor)
+                    yield return textEditor;
+            }
         }
 
         private void Window_Deactivated(object sender, EventArgs e)
@@ -355,13 +357,15 @@ namespace NotepadCore
         private void About_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("Icon made by https://www.flaticon.com/authors/smashicons from www.flaticon.com");
-            // Icon made by https://www.flaticon.com/authors/smashicons from www.flaticon.com
         }
 
         private void MainWindow_OnKeyDown(object sender, KeyEventArgs e)
         {
             if (Keyboard.IsKeyDown(Key.LeftCtrl) && e.Key == Key.T)
-                Tabs.SelectedItem = TabAdd;
+            {
+                Tabs.SelectedIndex = Tabs.Items.Count - 1;
+                e.Handled = true;
+            }
         }
     }
 }
