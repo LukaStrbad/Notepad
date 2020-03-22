@@ -337,7 +337,6 @@ namespace NotepadCore
                     //Text = Text.Insert(carretIndex, "\t");
                     //MainTextBox.CaretIndex = carretIndex + 1;
                 }
-
                 e.Handled = true;
             }
         }
