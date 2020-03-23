@@ -22,7 +22,7 @@
         <Label Content="Choose Font Family: " VerticalAlignment="Bottom" HorizontalAlignment="Center" />
         <ListBox x:Name="FontChooseListBox" Grid.Row="1" Grid.Column="0" Margin="10"
                  ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Hidden"
-                 ItemsSource="{x:Static Fonts.SystemFontFamilies}" SelectedIndex="8" />
+                 ItemsSource="{x:Static Fonts.SystemFontFamilies}" />
 
         <Label Content="Choose Font Size: " VerticalAlignment="Bottom" HorizontalAlignment="Center" Grid.Column="1" />
         <ListBox x:Name="FontSizeChooseListBox" Grid.Row="1" Grid.Column="1" Margin="10"
