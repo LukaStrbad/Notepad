@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:NotepadCore"
         mc:Ignorable="d"
         x:Name="settingsWindow"
-        Title="Settings" Height="350" Width="300">
+        Title="Settings" Height="350" Width="300" WindowStartupLocation="CenterOwner">
     <Grid>
         <CheckBox x:Name="ShowLineNumbersCheckBox" Content="Show line numbers" HorizontalAlignment="Left"
                   Margin="10,10,0,0" VerticalAlignment="Top" />

@@ -10,7 +10,7 @@ namespace NotepadCore
     {
         private bool _useSpaces = true;
 
-        private FontWindow fontDialog = new FontWindow();
+        private FontWindow fontDialog;
 
         public SettingsWindow()
         {
@@ -100,7 +100,7 @@ namespace NotepadCore
         private void ChangeFont_Click(object sender, RoutedEventArgs e)
         {
             if (fontDialog == null)
-                fontDialog = new FontWindow();
+                fontDialog = new FontWindow { Owner = this };
             fontDialog.ShowDialog();
 
             FontInfo.Content = $"Font: {fontDialog.fontFamily}, {fontDialog.fontSize}";

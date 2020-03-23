@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NotepadCore"
         mc:Ignorable="d"
-        Title="Font" Height="300" Width="400" FontFamily="Consolas" ResizeMode="NoResize" Closed="Window_Closed">
+        Title="Font" Height="300" Width="400" FontFamily="Consolas" ResizeMode="NoResize" Closed="Window_Closed" WindowStartupLocation="CenterOwner">
 
     <Grid>
         <Grid.RowDefinitions>

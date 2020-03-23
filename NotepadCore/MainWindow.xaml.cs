@@ -276,10 +276,10 @@ namespace NotepadCore
             // If file path is empty return
             if (string.IsNullOrEmpty(saveDialog.FileName))
                 return;
-            
+
             // Remove the current file path from settings
             userSettings.RemoveFilePaths(CurrentTextEditor.DocumentPath);
-            
+
             // Assign the new file path to the current text editor and insert the file path at a specified index
             CurrentTextEditor.DocumentPath = saveDialog.FileName;
             userSettings.AddFiles(Tabs.SelectedIndex, saveDialog.FileName);
@@ -317,13 +317,13 @@ namespace NotepadCore
                 return;
 
             // Show Find dialog
-            new Find().Show();
+            new Find { Owner = this }.Show();
         }
-        
+
         private void Settings_Click(object sender, RoutedEventArgs e)
         {
             // Show SettingsWindow dialog
-            new SettingsWindow().ShowDialog();
+            new SettingsWindow() { Owner = this }.ShowDialog();
         }
 
         private void Tabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
