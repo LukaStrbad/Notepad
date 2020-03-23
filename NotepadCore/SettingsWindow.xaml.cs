@@ -24,9 +24,9 @@ namespace NotepadCore
 
             FontInfo.Content = $"Font: {userSettings.EditorFontFamily}, {userSettings.EditorFontSize}";
 
-            ShowLineNumbersCheckBox.IsChecked = userSettings.ShowLineNumbers;
+            ShowLineNumbersCheckBox.IsChecked = Properties.Settings.Default.ShowLineNumbers;
 
-            SpacesCheckBox.IsChecked = userSettings.UseSpaces;
+            SpacesCheckBox.IsChecked = Properties.Settings.Default.UseSpaces;
         }
 
         public bool UseSpaces
@@ -83,13 +83,13 @@ namespace NotepadCore
             var mainWindow = Application.Current.Windows[0] as MainWindow;
 
             // Save ShowLineNumbers boolean
-            userSettings.ShowLineNumbers = ShowLineNumbersCheckBox.IsChecked ?? true;
+            Properties.Settings.Default.ShowLineNumbers = ShowLineNumbersCheckBox.IsChecked ?? true;
 
             foreach (var textEditor in mainWindow.GetTextEditors())
-                textEditor.ShowLineNumbers = userSettings.ShowLineNumbers;
+                textEditor.ShowLineNumbers = Properties.Settings.Default.ShowLineNumbers;
 
             // Save UseSpaces boolean
-            userSettings.UseSpaces = SpacesCheckBox.IsChecked ?? true;
+            Properties.Settings.Default.UseSpaces = SpacesCheckBox.IsChecked ?? true;
 
             userSettings.Save();
 

@@ -10,7 +10,7 @@ using NotepadCore.SyntaxHighlighters;
 namespace NotepadCore.Settings
 {
     /// <summary>
-    ///     A class that stores user settings
+    ///     A class that manages more complex user settings
     /// </summary>
     public sealed class UserSettings
     {
@@ -23,9 +23,7 @@ namespace NotepadCore.Settings
             EditorFontFamily = "Consolas",
             EditorFontSize = 12,
             TabSize = 4,
-            SelectedFileIndex = 0,
-            ShowLineNumbers = true,
-            UseSpaces = true
+            SelectedFileIndex = 0
         };
 
         private string _editorFontFamily;
@@ -150,10 +148,6 @@ namespace NotepadCore.Settings
                     _selectedFileIndex = DefaultUserSettings.SelectedFileIndex;
             }
         }
-
-        public bool ShowLineNumbers { get; set; } = true;
-
-        public bool UseSpaces { get; set; } = true;
 
         /// <summary>
         ///     Removes all occurances of the path

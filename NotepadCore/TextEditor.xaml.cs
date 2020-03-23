@@ -69,7 +69,7 @@ namespace NotepadCore
             ChangeFont();
 
             TabSize = userSettings.TabSize;
-            ShowLineNumbers = userSettings.ShowLineNumbers;
+            ShowLineNumbers = Properties.Settings.Default.ShowLineNumbers;
 
             FileLanguage = HighlightingLanguage.None;
         }
@@ -317,7 +317,7 @@ namespace NotepadCore
                     MainTextBox.CaretPosition.Paragraph.ContentStart.GetOffsetToPosition(MainTextBox.CaretPosition);
 
                 // If UseSpaces is true insert TabSize amount of spaces
-                if (Settings.UserSettings.Create().UseSpaces)
+                if (Properties.Settings.Default.UseSpaces)
                 {
                     MainTextBox.CaretPosition.InsertTextInRun(new string(' ', TabSize));
 
