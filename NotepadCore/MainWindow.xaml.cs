@@ -60,7 +60,11 @@ namespace NotepadCore
             // Changes the font according to settings
             ChangeFont();
 
-            InputBindings.Add(new KeyBinding(ApplicationCommands.Open, Key.T, ModifierKeys.Control));
+            // Restore previous window state
+            Left = Properties.Settings.Default.LeftWindowPosition;
+            Top = Properties.Settings.Default.TopWindowPosition;
+            Width = Properties.Settings.Default.WindowWidth;
+            Height = Properties.Settings.Default.WindowHeight;
         }
 
         public TextEditor CurrentTextEditor => (TextEditor)Tabs.SelectedContent;
@@ -93,6 +97,13 @@ namespace NotepadCore
             userSettings.SelectedFileIndex = Tabs.SelectedIndex;
             userSettings.RemoveInvalidFilePaths();
             userSettings.Save();
+
+            // Save window state
+            Properties.Settings.Default.LeftWindowPosition = Left;
+            Properties.Settings.Default.TopWindowPosition = Top;
+            Properties.Settings.Default.WindowWidth = Width;
+            Properties.Settings.Default.WindowHeight = Height;
+            Properties.Settings.Default.Save();
 
             Application.Current.Shutdown();
         }
