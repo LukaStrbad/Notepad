@@ -49,11 +49,7 @@ namespace NotepadCore
             // else insert an empty tab
             else
             {
-                Tabs.Items.Insert(Tabs.Items.Count - 1, new TabItem
-                {
-                    Content = new TextEditor(),
-                    Header = $"*new file {_newFileNumber++}"
-                });
+                Tabs.Items.Insert(0, EmptyTab);
                 Tabs.SelectedIndex = 0;
             }
 

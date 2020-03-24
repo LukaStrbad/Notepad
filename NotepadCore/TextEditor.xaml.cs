@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Navigation;
 using NotepadCore.Annotations;
 using NotepadCore.Exceptions;
 using NotepadCore.ExtensionMethods;
@@ -27,7 +24,6 @@ namespace NotepadCore
         private string _documentPath;
         private int _oldNumberOfLines = -1;
         private HighlightingLanguage _fileLanguage;
-
         private int _tabSize;
 
         public HighlightingLanguage FileLanguage
@@ -42,10 +38,42 @@ namespace NotepadCore
                 // Save FileLanguage for current editor
                 var userSettings = Settings.UserSettings.Create();
                 foreach (var editor in userSettings.Editors)
-                    if (editor.FilePath?.ToLower() == _documentPath?.ToLower() && _documentPath != null
-                    ) // Find current editor
-                        editor.HighlightingLanguage = value;
+                {
+            if (editor.FilePath?.ToLower() == _documentPath?.ToLower() && _documentPath != null) // Find current editor
+            {
+                editor.HighlightingLanguage = value;
+                break;
+            }
+                }
                 userSettings.Save();
+            }
+        }
+
+        public int TabSize
+        {
+            get => _tabSize;
+            set
+            {
+                if (value > 0)
+                    _tabSize = value;
+                else throw new ArgumentException("Tab size can't be less than zero or zero");
+            }
+        }
+
+        public string DocumentPath
+        {
+            get => _documentPath;
+            set
+            {
+                if (File.Exists(value))
+                {
+                    Text = File.ReadAllText(value);
+                    _documentPath = value;
+                }
+                else
+                {
+                    _documentPath = value;
+                }
             }
         }
 
@@ -116,38 +144,14 @@ namespace NotepadCore
             }
         }
 
-        public string DocumentPath
-        {
-            get => _documentPath;
-            set
-            {
-                if (File.Exists(value))
-                {
-                    Text = File.ReadAllText(value);
-                    _documentPath = value;
-                }
-                else
-                {
-                    _documentPath = value;
-                }
-            }
-        }
+        
 
         // Returns true if file exists
         public bool HasSaveLocation => File.Exists(DocumentPath ?? "");
 
         public string FileName => new FileInfo(DocumentPath).Name;
 
-        public int TabSize
-        {
-            get => _tabSize;
-            set
-            {
-                if (value > 0)
-                    _tabSize = value;
-                else throw new ArgumentException("Tab size can't be less than zero or zero");
-            }
-        }
+        
 
         public string Text
         {
