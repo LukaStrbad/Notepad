@@ -39,11 +39,11 @@ namespace NotepadCore
                 var userSettings = Settings.UserSettings.Create();
                 foreach (var editor in userSettings.Editors)
                 {
-            if (editor.FilePath?.ToLower() == _documentPath?.ToLower() && _documentPath != null) // Find current editor
-            {
-                editor.HighlightingLanguage = value;
-                break;
-            }
+                    if (editor.FilePath?.ToLower() == _documentPath?.ToLower() && _documentPath != null) // Find current editor
+                    {
+                        editor.HighlightingLanguage = value;
+                        break;
+                    }
                 }
                 userSettings.Save();
             }
@@ -66,14 +66,11 @@ namespace NotepadCore
             set
             {
                 if (File.Exists(value))
-                {
                     Text = File.ReadAllText(value);
-                    _documentPath = value;
-                }
                 else
-                {
-                    _documentPath = value;
-                }
+                    Text = "";
+
+                _documentPath = value;
             }
         }
 
@@ -104,18 +101,33 @@ namespace NotepadCore
 
         public TextEditor(string documentPath) : this()
         {
-            _documentPath = documentPath;
+            DocumentPath = documentPath;
 
-            Text = "";
-            try
+            if (!HasSaveLocation)
             {
-                Text = File.ReadAllText(_documentPath);
-            }
-            catch (FileNotFoundException e)
-            {
-                File.Create(_documentPath);
+                try
+                {
+                    File.Create(DocumentPath);
+                }
+                catch
+                {
+                }
             }
         }
+
+        // Returns true if file exists
+        public bool HasSaveLocation => File.Exists(DocumentPath);
+
+        public string FileName
+        {
+            get
+            {
+                if (HasSaveLocation)
+                    return new FileInfo(DocumentPath).Name;
+                return "";
+            }
+        }
+
 
         public bool ShowLineNumbers
         {
@@ -144,15 +156,6 @@ namespace NotepadCore
             }
         }
 
-        
-
-        // Returns true if file exists
-        public bool HasSaveLocation => File.Exists(DocumentPath ?? "");
-
-        public string FileName => new FileInfo(DocumentPath).Name;
-
-        
-
         public string Text
         {
             get
@@ -163,32 +166,28 @@ namespace NotepadCore
             set
             {
                 MainTextBox.Document.Blocks.Clear();
-                var paragraphs = value.Trim().Split(new[] { Environment.NewLine }, StringSplitOptions.None)
+                var paragraphs = value.Trim()
+                    .Split(new[] { Environment.NewLine }, StringSplitOptions.None)
                     .Select(a => new Paragraph(new Run(a)));
                 MainTextBox.Document.Blocks.AddRange(paragraphs);
-                try
-                {
-                    HighlightAllBlocks();
-                }
-                catch
-                {
-                }
+
+                HighlightBlocks();
             }
         }
 
         /// <summary>
         ///     Changes the font of the two textboxes
         /// </summary>
-        private void ChangeFont()
+        public void ChangeFont()
         {
             var userSettings = Settings.UserSettings.Create();
 
-            var ff = new FontFamily(userSettings.EditorFontFamily);
+            var fontFamily = new FontFamily(userSettings.EditorFontFamily);
 
             //change font of main textbox and line textbox
-            MainTextBox.FontFamily = ff;
+            MainTextBox.FontFamily = fontFamily;
             MainTextBox.FontSize = userSettings.EditorFontSize;
-            LineTextBox.FontFamily = ff;
+            LineTextBox.FontFamily = fontFamily;
             LineTextBox.FontSize = userSettings.EditorFontSize;
         }
 
@@ -197,9 +196,9 @@ namespace NotepadCore
         /// </summary>
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!string.IsNullOrEmpty(_documentPath))
+            if (HasSaveLocation)
             {
-                var fileInfo = new FileInfo(_documentPath);
+                var fileInfo = new FileInfo(DocumentPath);
 
                 FileLanguage = fileInfo.Extension switch
                 {
@@ -231,7 +230,8 @@ namespace NotepadCore
 
         private void HighlightCurrentLine()
         {
-            if (FileLanguage == HighlightingLanguage.None) return;
+            if (FileLanguage == HighlightingLanguage.None)
+                return;
             if (MainTextBox.CaretPosition.Paragraph == null)
                 return;
             MainTextBox.TextChanged -= MainTextBox_TextChanged;
@@ -253,25 +253,25 @@ namespace NotepadCore
             MainTextBox.TextChanged += MainTextBox_TextChanged;
         }
 
-        private void HighlightAllBlocks(TextPointer start = null, TextPointer end = null)
+        private void HighlightBlocks(TextPointer start = null, TextPointer end = null)
         {
             if (MainTextBox == null) return;
             MainTextBox.TextChanged -= MainTextBox_TextChanged;
             var textRange = new TextRange(start ?? MainTextBox.Document.ContentStart,
                 end ?? MainTextBox.Document.ContentEnd);
             textRange.ClearAllProperties();
-            try
+
+
+            foreach (var (match, brush) in Highlighter.GetMatches(textRange))
             {
-                foreach (var (match, brush) in Highlighter.GetMatches(textRange))
+                Dispatcher?.Invoke(() =>
                 {
                     new TextRange(textRange.Start.GetTextPointerAtOffset(match.Index),
-                            textRange.Start.GetTextPointerAtOffset(match.Index + match.Length))
-                        .ApplyPropertyValue(TextElement.ForegroundProperty, brush);
-                }
+                                textRange.Start.GetTextPointerAtOffset(match.Index + match.Length))
+                            .ApplyPropertyValue(TextElement.ForegroundProperty, brush);
+                });
             }
-            catch
-            {
-            }
+
 
             MainTextBox.TextChanged += MainTextBox_TextChanged;
         }
@@ -366,7 +366,7 @@ namespace NotepadCore
             MainTextBox.TextChanged -= MainTextBox_TextChanged;
             try
             {
-                HighlightAllBlocks();
+                HighlightBlocks();
             }
             catch
             {

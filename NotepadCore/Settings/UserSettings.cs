@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Windows.Media;
 using System.Xml.Serialization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using NotepadCore.ExtensionMethods;
 using NotepadCore.SyntaxHighlighters;
 
@@ -198,7 +200,7 @@ namespace NotepadCore.Settings
             Editors = editors.ToArray();
         }
 
-        public void Save()
+        public async void Save()
         {
             using (var streamWriter = new StreamWriter(SavePath, false))
             {

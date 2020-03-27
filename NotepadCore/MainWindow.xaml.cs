@@ -53,6 +53,7 @@ namespace NotepadCore
                 Tabs.SelectedIndex = 0;
             }
 
+            // TODO: remove
             // Changes the font according to settings
             ChangeFont();
 
@@ -291,15 +292,10 @@ namespace NotepadCore
         /// </summary>
         public void ChangeFont()
         {
-            var userSettings = UserSettings.Create();
-
             foreach (var textEdit in GetTextEditors())
             {
                 // Change font of main textbox and line textbox
-                textEdit.MainTextBox.FontFamily = new FontFamily(userSettings.EditorFontFamily);
-                textEdit.MainTextBox.FontSize = userSettings.EditorFontSize;
-                textEdit.LineTextBox.FontFamily = new FontFamily(userSettings.EditorFontFamily);
-                textEdit.LineTextBox.FontSize = userSettings.EditorFontSize;
+                textEdit.ChangeFont();
             }
         }
 
