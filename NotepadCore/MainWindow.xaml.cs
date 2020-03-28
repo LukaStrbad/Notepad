@@ -369,6 +369,27 @@ namespace NotepadCore
                 Tabs.SelectedIndex = Tabs.Items.Count - 1;
                 e.Handled = true;
             }
+            // TODO: add this
+            else if (Keyboard.IsKeyDown(Key.LeftCtrl) && e.Key == Key.Tab)
+            {
+                // Backward tab cycle
+                if (Keyboard.IsKeyDown(Key.LeftShift))
+                {
+                    if (Tabs.SelectedIndex == 0)
+                        Tabs.SelectedIndex = Tabs.Items.Count - 2;
+                    else
+                        Tabs.SelectedIndex--;
+                }
+                // Forward tab cycle
+                else
+                {
+                    if (Tabs.SelectedIndex == Tabs.Items.Count - 2)
+                        Tabs.SelectedIndex = 0;
+                    else
+                        Tabs.SelectedIndex++;
+                }
+                e.Handled = true;
+            }
         }
     }
 }
