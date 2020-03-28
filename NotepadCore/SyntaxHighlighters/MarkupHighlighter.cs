@@ -13,7 +13,8 @@ namespace NotepadCore.SyntaxHighlighters
         private static readonly (Regex Pattern, SolidColorBrush Brush)[] Keywords =
         {
             
-            (new Regex(@"(?<=<\/?)\w+(?=( |>?).*?>)"), Brushes.Blue), // Tags
+            (new Regex(@"(?<=<\/?)[a-zA-Z][\w:\.]*(?=( |>?)(.|(\n|\r|\r\n))*?>)", RegexOptions.Multiline), Brushes.Blue), // Tags
+            (new Regex(@"(?<= )[a-zA-Z][\w:\.]*(?=="")"), Brushes.Red), // Properties
             (new Regex(@"""(\\""|[^""])*"""), Brushes.Brown), // Strings,
             (new Regex(@"<!--(.|\n)*?-->"), Brushes.Green) // Comments
         };
