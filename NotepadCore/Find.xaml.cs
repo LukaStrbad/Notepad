@@ -49,17 +49,18 @@ namespace NotepadCore
             }
         }
 
+        private RichTextBox TextBox => ((TextEditor)MainWindow.Tabs.SelectedContent).MainTextBox;
+
         private void RecalculateNextMatch()
         {
             var textRange = new TextRange(TextBox.Document.ContentStart, TextBox.Document.ContentEnd);
             CurrentMatch = FindRegex.Match(textRange.Text);
         }
 
-        private RichTextBox TextBox => ((TextEditor)MainWindow.Tabs.SelectedContent).MainTextBox;
-
         private void FindButton_Click(object sender, RoutedEventArgs e)
         {
-            if (FindTextBox.Text == "") MessageBox.Show("No text to find");
+            if (FindTextBox.Text == "")
+                MessageBox.Show("No text to find");
 
             FindText();
         }
