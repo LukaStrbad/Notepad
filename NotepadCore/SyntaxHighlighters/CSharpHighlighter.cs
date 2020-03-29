@@ -16,7 +16,7 @@ namespace NotepadCore.SyntaxHighlighters
             "abstract", "as", "base", "bool", "break", "byte", "char", "checked", "class", "const", "decimal",
             "default", "delegate", "double", "enum", "event", "explicit", "extern", "false", "fixed", "float",
             "implicit", "in", "int", "interface", "internal", "is", "lock", "long", "namespace", "new", "null",
-            "object", "operator", "out", "override", "params", "private", "protected", "public", "readonly", "ref",
+            "object", "operator", "out", "override", "params", "partial", "private", "protected", "public", "readonly", "ref",
             "return", "sbyte", "sealed", "short", "sizeof", "stackalloc", "static", "string", "struct", "this",
             "throw",
             "true", "typeof", "uint", "ulong", "unchecked", "unsafe", "ushort", "using", "var", "virtual", "void",
@@ -29,13 +29,13 @@ namespace NotepadCore.SyntaxHighlighters
             "while"
         };
 
-        private new static (Regex Pattern, SolidColorBrush Brush)[] Keywords => new[]
+        private static (Regex Pattern, SolidColorBrush Brush)[] Keywords => new[]
         {
             (new Regex(@"(?<=\.)?[a-zA-Z_]\w*(?=\()"), new BrushConverter().ConvertFromString("#795E26") as SolidColorBrush), // Functions
             (new Regex($@"(?<!\w)({string.Join("|", _keywords1)})(?!\w)"), Brushes.Blue), // Keywords 1
             (new Regex($@"(?<!\w)({string.Join("|", _keywords2)})(?!\w)"), // Keywords 2
                 Brushes.Purple),
-            (new Regex(@"(\$|@|\$@|@\$)""(\\""|[^""])*"""), Brushes.Brown), // Strings
+            (new Regex(@"(\$|@|\$@|@\$)?""(\\""|[^""])*"""), Brushes.Brown), // Strings
             (new Regex(@$"//.*|/\*(.|{Environment.NewLine})*?\*/"), Brushes.Green) // Comments
         };
 
