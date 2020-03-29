@@ -13,14 +13,14 @@ namespace NotepadCore
     /// </summary>
     public partial class Find : Window
     {
-        private readonly MainWindow _mw;
+        private readonly MainWindow _mainWindow;
         private Match _currentMatch;
 
         public Find()
         {
             InitializeComponent();
             FindTextBox.Focus();
-            _mw = Application.Current.Windows[0] as MainWindow;
+            _mainWindow = Application.Current.Windows[0] as MainWindow;
 
             FindTextBox.TextChanged += (sender, args) => RecalculateNextMatch();
             RegExCheckBox.Checked += (sender, args) => RecalculateNextMatch();
@@ -56,7 +56,7 @@ namespace NotepadCore
             _currentMatch = FindRegex.Match(textRange.Text);
         }
 
-        private RichTextBox TextBox => ((TextEditor)_mw.Tabs.SelectedContent).MainTextBox;
+        private RichTextBox TextBox => ((TextEditor)_mainWindow.Tabs.SelectedContent).MainTextBox;
 
         private void FindButton_Click(object sender, RoutedEventArgs e)
         {
@@ -87,7 +87,7 @@ namespace NotepadCore
                 textRange.Start.GetTextPointerAtOffset(_currentMatch.Index - offset + _currentMatch.Length));
             SetNextMatch();
 
-            _mw.Focus();
+            _mainWindow.Focus();
             Focus();
         }
 
