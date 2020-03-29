@@ -97,6 +97,9 @@ namespace NotepadCore
             ShowLineNumbers = Properties.Settings.Default.ShowLineNumbers;
 
             FileLanguage = HighlightingLanguage.None;
+
+            // TODO: add
+            MainTextBox_OnSelectionChanged(this, null);
         }
 
         public TextEditor(string documentPath) : this()
@@ -267,15 +270,12 @@ namespace NotepadCore
             {
                 foreach (var (match, brush) in Highlighter?.GetMatches(textRange))
                 {
-
                     Dispatcher?.Invoke(() =>
                     {
                         new TextRange(textRange.Start.GetTextPointerAtOffset(match.Index),
                                     textRange.Start.GetTextPointerAtOffset(match.Index + match.Length))
                                 .ApplyPropertyValue(TextElement.ForegroundProperty, brush);
                     });
-
-
                 }
             }
             catch { }
@@ -307,7 +307,7 @@ namespace NotepadCore
         {
             var sb = new StringBuilder();
 
-            for (var i = 1; i <= MainTextBox.Document.Blocks.Count; i++) sb.AppendLine(i.ToString());
+            for (var i = 1; i <= MainTextBox.Document.Blocks.Count + 2; i++) sb.AppendLine(i.ToString());
 
             if (LineTextBox != null)
                 new TextRange(LineTextBox.Document.ContentStart, LineTextBox.Document.ContentEnd).Text = sb.ToString();
@@ -330,9 +330,9 @@ namespace NotepadCore
                 {
                     MainTextBox.CaretPosition.InsertTextInRun(new string(' ', TabSize));
 
-                    //MainTextBox.CaretPosition =
-                    //  MainTextBox.CaretPosition.Paragraph.ContentStart.GetPositionAtOffset(start + TabSize) ??
-                    //MainTextBox.CaretPosition;
+                    MainTextBox.CaretPosition =
+                      MainTextBox.CaretPosition.Paragraph.ContentStart.GetPositionAtOffset(start + TabSize) ??
+                    MainTextBox.CaretPosition;
                 }
                 // Else insert a tab
                 else
@@ -387,20 +387,25 @@ namespace NotepadCore
 
         private void MainTextBox_OnSelectionChanged(object sender, RoutedEventArgs e)
         {
-            // TODO: fix
-            var tp1 = MainTextBox.Selection.Start.GetLineStartPosition(0);
-            var tp2 = MainTextBox.Selection.Start;
+            var lineStart = MainTextBox.Selection.Start.GetLineStartPosition(0);
 
-            //int column = tp1.GetOffsetToPosition(tp2);
-            int column = tp1.GetOffsetAtTextPointer(tp2);
+            int column = lineStart.GetOffsetAtTextPointer(MainTextBox.Selection.Start);
 
-            int someBigNumber = int.MaxValue;
-            int lineMoved, currentLineNumber;
-            MainTextBox.Selection.Start.GetLineStartPosition(-someBigNumber, out lineMoved);
-            currentLineNumber = -lineMoved;
+            MainTextBox.Selection.Start.GetLineStartPosition(int.MinValue, out int linesMoved);
 
+            LineColumnLabel.Content = $"ln: {-linesMoved + 1}, col: {column + 1}";
 
-            LineColumnLabel.Content = $"ln: {currentLineNumber}, col: {column}";
+            // If text is selectd
+            if (MainTextBox.Selection.End != MainTextBox.Selection.Start)
+            {
+                lineStart = MainTextBox.Selection.End.GetLineStartPosition(0);
+
+                column = lineStart.GetOffsetAtTextPointer(MainTextBox.Selection.End);
+
+                MainTextBox.Selection.End.GetLineStartPosition(int.MinValue, out linesMoved);
+
+                LineColumnLabel.Content += $" - {-linesMoved + 1}, col: {column + 1} (selected {MainTextBox.Selection.Text.Length} chars)";
+            }
         }
     }
 }
