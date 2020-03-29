@@ -32,22 +32,15 @@ namespace NotepadCore.ExtensionMethods
             return ret;
         }
 
+        /// <summary>
+        /// Gets offset from <paramref name="from"> to <paramref name="to"> excluding FlowDocument tags
+        /// </summary>
+        /// <param name="from">This text pointer</param>
+        /// <param name="to">End text pointer</param>
+        /// <returns>Offset between text pointers</returns>
         public static int GetOffsetAtTextPointer(this TextPointer from, TextPointer to)
         {
-            int offset = 0;
-            var pointer = from.GetPositionAtOffset(0);
-
-            for (int i = 0; i < from.GetOffsetToPosition(to); i++)
-            {
-                if (pointer == null)
-                    break;
-                pointer = pointer.GetPositionAtOffset(1);
-
-                if (pointer?.GetPointerContext(LogicalDirection.Forward) == TextPointerContext.Text)
-                    offset++;
-            }
-
-            return offset;
+            return new TextRange(from, to).Text.Length;
         }
 
     }
