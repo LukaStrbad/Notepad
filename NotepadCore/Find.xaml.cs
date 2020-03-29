@@ -13,14 +13,13 @@ namespace NotepadCore
     /// </summary>
     public partial class Find : Window
     {
-        private readonly MainWindow _mainWindow;
-        private Match _currentMatch;
+        private MainWindow MainWindow => Application.Current.Windows[0] as MainWindow;
+        private Match CurrentMatch { get; set; }
 
         public Find()
         {
             InitializeComponent();
             FindTextBox.Focus();
-            _mainWindow = Application.Current.Windows[0] as MainWindow;
 
             FindTextBox.TextChanged += (sender, args) => RecalculateNextMatch();
             RegExCheckBox.Checked += (sender, args) => RecalculateNextMatch();
@@ -53,10 +52,10 @@ namespace NotepadCore
         private void RecalculateNextMatch()
         {
             var textRange = new TextRange(TextBox.Document.ContentStart, TextBox.Document.ContentEnd);
-            _currentMatch = FindRegex.Match(textRange.Text);
+            CurrentMatch = FindRegex.Match(textRange.Text);
         }
 
-        private RichTextBox TextBox => ((TextEditor)_mainWindow.Tabs.SelectedContent).MainTextBox;
+        private RichTextBox TextBox => ((TextEditor)MainWindow.Tabs.SelectedContent).MainTextBox;
 
         private void FindButton_Click(object sender, RoutedEventArgs e)
         {
@@ -69,9 +68,9 @@ namespace NotepadCore
         {
             var textRange = new TextRange(TextBox.Document.ContentStart, TextBox.Document.ContentEnd);
 
-            _currentMatch = _currentMatch?.NextMatch();
-            if (_currentMatch == null || !_currentMatch.Success)
-                _currentMatch = FindRegex.Match(textRange.Text);
+            CurrentMatch = CurrentMatch?.NextMatch();
+            if (CurrentMatch == null || !CurrentMatch.Success)
+                CurrentMatch = FindRegex.Match(textRange.Text);
         }
 
         private void FindText()
@@ -80,20 +79,20 @@ namespace NotepadCore
 
             // Calculate offset that is caused by new lines
             var newLines = textRange.Text.IndexesOf(Environment.NewLine);
-            int offset = newLines.Count(x => x < _currentMatch.Index) * Environment.NewLine.Length;
+            int offset = newLines.Count(x => x < CurrentMatch.Index) * Environment.NewLine.Length;
 
             // Select text according to the offset
-            TextBox.Selection.Select(textRange.Start.GetTextPointerAtOffset(_currentMatch.Index - offset),
-                textRange.Start.GetTextPointerAtOffset(_currentMatch.Index - offset + _currentMatch.Length));
+            TextBox.Selection.Select(textRange.Start.GetTextPointerAtOffset(CurrentMatch.Index - offset),
+                textRange.Start.GetTextPointerAtOffset(CurrentMatch.Index - offset + CurrentMatch.Length));
             SetNextMatch();
 
-            _mainWindow.Focus();
+            MainWindow.Focus();
             Focus();
         }
 
         private void ReplaceButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentMatch == null || !_currentMatch.Success)
+            if (CurrentMatch == null || !CurrentMatch.Success)
                 SetNextMatch();
             TextBox.Selection.Text = FindRegex.Replace(TextBox.Selection.Text, ReplaceTextBox.Text);
             FindText();
