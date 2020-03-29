@@ -263,9 +263,10 @@ namespace NotepadCore
             textRange.ClearAllProperties();
 
 
-            try
+
+            foreach (var (match, brush) in Highlighter?.GetMatches(textRange))
             {
-                foreach (var (match, brush) in Highlighter?.GetMatches(textRange))
+                try
                 {
                     Dispatcher?.Invoke(() =>
                     {
@@ -273,9 +274,10 @@ namespace NotepadCore
                                     textRange.Start.GetTextPointerAtOffset(match.Index + match.Length))
                                 .ApplyPropertyValue(TextElement.ForegroundProperty, brush);
                     });
+
                 }
+                catch { }
             }
-            catch { }
 
             MainTextBox.TextChanged += MainTextBox_TextChanged;
         }
@@ -328,8 +330,8 @@ namespace NotepadCore
                     MainTextBox.CaretPosition.InsertTextInRun(new string(' ', TabSize));
 
                     //MainTextBox.CaretPosition =
-                      //  MainTextBox.CaretPosition.Paragraph.ContentStart.GetPositionAtOffset(start + TabSize) ??
-                        //MainTextBox.CaretPosition;
+                    //  MainTextBox.CaretPosition.Paragraph.ContentStart.GetPositionAtOffset(start + TabSize) ??
+                    //MainTextBox.CaretPosition;
                 }
                 // Else insert a tab
                 else
