@@ -219,6 +219,7 @@ namespace NotepadCore
         private void MainTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             var lineCount = MainTextBox.Document.Blocks.Count;
+            // TODO: invert if
             if (_oldNumberOfLines != lineCount)
             {
                 WriteLineNumbers();
@@ -262,16 +263,19 @@ namespace NotepadCore
             textRange.ClearAllProperties();
 
 
-            foreach (var (match, brush) in Highlighter.GetMatches(textRange))
+            try
             {
-                Dispatcher?.Invoke(() =>
+                foreach (var (match, brush) in Highlighter?.GetMatches(textRange))
                 {
-                    new TextRange(textRange.Start.GetTextPointerAtOffset(match.Index),
-                                textRange.Start.GetTextPointerAtOffset(match.Index + match.Length))
-                            .ApplyPropertyValue(TextElement.ForegroundProperty, brush);
-                });
+                    Dispatcher?.Invoke(() =>
+                    {
+                        new TextRange(textRange.Start.GetTextPointerAtOffset(match.Index),
+                                    textRange.Start.GetTextPointerAtOffset(match.Index + match.Length))
+                                .ApplyPropertyValue(TextElement.ForegroundProperty, brush);
+                    });
+                }
             }
-
+            catch { }
 
             MainTextBox.TextChanged += MainTextBox_TextChanged;
         }
@@ -279,9 +283,7 @@ namespace NotepadCore
 
         private void MainTextBox_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            var lineCount =
-                new TextRange(MainTextBox.Document.ContentStart, MainTextBox.Document.ContentEnd).Text.Count(c =>
-                    c == '\n');
+            var lineCount = MainTextBox.Document.Blocks.Count;
 
             if (_oldNumberOfLines == lineCount) return;
             WriteLineNumbers();
@@ -296,7 +298,7 @@ namespace NotepadCore
 
 
         /// <summary>
-        ///     Writes teh line numbers to the LineTextBox
+        ///     Writes the line numbers to the LineTextBox
         /// </summary>
         private void WriteLineNumbers()
         {
@@ -325,11 +327,9 @@ namespace NotepadCore
                 {
                     MainTextBox.CaretPosition.InsertTextInRun(new string(' ', TabSize));
 
-                    MainTextBox.CaretPosition =
-                        MainTextBox.CaretPosition.Paragraph.ContentStart.GetPositionAtOffset(start + TabSize) ??
-                        MainTextBox.CaretPosition;
-                    //Text = Text.Insert(, new string(' ', TabSize));
-                    //MainTextBox.CaretIndex = carretIndex + TabSize;
+                    //MainTextBox.CaretPosition =
+                      //  MainTextBox.CaretPosition.Paragraph.ContentStart.GetPositionAtOffset(start + TabSize) ??
+                        //MainTextBox.CaretPosition;
                 }
                 // Else insert a tab
                 else
@@ -338,8 +338,6 @@ namespace NotepadCore
 
                     MainTextBox.CaretPosition =
                         MainTextBox.CaretPosition.Paragraph.ContentStart.GetPositionAtOffset(start + 1);
-                    //Text = Text.Insert(carretIndex, "\t");
-                    //MainTextBox.CaretIndex = carretIndex + 1;
                 }
                 e.Handled = true;
             }
@@ -350,9 +348,9 @@ namespace NotepadCore
         /// </summary>
         public void SaveFile()
         {
-            if (string.IsNullOrEmpty(_documentPath))
+            if (!HasSaveLocation)
                 throw new InvalidSaveLocationException();
-            using var sw = new StreamWriter(_documentPath);
+            using var sw = new StreamWriter(DocumentPath);
             sw.Write(Text);
         }
 
@@ -361,9 +359,11 @@ namespace NotepadCore
             e.Handled = true;
         }
 
+        /// <summary>
+        /// Highlights the MainTextBox when changing language
+        /// </summary>
         private void LanguageComboBox_OnSelectionChanged(object sender, RoutedEventArgs e)
         {
-            MainTextBox.TextChanged -= MainTextBox_TextChanged;
             try
             {
                 HighlightBlocks();
@@ -372,8 +372,6 @@ namespace NotepadCore
             {
                 // ignored
             }
-
-            MainTextBox.TextChanged += MainTextBox_TextChanged;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -386,6 +384,7 @@ namespace NotepadCore
 
         private void MainTextBox_OnSelectionChanged(object sender, RoutedEventArgs e)
         {
+            // TODO: fix
             var tp1 = MainTextBox.Selection.Start.GetLineStartPosition(0);
             var tp2 = MainTextBox.Selection.Start;
 
