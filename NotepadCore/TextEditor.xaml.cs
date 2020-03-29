@@ -263,11 +263,11 @@ namespace NotepadCore
             textRange.ClearAllProperties();
 
 
-
-            foreach (var (match, brush) in Highlighter?.GetMatches(textRange))
+            try
             {
-                try
+                foreach (var (match, brush) in Highlighter?.GetMatches(textRange))
                 {
+
                     Dispatcher?.Invoke(() =>
                     {
                         new TextRange(textRange.Start.GetTextPointerAtOffset(match.Index),
@@ -275,9 +275,10 @@ namespace NotepadCore
                                 .ApplyPropertyValue(TextElement.ForegroundProperty, brush);
                     });
 
+
                 }
-                catch { }
             }
+            catch { }
 
             MainTextBox.TextChanged += MainTextBox_TextChanged;
         }
