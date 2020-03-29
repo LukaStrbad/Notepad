@@ -31,10 +31,11 @@ namespace NotepadCore.SyntaxHighlighters
 
         private new static (Regex Pattern, SolidColorBrush Brush)[] Keywords => new[]
         {
-            (new Regex($@"(?<!\w)({string.Join("|", _keywords1)})(?!\w)"), Brushes.Blue),
-            (new Regex($@"(?<!\w)({string.Join("|", _keywords2)})(?!\w)"),
+            (new Regex(@"(?<=\.)?[a-zA-Z_]\w*(?=\()"), new BrushConverter().ConvertFromString("#795E26") as SolidColorBrush), // Functions
+            (new Regex($@"(?<!\w)({string.Join("|", _keywords1)})(?!\w)"), Brushes.Blue), // Keywords 1
+            (new Regex($@"(?<!\w)({string.Join("|", _keywords2)})(?!\w)"), // Keywords 2
                 Brushes.Purple),
-            (new Regex(@"""(\\""|[^""])*"""), Brushes.Brown), // Strings
+            (new Regex(@"(\$|@|\$@|@\$)""(\\""|[^""])*"""), Brushes.Brown), // Strings
             (new Regex(@$"//.*|/\*(.|{Environment.NewLine})*?\*/"), Brushes.Green) // Comments
         };
 
