@@ -61,8 +61,8 @@ namespace NotepadCore
         {
             if (FindTextBox.Text == "")
                 MessageBox.Show("No text to find");
-
-            FindText();
+            else
+                FindText();
         }
 
         private void SetNextMatch()
@@ -80,6 +80,10 @@ namespace NotepadCore
 
             // Calculate offset that is caused by new lines
             var newLines = textRange.Text.IndexesOf(Environment.NewLine);
+
+            if (CurrentMatch == null)
+                RecalculateNextMatch();
+
             int offset = newLines.Count(x => x < CurrentMatch.Index) * Environment.NewLine.Length;
 
             // Select text according to the offset
@@ -101,6 +105,7 @@ namespace NotepadCore
 
         private void FindTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+            // TODO: remove
         }
 
         private void Window_Closed(object sender, EventArgs e)
