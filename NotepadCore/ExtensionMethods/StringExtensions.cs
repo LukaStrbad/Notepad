@@ -4,22 +4,20 @@ namespace NotepadCore.ExtensionMethods
 {
     public static class StringExtensions
     {
-        public static List<int> IndexesOf(this string str, string value)
+        public static IEnumerable<int> IndexesOf(this string str, string value)
         {
             var indexes = new List<int>();
 
             if (string.IsNullOrEmpty(value))
-                return indexes;
+                yield break;
 
             for (var i = 0;; i += value.Length)
             {
                 i = str.IndexOf(value, i);
                 if (i == -1)
                     break;
-                indexes.Add(i);
+                yield return i;
             }
-
-            return indexes;
         }
 
         /// <summary>
