@@ -102,15 +102,5 @@ namespace NotepadCore
             TextBox.Selection.Text = FindRegex.Replace(TextBox.Selection.Text, ReplaceTextBox.Text);
             FindText();
         }
-
-        private void FindTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            // TODO: remove
-        }
-
-        private void Window_Closed(object sender, EventArgs e)
-        {
-            Close();
-        }
     }
 }

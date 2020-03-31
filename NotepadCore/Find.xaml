@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NotepadCore"
         mc:Ignorable="d"
-        Title="Find" Height="220" Width="400" ResizeMode="NoResize" Closed="Window_Closed" WindowStartupLocation="CenterOwner">
+        Title="Find" Height="220" Width="400" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <Style TargetType="Label">
             <Setter Property="Width" Value="70" />
@@ -18,7 +18,7 @@
 
     <Canvas>
         <Label Content="Find: " Margin="10,10" />
-        <TextBox x:Name="FindTextBox" Width="150" Height="20" Margin="80,13" TextChanged="FindTextBox_TextChanged" />
+        <TextBox x:Name="FindTextBox" Width="150" Height="20" Margin="80,13" />
 
         <Label Content="Replace: " Margin="10,40" />
         <TextBox x:Name="ReplaceTextBox" Width="150" Height="20" Margin="80,43" />
