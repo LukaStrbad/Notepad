@@ -25,7 +25,7 @@ namespace NotepadCore.SyntaxHighlighters
 
         private static readonly string[] _keywords2 =
         {
-            "case", "catch", "continue", "do", "else", "finally", "for", "foreach", "goto", "if", "switch", "try",
+            "case", "catch", "continue", "do", "else", "finally", "for", "foreach", "get", "goto", "if", "set","switch", "try",
             "while"
         };
 
