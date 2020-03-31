@@ -11,8 +11,7 @@
         <CheckBox x:Name="ShowLineNumbersCheckBox" Content="Show line numbers" HorizontalAlignment="Left"
                   Margin="10,10,0,0" VerticalAlignment="Top" />
         <CheckBox x:Name="SpacesCheckBox" Content="Use spaces instead of tabs" HorizontalAlignment="Left"
-                  Margin="10,35,0,0" VerticalAlignment="Top" Checked="SpacesCheckBox_Checked"
-                  Unchecked="SpacesCheckBox_Unchecked" />
+                  Margin="10,35,0,0" VerticalAlignment="Top" IsChecked="{Binding UseSpaces, Mode=TwoWay}"/>
 
         <Label x:Name="TabSizeLabel" Content="Tab size: " HorizontalAlignment="Left" Margin="10,60,0,0"
                VerticalAlignment="Top" />

@@ -1,33 +1,17 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows;
+using NotepadCore.Annotations;
 
 namespace NotepadCore
 {
     /// <summary>
     ///     Interaction logic for SettingsWindow.xaml
     /// </summary>
-    public partial class SettingsWindow : Window
+    public partial class SettingsWindow : Window, INotifyPropertyChanged
     {
         private bool _useSpaces = true;
-
-        private FontWindow fontDialog;
-
-        public SettingsWindow()
-        {
-            InitializeComponent();
-
-            var userSettings = Settings.UserSettings.Create();
-
-            SpacesCheckBox.IsChecked = true; // TODO: implement storage
-
-            TabSizeTextBox.Text = userSettings.TabSize.ToString();
-
-            FontInfo.Content = $"Font: {userSettings.EditorFontFamily}, {userSettings.EditorFontSize}";
-
-            ShowLineNumbersCheckBox.IsChecked = Properties.Settings.Default.ShowLineNumbers;
-
-            SpacesCheckBox.IsChecked = Properties.Settings.Default.UseSpaces;
-        }
 
         public bool UseSpaces
         {
@@ -45,17 +29,27 @@ namespace NotepadCore
                     TabSizeLabel.IsEnabled = false;
                     TabSizeTextBox.IsEnabled = false;
                 }
+                OnPropertyChanged();
             }
         }
 
-        private void SpacesCheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-            UseSpaces = true;
-        }
+        private FontWindow FontDialog { get; set; }
 
-        private void SpacesCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        public SettingsWindow()
         {
-            UseSpaces = false;
+            InitializeComponent();
+
+            var userSettings = Settings.UserSettings.Create();
+
+            UseSpaces = true; // TODO: implement storage
+
+            TabSizeTextBox.Text = userSettings.TabSize.ToString();
+
+            FontInfo.Content = $"Font: {userSettings.EditorFontFamily}, {userSettings.EditorFontSize}";
+
+            ShowLineNumbersCheckBox.IsChecked = Properties.Settings.Default.ShowLineNumbers;
+
+            UseSpaces = Properties.Settings.Default.UseSpaces;
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
@@ -74,8 +68,8 @@ namespace NotepadCore
             }
 
             // save font
-            var fontFamily = Convert.ToString(fontDialog.FontChooseListBox.SelectedItem);
-            var fontSize = Convert.ToInt32(fontDialog.FontSizeChooseListBox.SelectedItem);
+            var fontFamily = Convert.ToString(FontDialog.FontChooseListBox.SelectedItem);
+            var fontSize = Convert.ToInt32(FontDialog.FontSizeChooseListBox.SelectedItem);
 
             userSettings.EditorFontFamily = fontFamily;
             userSettings.EditorFontSize = fontSize;
@@ -99,11 +93,19 @@ namespace NotepadCore
 
         private void ChangeFont_Click(object sender, RoutedEventArgs e)
         {
-            if (fontDialog == null)
-                fontDialog = new FontWindow { Owner = this };
-            fontDialog.ShowDialog();
+            if (FontDialog == null)
+                FontDialog = new FontWindow { Owner = this };
+            FontDialog.ShowDialog();
 
-            FontInfo.Content = $"Font: {fontDialog.fontFamily}, {fontDialog.fontSize}";
+            FontInfo.Content = $"Font: {FontDialog.fontFamily}, {FontDialog.fontSize}";
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
