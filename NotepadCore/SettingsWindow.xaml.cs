@@ -33,7 +33,17 @@ namespace NotepadCore
             }
         }
 
-        private FontWindow FontDialog { get; set; }
+        private FontWindow _fontDialog;
+        private FontWindow FontDialog
+        {
+            get
+            {
+                if (_fontDialog == null)
+                    _fontDialog = new FontWindow { Owner = this };
+            return _fontDialog;
+            }
+            set => _fontDialog = value;
+        }
 
         public SettingsWindow()
         {
@@ -42,6 +52,7 @@ namespace NotepadCore
             var userSettings = Settings.UserSettings.Create();
 
             UseSpaces = true; // TODO: implement storage
+            SpacesCheckBox.DataContext = this;
 
             TabSizeTextBox.Text = userSettings.TabSize.ToString();
 
@@ -93,8 +104,6 @@ namespace NotepadCore
 
         private void ChangeFont_Click(object sender, RoutedEventArgs e)
         {
-            if (FontDialog == null)
-                FontDialog = new FontWindow { Owner = this };
             FontDialog.ShowDialog();
 
             FontInfo.Content = $"Font: {FontDialog.fontFamily}, {FontDialog.fontSize}";
