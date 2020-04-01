@@ -36,12 +36,7 @@ namespace NotepadCore
         private FontWindow _fontDialog;
         private FontWindow FontDialog
         {
-            get
-            {
-                if (_fontDialog == null)
-                    _fontDialog = new FontWindow { Owner = this };
-            return _fontDialog;
-            }
+            get => _fontDialog ??= new FontWindow {Owner = this};
             set => _fontDialog = value;
         }
 
@@ -79,8 +74,8 @@ namespace NotepadCore
             }
 
             // save font
-            var fontFamily = Convert.ToString(FontDialog.FontChooseListBox.SelectedItem);
-            var fontSize = Convert.ToInt32(FontDialog.FontSizeChooseListBox.SelectedItem);
+            var fontFamily = FontDialog.FontChooseListBox.SelectedItem.ToString();
+            var fontSize = (int)FontDialog.FontSizeChooseListBox.SelectedItem;
 
             userSettings.EditorFontFamily = fontFamily;
             userSettings.EditorFontSize = fontSize;
