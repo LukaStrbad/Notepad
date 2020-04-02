@@ -205,14 +205,14 @@ namespace NotepadCore
             {
                 var fileInfo = new FileInfo(DocumentPath);
 
-                FileLanguage = fileInfo.Extension switch
-                {
-                    ".cs" => HighlightingLanguage.CSharp,
-                    _ => HighlightingLanguage.None
-                };
-
                 if (fileInfo.Extension.EndsWith("ml"))
                     FileLanguage = HighlightingLanguage.MarkupLanguage;
+                else
+                    FileLanguage = fileInfo.Extension switch
+                    {
+                        ".cs" => HighlightingLanguage.CSharp,
+                        _ => HighlightingLanguage.None
+                    };
             }
 
             WriteLineNumbers();
@@ -284,7 +284,7 @@ namespace NotepadCore
 
                     new TextRange(offset, offset.GetTextPointerAtOffset(match.Length))
                         .ApplyPropertyValue(TextElement.ForegroundProperty, brush);
-                    
+
                     prevIndex = match.Index;
                 }
             }
