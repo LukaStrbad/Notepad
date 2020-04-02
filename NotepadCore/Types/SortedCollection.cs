@@ -54,6 +54,10 @@ namespace NotepadCore.Types
             return -1;
         }
 
-        public T this[int index] => _collection[index];
+        public T this[int index]
+        {
+            get => _collection[index];
+            set => _collection[index] = value;
+        }
     }
 }
