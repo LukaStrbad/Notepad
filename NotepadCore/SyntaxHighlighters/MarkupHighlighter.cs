@@ -7,7 +7,6 @@ using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
 using NotepadCore.ExtensionMethods;
-using NotepadCore.Types;
 
 namespace NotepadCore.SyntaxHighlighters
 {
