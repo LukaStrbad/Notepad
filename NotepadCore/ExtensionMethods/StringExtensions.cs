@@ -6,8 +6,6 @@ namespace NotepadCore.ExtensionMethods
     {
         public static IEnumerable<int> IndexesOf(this string str, string value)
         {
-            var indexes = new List<int>();
-
             if (string.IsNullOrEmpty(value))
                 yield break;
 
