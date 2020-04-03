@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -176,7 +177,10 @@ namespace NotepadCore
                     .Select(a => new Paragraph(new Run(a)));
                 MainTextBox.Document.Blocks.AddRange(paragraphs);
 
-                HighlightBlocks();
+                MainTextBox.TextChanged -= MainTextBox_TextChanged;
+                HighlightRange();
+                HighlightCommentsInRange();
+                MainTextBox.TextChanged += MainTextBox_TextChanged;
             }
         }
 
@@ -231,48 +235,33 @@ namespace NotepadCore
                 _oldNumberOfLines = lineCount;
             }
 
+            MainTextBox.TextChanged -= MainTextBox_TextChanged;
             HighlightCurrentLine();
+            HighlightCommentsInRange();
+            MainTextBox.TextChanged += MainTextBox_TextChanged;
         }
 
         private void HighlightCurrentLine()
         {
-            if (FileLanguage == HighlightingLanguage.None)
-                return;
             if (MainTextBox.CaretPosition.Paragraph == null)
                 return;
-            MainTextBox.TextChanged -= MainTextBox_TextChanged;
-
-            var textRange = new TextRange(MainTextBox.CaretPosition.Paragraph.ContentStart,
+            HighlightRange(MainTextBox.CaretPosition.Paragraph.ContentStart,
                 MainTextBox.CaretPosition.Paragraph.ContentEnd);
-            textRange.ClearAllProperties();
-
-            foreach (var (match, brush) in Highlighter.GetMatches(textRange))
-            {
-                Dispatcher?.Invoke(() =>
-                {
-                    new TextRange(textRange.Start.GetTextPointerAtOffset(match.Index),
-                            textRange.Start.GetTextPointerAtOffset(match.Index + match.Length))
-                        .ApplyPropertyValue(TextElement.ForegroundProperty, brush);
-                });
-            }
-
-            MainTextBox.TextChanged += MainTextBox_TextChanged;
         }
 
-        private void HighlightBlocks(TextPointer start = null, TextPointer end = null)
+        private void HighlightRange(TextPointer start = null, TextPointer end = null)
         {
             if (MainTextBox == null) return;
-            MainTextBox.TextChanged -= MainTextBox_TextChanged;
+
             var textRange = new TextRange(start ?? MainTextBox.Document.ContentStart,
                 end ?? MainTextBox.Document.ContentEnd);
             textRange.ClearAllProperties();
-
 
             try
             {
                 TextPointer offset = null;
                 int prevIndex = -1;
-                foreach (var (match, brush) in Highlighter?.GetMatches(textRange))
+                foreach (var (match, brush) in Highlighter.GetMatches(textRange).OrderBy(x => x.Match.Index))
                 {
                     if (offset == null)
                     {
@@ -291,8 +280,72 @@ namespace NotepadCore
             catch
             {
             }
+        }
 
-            MainTextBox.TextChanged += MainTextBox_TextChanged;
+        private bool UndoCommentsInRange(bool highlightLater = true)
+        {
+            if (MainTextBox == null || _comments == null || !_comments.Any())
+                return false;
+
+            try
+            {
+                foreach (var comment in _comments)
+                {
+                    comment.ClearAllProperties();
+                    if (highlightLater)
+                        HighlightRange(comment.Start, comment.End);
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
+
+            _comments.Clear();
+            return true;
+        }
+
+        private List<TextRange> _comments = new List<TextRange>();
+
+        private void HighlightCommentsInRange(TextPointer start = null, TextPointer end = null,
+            bool saveComments = true, bool highlightLater = true)
+        {
+            if (MainTextBox == null) return;
+
+            var textRange = new TextRange(start ?? MainTextBox.Document.ContentStart,
+                end ?? MainTextBox.Document.ContentEnd);
+
+            if (!UndoCommentsInRange(highlightLater))
+                HighlightRange(start, end);
+
+            try
+            {
+                TextPointer offset = null;
+                int prevIndex = -1;
+
+                foreach (var (match, brush) in Highlighter.GetCommentMatches(textRange).OrderBy(x => x.Match.Index))
+                {
+                    if (offset == null)
+                    {
+                        offset = textRange.Start.GetTextPointerAtOffset(match.Index);
+                        prevIndex = match.Index;
+                    }
+
+                    offset = offset.GetTextPointerAtOffset(match.Index - prevIndex);
+
+                    var tempRange = new TextRange(offset, offset.GetTextPointerAtOffset(match.Length));
+                    
+                    tempRange.ApplyPropertyValue(TextElement.ForegroundProperty, brush);
+
+                    if (saveComments)
+                        _comments.Add(tempRange);
+
+                    prevIndex = match.Index;
+                }
+            }
+            catch
+            {
+            }
         }
 
 
@@ -382,7 +435,10 @@ namespace NotepadCore
         {
             try
             {
-                HighlightBlocks();
+                MainTextBox.TextChanged -= MainTextBox_TextChanged;
+                HighlightRange();
+                HighlightCommentsInRange();
+                MainTextBox.TextChanged += MainTextBox_TextChanged;
             }
             catch
             {
