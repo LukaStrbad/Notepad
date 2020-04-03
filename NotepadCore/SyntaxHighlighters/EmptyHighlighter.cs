@@ -11,5 +11,10 @@ namespace NotepadCore.SyntaxHighlighters
         {
             return null;
         }
+
+        public IEnumerable<((int Index, int Length) Match, SolidColorBrush Brush)> GetCommentMatches(TextRange textRange)
+        {
+            return null;
+        }
     }
 }

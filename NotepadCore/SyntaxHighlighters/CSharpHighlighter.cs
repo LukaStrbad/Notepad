@@ -16,7 +16,8 @@ namespace NotepadCore.SyntaxHighlighters
             "abstract", "as", "base", "bool", "break", "byte", "char", "checked", "class", "const", "decimal",
             "default", "delegate", "double", "enum", "event", "explicit", "extern", "false", "fixed", "float",
             "implicit", "in", "int", "interface", "internal", "is", "lock", "long", "namespace", "new", "null",
-            "object", "operator", "out", "override", "params", "partial", "private", "protected", "public", "readonly", "ref",
+            "object", "operator", "out", "override", "params", "partial", "private", "protected", "public", "readonly",
+            "ref",
             "return", "sbyte", "sealed", "short", "sizeof", "stackalloc", "static", "string", "struct", "this",
             "throw",
             "true", "typeof", "uint", "ulong", "unchecked", "unsafe", "ushort", "using", "var", "virtual", "void",
@@ -25,19 +26,23 @@ namespace NotepadCore.SyntaxHighlighters
 
         private static readonly string[] _keywords2 =
         {
-            "case", "catch", "continue", "do", "else", "finally", "for", "foreach", "get", "goto", "if", "set","switch", "try",
+            "case", "catch", "continue", "do", "else", "finally", "for", "foreach", "get", "goto", "if", "set",
+            "switch", "try",
             "while"
         };
 
         private static (Regex Pattern, SolidColorBrush Brush)[] Keywords => new[]
         {
-            (new Regex(@"(?<=\.)?[a-zA-Z_]\w*(?=\()"), new BrushConverter().ConvertFromString("#795E26") as SolidColorBrush), // Functions
+            (new Regex(@"(?<=\.)?[a-zA-Z_]\w*(?=\()"),
+                new BrushConverter().ConvertFromString("#795E26") as SolidColorBrush), // Functions
             (new Regex($@"(?<!\w)({string.Join("|", _keywords1)})(?!\w)"), Brushes.Blue), // Keywords 1
             (new Regex($@"(?<!\w)({string.Join("|", _keywords2)})(?!\w)"), // Keywords 2
                 Brushes.Purple),
-            (new Regex(@"(\$|@|\$@|@\$)?""(\\""|[^""])*"""), Brushes.Brown), // Strings
-            (new Regex(@$"//.*|/\*(.|{Environment.NewLine})*?\*/"), Brushes.Green) // Comments
+            (new Regex(@"(\$|@|\$@|@\$)?""(\\""|[^""])*"""), Brushes.Brown) // Strings
         };
+
+        private static (Regex Pattern, SolidColorBrush Brush) Comment =>
+            (new Regex(@$"//.*|/\*(.|{Environment.NewLine})*?\*/"), Brushes.Green);
 
         IEnumerable<((int Index, int Length) Match, SolidColorBrush Brush)> IHighlighter.GetMatches(TextRange textRange)
         {
@@ -54,6 +59,21 @@ namespace NotepadCore.SyntaxHighlighters
                     int offset = newLines.Count(x => x < match.Index) * Environment.NewLine.Length;
                     yield return ((match.Index - offset, match.Length), brush);
                 }
+            }
+        }
+
+        public IEnumerable<((int Index, int Length) Match, SolidColorBrush Brush)> GetCommentMatches(
+            TextRange textRange)
+        {
+            var newLines = textRange.Text.IndexesOf(Environment.NewLine);
+
+            foreach (Match match in Comment.Pattern.Matches(textRange.Text))
+            {
+                int indexOffset = newLines.Count(x => x < match.Index) * Environment.NewLine.Length;
+                int rangeOffset =
+                    textRange.Text.Substring(match.Index, match.Length).IndexesOf(Environment.NewLine).Count() *
+                    Environment.NewLine.Length;
+                yield return ((match.Index - indexOffset, match.Length - rangeOffset), Comment.Brush);
             }
         }
     }
