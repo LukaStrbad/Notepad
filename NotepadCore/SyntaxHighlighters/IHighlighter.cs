@@ -15,5 +15,7 @@ namespace NotepadCore.SyntaxHighlighters
         /// <param name="textRange"></param>
         /// <returns></returns>
         IEnumerable<((int Index, int Length) Match, SolidColorBrush Brush)> GetMatches(TextRange textRange);
+
+        IEnumerable<((int Index, int Length) Match, SolidColorBrush Brush)> GetCommentMatches(TextRange textRange);
     }
 }

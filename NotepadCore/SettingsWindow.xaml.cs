@@ -46,7 +46,6 @@ namespace NotepadCore
 
             var userSettings = Settings.UserSettings.Create();
 
-            UseSpaces = true; // TODO: implement storage
             SpacesCheckBox.DataContext = this;
 
             TabSizeTextBox.Text = userSettings.TabSize.ToString();
@@ -101,7 +100,7 @@ namespace NotepadCore
         {
             FontDialog.ShowDialog();
 
-            FontInfo.Content = $"Font: {FontDialog.fontFamily}, {FontDialog.fontSize}";
+            FontInfo.Content = $"Font: {FontDialog.ChosenFontFamily}, {FontDialog.ChosenFontSize}";
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

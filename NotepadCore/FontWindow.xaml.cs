@@ -8,8 +8,8 @@ namespace NotepadCore
     /// </summary>
     public partial class FontWindow : Window
     {
-        public string fontFamily;
-        public int fontSize;
+        public string ChosenFontFamily { get; private set; }
+        public int ChosenFontSize { get; private set; }
 
         public FontWindow()
         {
@@ -18,7 +18,8 @@ namespace NotepadCore
             var userSettings = Settings.UserSettings.Create();
 
             // write font sizes from 8 to 96
-            for (var i = 8; i <= 96; i++) FontSizeChooseListBox.Items.Add(i);
+            for (var i = 8; i <= 96; i++)
+                FontSizeChooseListBox.Items.Add(i);
 
             FontChooseListBox.SelectedItem = new System.Windows.Media.FontFamily(userSettings.EditorFontFamily); // selects the fontfamily in the listbox
             FontSizeChooseListBox.SelectedItem =
@@ -30,14 +31,9 @@ namespace NotepadCore
 
         private void FontOKButton_Click(object sender, RoutedEventArgs e)
         {
-            fontFamily = Convert.ToString(FontChooseListBox.SelectedItem);
-            fontSize = Convert.ToInt32(FontSizeChooseListBox.SelectedItem);
+            ChosenFontFamily = FontChooseListBox.SelectedItem.ToString();
+            ChosenFontSize = (int)FontSizeChooseListBox.SelectedItem;
             Hide();
-        }
-
-        private void Window_Closed(object sender, EventArgs e)
-        {
-            FontOKButton_Click(new object(), new RoutedEventArgs());
         }
     }
 }
