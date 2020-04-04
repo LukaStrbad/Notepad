@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Windows.Media;
 using System.Xml.Serialization;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 using NotepadCore.ExtensionMethods;
 using NotepadCore.SyntaxHighlighters;
 
@@ -17,11 +17,11 @@ namespace NotepadCore.Settings
     public sealed class UserSettings
     {
         private static readonly string SavePath =
-            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Data\settings.xml");
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Data\settings.json");
 
         private static readonly UserSettings DefaultUserSettings = new UserSettings
         {
-            Editors = new EditorInfo[] { new EditorInfo(),  },
+            Editors = new EditorInfo[] {new EditorInfo(),},
             EditorFontFamily = "Consolas",
             EditorFontSize = 12,
             TabSize = 4,
@@ -47,7 +47,8 @@ namespace NotepadCore.Settings
                     _editors = new EditorInfo[] { };
                 return _editors.Distinct(editor => editor.FilePath.ToLower()).ToArray();
             }
-            set => _editors = value?.Distinct(editor => editor.FilePath.ToLower()).ToArray() ?? new[]{new EditorInfo(), };
+            set => _editors = value?.Distinct(editor => editor.FilePath.ToLower()).ToArray() ??
+                              new[] {new EditorInfo(),};
         }
 
         public string EditorFontFamily
@@ -190,7 +191,7 @@ namespace NotepadCore.Settings
         public void AddFiles(int index, params string[] paths)
         {
             var editors = Editors.ToList();
-            
+
             // Adds distinct paths at specified index
             for (int i = 0; i < paths.Length; i++)
             {
@@ -200,37 +201,40 @@ namespace NotepadCore.Settings
             Editors = editors.ToArray();
         }
 
-        public async void Save()
+        public void Save()
         {
-            using (var streamWriter = new StreamWriter(SavePath, false))
+            var serializer = JsonSerializer.Create(new JsonSerializerSettings
             {
-                var serializer = new XmlSerializer(typeof(UserSettings));
-                serializer.Serialize(streamWriter, this);
-            }
+                Formatting = Formatting.Indented
+            });
+            
+            using var streamWriter = new StreamWriter(SavePath);
+            using JsonWriter writer = new JsonTextWriter(streamWriter);
+            serializer.Serialize(writer, this);
         }
 
         public static UserSettings Create()
         {
-            var serializer = new XmlSerializer(typeof(UserSettings));
-
             var dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
+            var serializer = JsonSerializer.Create(new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented
+            });
+
             try
             {
-                using (var streamReader = new StreamReader(SavePath))
-                {
-                    var temp = (UserSettings) serializer.Deserialize(streamReader);
-                    return temp;
-                }
+                using var streamReader = new StreamReader(SavePath);
+                using var reader = new JsonTextReader(streamReader);
+                return serializer.Deserialize<UserSettings>(reader);
             }
             catch
             {
-                using (var streamWriter = new StreamWriter(SavePath))
-                {
-                    serializer.Serialize(streamWriter, DefaultUserSettings);
-                }
+                using var streamWriter = new StreamWriter(SavePath);
+                using var writer = new JsonTextWriter(streamWriter);
+                serializer.Serialize(writer, DefaultUserSettings);
             }
 
             return DefaultUserSettings;
