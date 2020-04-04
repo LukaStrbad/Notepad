@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Windows.Media;
-using System.Xml.Serialization;
 using Newtonsoft.Json;
 using NotepadCore.ExtensionMethods;
 using NotepadCore.SyntaxHighlighters;
@@ -21,7 +18,7 @@ namespace NotepadCore.Settings
 
         private static readonly UserSettings DefaultUserSettings = new UserSettings
         {
-            Editors = new EditorInfo[] {new EditorInfo(),},
+            Editors = new EditorInfo[] { },
             EditorFontFamily = "Consolas",
             EditorFontSize = 12,
             TabSize = 4,
@@ -31,7 +28,6 @@ namespace NotepadCore.Settings
         private string _editorFontFamily;
         private int _editorFontSize;
         private EditorInfo[] _editors;
-
         private int _selectedFileIndex;
         private int _tabSize;
 
@@ -44,11 +40,14 @@ namespace NotepadCore.Settings
             get
             {
                 if (_editors == null)
-                    _editors = new EditorInfo[] { };
+                    _editors = DefaultUserSettings.Editors;
                 return _editors.Distinct(editor => editor.FilePath.ToLower()).ToArray();
             }
-            set => _editors = value?.Distinct(editor => editor.FilePath.ToLower()).ToArray() ??
-                              new[] {new EditorInfo(),};
+            set
+            {
+                _editors = value?.Distinct(editor => editor.FilePath.ToLower())
+                        .ToArray() ?? DefaultUserSettings.Editors;
+            }
         }
 
         public string EditorFontFamily
@@ -207,7 +206,7 @@ namespace NotepadCore.Settings
             {
                 Formatting = Formatting.Indented
             });
-            
+
             using var streamWriter = new StreamWriter(SavePath);
             using JsonWriter writer = new JsonTextWriter(streamWriter);
             serializer.Serialize(writer, this);
