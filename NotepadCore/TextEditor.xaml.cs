@@ -82,6 +82,7 @@ namespace NotepadCore
             {
                 HighlightingLanguage.CSharp => new CSharpHighlighter(),
                 HighlightingLanguage.MarkupLanguage => new MarkupHighlighter(),
+                HighlightingLanguage.JSON => new JSONHighlighter(),
                 _ => new EmptyHighlighter()
             };
 
@@ -215,6 +216,7 @@ namespace NotepadCore
                     FileLanguage = fileInfo.Extension switch
                     {
                         ".cs" => HighlightingLanguage.CSharp,
+                        ".json" => HighlightingLanguage.JSON,
                         _ => HighlightingLanguage.None
                     };
             }
