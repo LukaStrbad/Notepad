@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
 using NotepadCore.ExtensionMethods;
@@ -27,8 +26,7 @@ namespace NotepadCore.SyntaxHighlighters
         private static readonly string[] _keywords2 =
         {
             "case", "catch", "continue", "do", "else", "finally", "for", "foreach", "get", "goto", "if", "set",
-            "switch", "try",
-            "while"
+            "switch", "try", "while"
         };
 
         private static (Regex Pattern, SolidColorBrush Brush)[] Keywords => new[]
