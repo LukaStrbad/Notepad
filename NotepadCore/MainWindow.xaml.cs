@@ -313,7 +313,7 @@ namespace NotepadCore
         private void Settings_Click(object sender, RoutedEventArgs e)
         {
             // Show SettingsWindow dialog
-            new SettingsWindow() { Owner = this }.ShowDialog();
+            new SettingsWindow { Owner = this }.ShowDialog();
         }
 
         private void Tabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -357,7 +357,9 @@ namespace NotepadCore
 
         private void About_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Icon made by https://www.flaticon.com/authors/smashicons from www.flaticon.com");
+            string message = "Application made by Luka Strbad\n" +
+                        "Icon made by https://www.flaticon.com/authors/smashicons from www.flaticon.com";
+            MessageBox.Show(message, "About", MessageBoxButton.OK, MessageBoxImage.None);
         }
 
         private void MainWindow_OnKeyDown(object sender, KeyEventArgs e)
@@ -367,7 +369,6 @@ namespace NotepadCore
                 Tabs.SelectedIndex = Tabs.Items.Count - 1;
                 e.Handled = true;
             }
-            // TODO: add this
             else if (Keyboard.IsKeyDown(Key.LeftCtrl) && e.Key == Key.Tab)
             {
                 // Backward tab cycle
@@ -395,12 +396,12 @@ namespace NotepadCore
             Clipboard.SetDataObject(CurrentTextEditor.MainTextBox.Selection.Text);
             CurrentTextEditor.MainTextBox.Selection.Text = "";
         }
-        
+
         private void Copy_Click(object sender, RoutedEventArgs e)
         {
             Clipboard.SetDataObject(CurrentTextEditor.MainTextBox.Selection.Text);
         }
-        
+
         private void Paste_Click(object sender, RoutedEventArgs e)
         {
             CurrentTextEditor.MainTextBox.CaretPosition.InsertTextInRun(Clipboard.GetText());

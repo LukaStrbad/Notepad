@@ -40,7 +40,7 @@ namespace NotepadCore
                 var userSettings = Settings.UserSettings.Create();
                 foreach (var editor in userSettings.Editors)
                 {
-                    if (editor.FilePath?.ToLower() == _documentPath?.ToLower() && _documentPath != null
+                    if (editor.FilePath?.ToLower() == DocumentPath?.ToLower() && DocumentPath != null
                     ) // Find current editor
                     {
                         editor.HighlightingLanguage = value;
