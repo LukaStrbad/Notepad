@@ -14,7 +14,7 @@ namespace NotepadCore.SyntaxHighlighters
         {
             (new Regex(@""".*?""(?= *:)"),
                 Brushes.Blue), // Key
-            (new Regex(@"(?<=:) *"".*?"""), Brushes.Brown), // Value string
+            (new Regex(@"(?<=:) *""(\\""|[^""])*"""), Brushes.Brown), // Value string
             (new Regex(@"(?<=:) *(true|false|\d+)"), Brushes.LightSkyBlue) // Value number/bool
         };
         
