@@ -391,5 +391,21 @@ namespace NotepadCore
                 e.Handled = true;
             }
         }
+
+        private void Cut_Click(object sender, RoutedEventArgs e)
+        {
+            Clipboard.SetDataObject(CurrentTextEditor.MainTextBox.Selection.Text);
+            CurrentTextEditor.MainTextBox.Selection.Text = "";
+        }
+        
+        private void Copy_Click(object sender, RoutedEventArgs e)
+        {
+            Clipboard.SetDataObject(CurrentTextEditor.MainTextBox.Selection.Text);
+        }
+        
+        private void Paste_Click(object sender, RoutedEventArgs e)
+        {
+            CurrentTextEditor.MainTextBox.CaretPosition.InsertTextInRun(Clipboard.GetText());
+        }
     }
 }
