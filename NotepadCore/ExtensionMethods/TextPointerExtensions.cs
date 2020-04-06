@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Mime;
-using System.Text;
 using System.Windows.Documents;
-using NotepadCore.Annotations;
 
 namespace NotepadCore.ExtensionMethods
 {
@@ -24,9 +19,9 @@ namespace NotepadCore.ExtensionMethods
                 if (ret.GetPointerContext(LogicalDirection.Forward) == TextPointerContext.Text)
                     i++;
 
-                ret = ret.GetPositionAtOffset(1, LogicalDirection.Forward);
-                if (ret?.GetPositionAtOffset(1, LogicalDirection.Forward) == null)
+                if (ret.GetPositionAtOffset(1, LogicalDirection.Forward) == null)
                     return ret;
+                ret = ret.GetPositionAtOffset(1, LogicalDirection.Forward);
             }
 
             return ret;

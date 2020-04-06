@@ -47,9 +47,9 @@
             </MenuItem>
 
             <MenuItem Header="Edit">
-                <MenuItem Header="Cut" InputGestureText="Ctrl + X" />
-                <MenuItem Header="Copy" InputGestureText="Ctrl + C" />
-                <MenuItem Header="Paste" InputGestureText="Ctrl + V" />
+                <MenuItem Header="Cut" Click="Cut_Click" InputGestureText="Ctrl + X" />
+                <MenuItem Header="Copy" Click="Copy_Click" InputGestureText="Ctrl + C" />
+                <MenuItem Header="Paste" Click="Paste_Click" InputGestureText="Ctrl + V" />
                 <Separator />
                 <MenuItem Header="Find/Replace" Click="FindReplace_Click" InputGestureText="Ctrl + F" />
             </MenuItem>

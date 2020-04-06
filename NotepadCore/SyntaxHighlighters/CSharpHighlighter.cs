@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Windows;
+using System.Threading.Tasks;
 using System.Windows.Documents;
 using System.Windows.Media;
 using NotepadCore.ExtensionMethods;
@@ -27,8 +28,7 @@ namespace NotepadCore.SyntaxHighlighters
         private static readonly string[] _keywords2 =
         {
             "case", "catch", "continue", "do", "else", "finally", "for", "foreach", "get", "goto", "if", "set",
-            "switch", "try",
-            "while"
+            "switch", "try", "while"
         };
 
         private static (Regex Pattern, SolidColorBrush Brush)[] Keywords => new[]
@@ -38,7 +38,7 @@ namespace NotepadCore.SyntaxHighlighters
             (new Regex($@"(?<!\w)({string.Join("|", _keywords1)})(?!\w)"), Brushes.Blue), // Keywords 1
             (new Regex($@"(?<!\w)({string.Join("|", _keywords2)})(?!\w)"), // Keywords 2
                 Brushes.Purple),
-            (new Regex(@"(\$|@|\$@|@\$)?""(\\""|[^""])*"""), Brushes.Brown) // Strings
+            (new Regex(@"(\$|@|\$@|@\$)?""(\\""|[^""])*""|'(\\'|[^'])*?'"), Brushes.Brown) // Strings
         };
 
         private static (Regex Pattern, SolidColorBrush Brush) Comment =>

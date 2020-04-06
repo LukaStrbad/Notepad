@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using NotepadCore.SyntaxHighlighters;
+﻿using NotepadCore.SyntaxHighlighters;
 
 namespace NotepadCore.Settings
 {
-    public class EditorInfo:  IEquatable<EditorInfo>, IEquatable<string>
+    public class EditorInfo
     {
         public EditorInfo()
         {
@@ -23,16 +18,5 @@ namespace NotepadCore.Settings
 
         public HighlightingLanguage HighlightingLanguage { get; set; }
         public string FilePath { get; set; }
-
-
-        public bool Equals(EditorInfo other)
-        {
-            return FilePath == other?.FilePath;
-        }
-
-        public bool Equals(string other)
-        {
-            return FilePath == other;
-        }
     }
 }

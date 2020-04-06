@@ -1,29 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
 using NotepadCore.ExtensionMethods;
 
 namespace NotepadCore.SyntaxHighlighters
 {
-    public class MarkupHighlighter : IHighlighter
+    public class JSONHighlighter : IHighlighter
     {
         private static readonly (Regex Pattern, SolidColorBrush Brush)[] Keywords =
         {
-            (new Regex($@"(?<=<\/?)[a-zA-Z][\w:\.]*(?=( |>?)(.|{Environment.NewLine})*?>)"),
-                Brushes.Blue), // Tags
-            (new Regex(@"(?<= )[a-zA-Z][\w:\.]*(?=="")"), Brushes.Red), // Properties
-            (new Regex(@"""(\\""|[^""])*"""), Brushes.Brown) // Strings
+            (new Regex(@""".*?""(?= *:)"),
+                Brushes.Blue), // Key
+            (new Regex(@"(?<=:) *""(\\""|[^""])*"""), Brushes.Brown), // Value string
+            (new Regex(@"(?<=:) *(true|false|\d+)"), Brushes.LightSkyBlue) // Value number/bool
         };
-
+        
         private static (Regex Pattern, SolidColorBrush Brush) Comment =>
-            (new Regex(@"<!--(.|\n)*?-->"), Brushes.Green);
-
-        IEnumerable<((int Index, int Length) Match, SolidColorBrush Brush)> IHighlighter.GetMatches(TextRange textRange)
+            (new Regex(@$"//.*|/\*(.|{Environment.NewLine})*?\*/"), Brushes.Green);
+        
+        public IEnumerable<((int Index, int Length) Match, SolidColorBrush Brush)> GetMatches(TextRange textRange)
         {
             // Gets all indexes of new lines in text
             var newLines = textRange.Text.IndexesOf(Environment.NewLine);
@@ -43,7 +41,7 @@ namespace NotepadCore.SyntaxHighlighters
 
         public IEnumerable<((int Index, int Length) Match, SolidColorBrush Brush)> GetCommentMatches(TextRange textRange)
         {
-            var newLines = textRange.Text.IndexesOf(Environment.NewLine).ToList();
+            var newLines = textRange.Text.IndexesOf(Environment.NewLine);
 
             foreach (Match match in Comment.Pattern.Matches(textRange.Text))
             {

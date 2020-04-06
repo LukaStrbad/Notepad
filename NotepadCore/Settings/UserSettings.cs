@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Media;
-using System.Xml.Serialization;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 using NotepadCore.ExtensionMethods;
 using NotepadCore.SyntaxHighlighters;
 
@@ -17,11 +15,11 @@ namespace NotepadCore.Settings
     public sealed class UserSettings
     {
         private static readonly string SavePath =
-            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Data\settings.xml");
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Data\settings.json");
 
         private static readonly UserSettings DefaultUserSettings = new UserSettings
         {
-            Editors = new EditorInfo[] { new EditorInfo(),  },
+            Editors = new EditorInfo[] { },
             EditorFontFamily = "Consolas",
             EditorFontSize = 12,
             TabSize = 4,
@@ -31,7 +29,6 @@ namespace NotepadCore.Settings
         private string _editorFontFamily;
         private int _editorFontSize;
         private EditorInfo[] _editors;
-
         private int _selectedFileIndex;
         private int _tabSize;
 
@@ -44,44 +41,20 @@ namespace NotepadCore.Settings
             get
             {
                 if (_editors == null)
-                    _editors = new EditorInfo[] { };
+                    _editors = DefaultUserSettings.Editors;
                 return _editors.Distinct(editor => editor.FilePath.ToLower()).ToArray();
             }
-            set => _editors = value?.Distinct(editor => editor.FilePath.ToLower()).ToArray() ?? new[]{new EditorInfo(), };
+            set
+            {
+                _editors = value?.Distinct(editor => editor.FilePath.ToLower())
+                        .ToArray() ?? DefaultUserSettings.Editors;
+            }
         }
 
         public string EditorFontFamily
         {
-            get
-            {
-                try
-                {
-                    new FontFamily(_editorFontFamily);
-                    return _editorFontFamily;
-                }
-                catch
-                {
-                    _editorFontFamily = DefaultUserSettings.EditorFontFamily;
-                }
-
-                return _editorFontFamily;
-            }
-            set
-            {
-                // sets the editor font family if it's not null
-                try
-                {
-                    new FontFamily(value);
-                    _editorFontFamily = value;
-                }
-                catch
-                {
-                    _editorFontFamily = "Consolas";
-                    return;
-                }
-
-                _editorFontFamily = value;
-            }
+            get => _editorFontFamily;
+            set => _editorFontFamily = value;
         }
 
         public int EditorFontSize
@@ -123,15 +96,6 @@ namespace NotepadCore.Settings
             }
         }
 
-        /// <summary>
-        ///     Gets saved file paths
-        /// </summary>
-        // public string[] FilePaths
-        // {
-        //     get { return _filePaths.Select(x => x.ToLower()).Distinct().ToArray() ?? DefaultUserSettings.FilePaths; }
-        //     set => _filePaths = value.Select(x => x.ToLower()).Distinct().ToArray() ?? DefaultUserSettings.FilePaths;
-        // }
-
         public int SelectedFileIndex
         {
             get
@@ -144,10 +108,10 @@ namespace NotepadCore.Settings
             }
             set
             {
-                if (_selectedFileIndex >= 0 && _selectedFileIndex < Editors.Length)
+                if (value >= 0 && value < Editors.Length)
                     _selectedFileIndex = value;
                 else
-                    _selectedFileIndex = DefaultUserSettings.SelectedFileIndex;
+                    _selectedFileIndex = 0;
             }
         }
 
@@ -157,9 +121,8 @@ namespace NotepadCore.Settings
         /// <param name="path">Path to remove</param>
         private void RemoveFilePath(string path)
         {
-            // if there are multiple occurrences
-            while (Editors.Select(x => x.FilePath).Contains(path))
-                Editors = Editors.Where(x => x.FilePath != path).ToArray();
+            // Sets Editors if the path is different from the parameter
+            Editors = Editors.Where(x => x.FilePath.ToLower() != path.ToLower()).ToArray();
         }
 
         /// <summary>
@@ -190,7 +153,7 @@ namespace NotepadCore.Settings
         public void AddFiles(int index, params string[] paths)
         {
             var editors = Editors.ToList();
-            
+
             // Adds distinct paths at specified index
             for (int i = 0; i < paths.Length; i++)
             {
@@ -200,37 +163,40 @@ namespace NotepadCore.Settings
             Editors = editors.ToArray();
         }
 
-        public async void Save()
+        public void Save()
         {
-            using (var streamWriter = new StreamWriter(SavePath, false))
+            var serializer = JsonSerializer.Create(new JsonSerializerSettings
             {
-                var serializer = new XmlSerializer(typeof(UserSettings));
-                serializer.Serialize(streamWriter, this);
-            }
+                Formatting = Formatting.Indented
+            });
+
+            using var streamWriter = new StreamWriter(SavePath);
+            using JsonWriter writer = new JsonTextWriter(streamWriter);
+            serializer.Serialize(writer, this);
         }
 
         public static UserSettings Create()
         {
-            var serializer = new XmlSerializer(typeof(UserSettings));
-
             var dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
+            var serializer = JsonSerializer.Create(new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented
+            });
+
             try
             {
-                using (var streamReader = new StreamReader(SavePath))
-                {
-                    var temp = (UserSettings) serializer.Deserialize(streamReader);
-                    return temp;
-                }
+                using var streamReader = new StreamReader(SavePath);
+                using var reader = new JsonTextReader(streamReader);
+                return serializer.Deserialize<UserSettings>(reader);
             }
             catch
             {
-                using (var streamWriter = new StreamWriter(SavePath))
-                {
-                    serializer.Serialize(streamWriter, DefaultUserSettings);
-                }
+                using var streamWriter = new StreamWriter(SavePath);
+                using var writer = new JsonTextWriter(streamWriter);
+                serializer.Serialize(writer, DefaultUserSettings);
             }
 
             return DefaultUserSettings;

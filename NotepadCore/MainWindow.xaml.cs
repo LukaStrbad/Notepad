@@ -6,7 +6,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using Microsoft.Win32;
 using NotepadCore.Exceptions;
 using NotepadCore.Settings;
@@ -53,7 +52,6 @@ namespace NotepadCore
                 Tabs.SelectedIndex = 0;
             }
 
-            // TODO: remove
             // Changes the font according to settings
             ChangeFont();
 
@@ -390,6 +388,22 @@ namespace NotepadCore
                 }
                 e.Handled = true;
             }
+        }
+
+        private void Cut_Click(object sender, RoutedEventArgs e)
+        {
+            Clipboard.SetDataObject(CurrentTextEditor.MainTextBox.Selection.Text);
+            CurrentTextEditor.MainTextBox.Selection.Text = "";
+        }
+        
+        private void Copy_Click(object sender, RoutedEventArgs e)
+        {
+            Clipboard.SetDataObject(CurrentTextEditor.MainTextBox.Selection.Text);
+        }
+        
+        private void Paste_Click(object sender, RoutedEventArgs e)
+        {
+            CurrentTextEditor.MainTextBox.CaretPosition.InsertTextInRun(Clipboard.GetText());
         }
     }
 }
