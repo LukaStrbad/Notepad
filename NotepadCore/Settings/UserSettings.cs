@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Media;
@@ -52,36 +53,8 @@ namespace NotepadCore.Settings
 
         public string EditorFontFamily
         {
-            get
-            {
-                try
-                {
-                    new FontFamily(_editorFontFamily);
-                    return _editorFontFamily;
-                }
-                catch
-                {
-                    _editorFontFamily = DefaultUserSettings.EditorFontFamily;
-                }
-
-                return _editorFontFamily;
-            }
-            set
-            {
-                // sets the editor font family if it's not null
-                try
-                {
-                    new FontFamily(value);
-                    _editorFontFamily = value;
-                }
-                catch
-                {
-                    _editorFontFamily = "Consolas";
-                    return;
-                }
-
-                _editorFontFamily = value;
-            }
+            get => _editorFontFamily;
+            set => _editorFontFamily = value;
         }
 
         public int EditorFontSize
@@ -123,15 +96,6 @@ namespace NotepadCore.Settings
             }
         }
 
-        /// <summary>
-        ///     Gets saved file paths
-        /// </summary>
-        // public string[] FilePaths
-        // {
-        //     get { return _filePaths.Select(x => x.ToLower()).Distinct().ToArray() ?? DefaultUserSettings.FilePaths; }
-        //     set => _filePaths = value.Select(x => x.ToLower()).Distinct().ToArray() ?? DefaultUserSettings.FilePaths;
-        // }
-
         public int SelectedFileIndex
         {
             get
@@ -144,10 +108,10 @@ namespace NotepadCore.Settings
             }
             set
             {
-                if (_selectedFileIndex >= 0 && _selectedFileIndex < Editors.Length)
+                if (value >= 0 && value < Editors.Length)
                     _selectedFileIndex = value;
                 else
-                    _selectedFileIndex = DefaultUserSettings.SelectedFileIndex;
+                    _selectedFileIndex = 0;
             }
         }
 
@@ -157,9 +121,8 @@ namespace NotepadCore.Settings
         /// <param name="path">Path to remove</param>
         private void RemoveFilePath(string path)
         {
-            // if there are multiple occurrences
-            while (Editors.Select(x => x.FilePath).Contains(path))
-                Editors = Editors.Where(x => x.FilePath != path).ToArray();
+            // Sets Editors if the path is different from the parameter
+            Editors = Editors.Where(x => x.FilePath.ToLower() != path.ToLower()).ToArray();
         }
 
         /// <summary>
