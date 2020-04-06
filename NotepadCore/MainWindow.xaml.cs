@@ -6,7 +6,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using Microsoft.Win32;
 using NotepadCore.Exceptions;
 using NotepadCore.Settings;
@@ -53,7 +52,6 @@ namespace NotepadCore
                 Tabs.SelectedIndex = 0;
             }
 
-            // TODO: remove
             // Changes the font according to settings
             ChangeFont();
 
