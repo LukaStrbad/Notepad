@@ -200,7 +200,7 @@ namespace NotepadCore.Settings
             Editors = editors.ToArray();
         }
 
-        public async void Save()
+        public void Save()
         {
             using (var streamWriter = new StreamWriter(SavePath, false))
             {

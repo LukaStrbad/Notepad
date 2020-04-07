@@ -26,6 +26,7 @@ namespace NotepadCore
         private int _oldNumberOfLines = -1;
         private HighlightingLanguage _fileLanguage;
         private int _tabSize;
+        private List<TextRange> _comments = new List<TextRange>();
 
         public HighlightingLanguage FileLanguage
         {
@@ -102,7 +103,6 @@ namespace NotepadCore
 
             FileLanguage = HighlightingLanguage.None;
 
-            // TODO: add
             MainTextBox_OnSelectionChanged(this, null);
         }
 
@@ -300,14 +300,11 @@ namespace NotepadCore
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message);
             }
 
             _comments.Clear();
             return true;
         }
-
-        private List<TextRange> _comments = new List<TextRange>();
 
         private void HighlightCommentsInRange(TextPointer start = null, TextPointer end = null,
             bool saveComments = true, bool highlightLater = true)
@@ -476,7 +473,7 @@ namespace NotepadCore
                 MainTextBox.Selection.End.GetLineStartPosition(int.MinValue, out linesMoved);
 
                 LineColumnLabel.Content +=
-                    $" - {-linesMoved + 1}, col: {column + 1} (selected {MainTextBox.Selection.Text.Length} chars)";
+                    $" - ln: {-linesMoved + 1}, col: {column + 1} (selected {MainTextBox.Selection.Text.Length} chars)";
             }
         }
     }
