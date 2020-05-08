@@ -275,8 +275,16 @@ namespace NotepadCore
             // Remove the current file path from settings
             userSettings.RemoveFilePaths(CurrentTextEditor.DocumentPath);
 
-            // Assign the new file path to the current text editor and insert the file path at a specified index
+            // Create new file
+            using (var sw = new StreamWriter(saveDialog.FileName, false))
+            {
+                sw.Write(CurrentTextEditor.Text);
+            }
+            
+            // Assign the new file path to the current text editor
             CurrentTextEditor.DocumentPath = saveDialog.FileName;
+            CurrentTextEditor.SaveFile();
+            // Insert the file path at a specified index
             userSettings.AddFiles(Tabs.SelectedIndex, saveDialog.FileName);
 
             userSettings.Save();
@@ -319,7 +327,7 @@ namespace NotepadCore
         private void Tabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // if + tab is selected add a new tab
-            if (Tabs.SelectedItem == TabAdd)
+            if (ReferenceEquals(Tabs.SelectedItem, TabAdd))
             {
                 var userSettings = UserSettings.Create();
 
