@@ -360,8 +360,13 @@ namespace NotepadCore
         /// <summary>
         ///     Synchronizes the scroll of the two textboxes
         /// </summary>
-        private void ScrollChanged(object sender, ScrollChangedEventArgs e) =>
-            LineTextBox.ScrollToVerticalOffset(MainTextBox.VerticalOffset);
+        private void ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            if (ReferenceEquals(sender, MainTextBox))
+                LineTextBox.ScrollToVerticalOffset(MainTextBox.VerticalOffset);
+            else if (ReferenceEquals(sender, LineTextBox))
+                MainTextBox.ScrollToVerticalOffset(LineTextBox.VerticalOffset);
+        }
 
 
         /// <summary>
@@ -371,7 +376,8 @@ namespace NotepadCore
         {
             var sb = new StringBuilder();
 
-            for (var i = 1; i <= MainTextBox.Document.Blocks.Count + 2; i++) sb.AppendLine(i.ToString());
+            for (int i = 1; i <= MainTextBox.Document.Blocks.Count; i++)
+                sb.AppendLine(i.ToString());
 
             if (LineTextBox != null)
                 new TextRange(LineTextBox.Document.ContentStart, LineTextBox.Document.ContentEnd).Text = sb.ToString();
