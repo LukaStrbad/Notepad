@@ -33,6 +33,7 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Syncfusion.Themes.VisualStudio2015.WPF" Version="18.1.0.52" />
   </ItemGroup>
 
 </Project>

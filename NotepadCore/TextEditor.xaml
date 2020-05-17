@@ -1,65 +1,45 @@
-﻿<UserControl x:Class="NotepadCore.TextEditor"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:NotepadCore"
-             xmlns:System="clr-namespace:System;assembly=System.Runtime"
-             xmlns:syntaxHighlighters="clr-namespace:NotepadCore.SyntaxHighlighters"
-             mc:Ignorable="d"
-             d:DesignHeight="450" d:DesignWidth="800" Loaded="UserControl_Loaded" LostFocus="UserControl_LostFocus">
-    <UserControl.Resources>
+﻿<!-- Kontrola ima dva svojstva d:DesignHeight i d:DesignWidth koja se ignoriraju      
+     pri pokretanju programa zbog svojstva mc:Ignorable="d" 
+     Kontrola ima dva eventa, Loaded i LostFocus koji se pokreću kada se kontrola
+     učita, odnosno kada izgubi fokus-->
+<UserControl x:Class="NotepadCore.TextEditor" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:local="clr-namespace:NotepadCore" xmlns:System="clr-namespace:System;assembly=System.Runtime" xmlns:syntaxHighlighters="clr-namespace:NotepadCore.SyntaxHighlighters" mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800" Loaded="UserControl_Loaded" LostFocus="UserControl_LostFocus">
+    <UserControl.Resources><!--Resurs pomoću kojeg se može dobiti vrijednosti enum-a-->
         <ObjectDataProvider x:Key="HighlightingLanguages" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
-            <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="syntaxHighlighters:HighlightingLanguage" />
+            <ObjectDataProvider.MethodParameters>&lt;-- Potreban resurs je vrijednosti enum-a HighlightingLanguage--&gt;
+                <x:Type TypeName="syntaxHighlighters:HighlightingLanguage"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
     </UserControl.Resources>
-
-    <Grid>
+    <Grid><!-- Definiranje rešetke sa dva retka od kojih drugi ima visinu 20 i sa 
+             dva stupca od kojih prvi ima širinu 50 -->
         <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition Height="20" />
+            <RowDefinition/>
+            <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="50" />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-
-        <!-- Editing TextBox -->
-        <RichTextBox x:Name="MainTextBox" x:FieldModifier="internal" Grid.Row="0" Grid.Column="1"
-                     HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" AcceptsReturn="True"
-                     TextChanged="MainTextBox_TextChanged" ScrollViewer.ScrollChanged="ScrollChanged"
-                     BorderThickness="0" Keyboard.PreviewKeyDown="MainTextBox_KeyDown"
-                     SizeChanged="MainTextBox_SizeChanged" Visibility="Visible" SelectionChanged="MainTextBox_OnSelectionChanged">
+            <ColumnDefinition Width="50"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions><!-- Glavni tekstualni editor -->
+        <RichTextBox x:Name="MainTextBox" x:FieldModifier="internal" Grid.Row="0" Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" TextChanged="MainTextBox_TextChanged" ScrollViewer.ScrollChanged="ScrollChanged" BorderThickness="0" Keyboard.PreviewKeyDown="MainTextBox_KeyDown" SizeChanged="MainTextBox_SizeChanged" Visibility="Visible" SelectionChanged="MainTextBox_OnSelectionChanged"><!-- Sadržaj glavnog editora je FlowDocument sa visinom linije 1 -->
             <FlowDocument LineHeight="1">
                 <Paragraph>
-                    <Run />
+                    <Run/>
                 </Paragraph>
             </FlowDocument>
-        </RichTextBox>
-
-        <!-- Line Number Text Box -->
-        <RichTextBox x:Name="LineTextBox" x:FieldModifier="internal" Grid.Row="0" Grid.Column="0" IsReadOnly="True"
-                     ScrollViewer.CanContentScroll="False" Background="#FFABADB3"
-                     ScrollViewer.ScrollChanged="ScrollChanged" BorderThickness="0">
+        </RichTextBox><!-- Editor za prikaz brojeva linija -->
+        <RichTextBox x:Name="LineTextBox" x:FieldModifier="internal" Grid.Row="0" Grid.Column="0" IsReadOnly="True" ScrollViewer.CanContentScroll="False" Background="#FFABADB3" ScrollViewer.ScrollChanged="ScrollChanged" BorderThickness="0"><!-- Sadržaj editora za linije je FlowDocument sa visinom linije 1 -->
             <FlowDocument LineHeight="1" TextAlignment="Right">
                 <Paragraph>
-                    <Run />
+                    <Run/>
                 </Paragraph>
             </FlowDocument>
-        </RichTextBox>
-
-        <!-- Bottom status bar -->
+        </RichTextBox><!-- Status bar koji omogućuje odabir jezika datoteke -->
         <StatusBar Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
-            <StatusBarItem Style="{StaticResource StatusBarItemStyle}" >
-                <ComboBox x:Name="LanguageComboBox" SelectedIndex="0" FontSize="10" Padding="2"
-                          ItemsSource="{Binding Source={StaticResource HighlightingLanguages}}"
-                          SelectedItem="{Binding FileLanguage, Mode=TwoWay}"
-                          SelectionChanged="LanguageComboBox_OnSelectionChanged"/>
+            <StatusBarItem Style="{StaticResource StatusBarItemStyle}">
+                <ComboBox x:Name="LanguageComboBox" SelectedIndex="0" FontSize="10" Padding="2" ItemsSource="{Binding Source={StaticResource HighlightingLanguages}}" SelectedItem="{Binding FileLanguage, Mode=TwoWay}" SelectionChanged="LanguageComboBox_OnSelectionChanged"/>
             </StatusBarItem>
             <StatusBarItem Style="{StaticResource StatusBarItemStyle}">
-                <Label x:Name="LineColumnLabel" FontSize="10" Padding="2" />
+                <Label x:Name="LineColumnLabel" FontSize="10" Padding="2"/>
             </StatusBarItem>
         </StatusBar>
     </Grid>
