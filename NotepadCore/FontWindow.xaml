@@ -8,26 +8,32 @@
         Title="Font" Height="300" Width="400" FontFamily="Consolas" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
 
     <Grid>
+        <!-- Definiranje 3 retka, 1 za labele, 2. za list i 3. za gumb OK -->
         <Grid.RowDefinitions>
             <RowDefinition Height="30" />
             <RowDefinition />
             <RowDefinition Height="30" />
         </Grid.RowDefinitions>
 
+        <!-- Definiranje 2 stupca za liste s time da je lijevi malo veći -->
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="230" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-
+        <!-- Labela koja prikazuje tekst "Choose Font Family:" -->
         <Label Content="Choose Font Family: " VerticalAlignment="Bottom" HorizontalAlignment="Center" />
+        <!-- Lista sa imenima fontova, izvor podataka je lista sistemskih fontova  
+        -->
         <ListBox x:Name="FontChooseListBox" Grid.Row="1" Grid.Column="0" Margin="10"
                  ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                  ItemsSource="{x:Static Fonts.SystemFontFamilies}" />
-
+        <!-- Labela koja prikazuje tekst "Choose Font Size:" -->
         <Label Content="Choose Font Size: " VerticalAlignment="Bottom" HorizontalAlignment="Center" Grid.Column="1" />
+        <!-- Lista za prikaz veličina fonta -->
         <ListBox x:Name="FontSizeChooseListBox" Grid.Row="1" Grid.Column="1" Margin="10"
                  ScrollViewer.VerticalScrollBarVisibility="Visible" />
 
+        <!-- Gumb sa spremanje postavki -->
         <Button x:Name="FontOKButton" Content="OK" Width="50" Click="FontOKButton_Click" Grid.Row="2"
                 Grid.ColumnSpan="2" VerticalAlignment="Top" />
 

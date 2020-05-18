@@ -1,4 +1,7 @@
-﻿<Window x:Class="NotepadCore.Find"
+﻿<!-- Prozor je veličine 400x220 bez mogućnosti promjene veličine
+     Lokacija stvaranja prozora je centar vlasnika (prozora koji otvara ovaj            
+     Prozor -->
+<Window x:Class="NotepadCore.Find"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -7,10 +10,13 @@
         mc:Ignorable="d"
         Title="Find" Height="220" Width="400" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
     <Window.Resources>
+        <!-- Definiramo zadani stil za kontrolu Label; širina 70 sa poravnanjem 
+        teksta prema desno -->
         <Style TargetType="Label">
             <Setter Property="Width" Value="70" />
             <Setter Property="HorizontalContentAlignment" Value="Right" />
         </Style>
+        <!-- Zadani stil za kontrolu Button ima širinu 70 -->
         <Style TargetType="Button">
             <Setter Property="Width" Value="70" />
         </Style>
@@ -18,14 +24,18 @@
 
     <Canvas>
         <Label Content="Find: " Margin="10,10" />
+        <!-- TextBox koji sadrži tekst za pretraživanje -->
         <TextBox x:Name="FindTextBox" Width="150" Height="20" Margin="80,13" />
 
         <Label Content="Replace: " Margin="10,40" />
+        <!-- TextBox koji sadrži tekst za zamjenu -->
         <TextBox x:Name="ReplaceTextBox" Width="150" Height="20" Margin="80,43" />
-
+        <!-- Dva CheckBox-a koji označavaju gledaju li se velika i mala slova i 
+        koristi li se regex-->
         <CheckBox x:Name="CaseSensitiveCheckBox" Content="Case sensitive" Margin="80,83" IsChecked="True" />
         <CheckBox x:Name="RegExCheckBox" Content="Use regular expressions" Margin="80,103" />
 
+        <!-- Gumbi za pronalaženje i zamjenu teksta -->
         <Button x:Name="FindButton" Content="Find Next" Margin="250,13" Click="FindButton_Click" />
         <Button x:Name="ReplaceButton" Content="Replace" Margin="250,43" Click="ReplaceButton_Click" />
 

@@ -1,4 +1,5 @@
-﻿<Window x:Class="NotepadCore.SettingsWindow"
+﻿<!-- Veličina prozora je 300x350 sa lokacijom na sredini vlasnika -->
+<Window x:Class="NotepadCore.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -8,24 +9,26 @@
         x:Name="settingsWindow"
         Title="Settings" Height="350" Width="300" WindowStartupLocation="CenterOwner">
     <Grid>
+        <!-- CheckBox za prikazivanje brojeva linija -->
         <CheckBox x:Name="ShowLineNumbersCheckBox" Content="Show line numbers" HorizontalAlignment="Left"
                   Margin="10,10,0,0" VerticalAlignment="Top" />
+        <!-- CheckBox za korištenje razmaka umjesto tab-a -->
         <CheckBox x:Name="SpacesCheckBox" Content="Use spaces instead of tabs" HorizontalAlignment="Left"
                   Margin="10,35,0,0" VerticalAlignment="Top" IsChecked="{Binding UseSpaces, Mode=TwoWay}"/>
 
         <Label x:Name="TabSizeLabel" Content="Tab size: " HorizontalAlignment="Left" Margin="10,60,0,0"
                VerticalAlignment="Top" />
+        <!-- TextBox za unos količine razmaka pri umetanju -->
         <TextBox x:Name="TabSizeTextBox" HorizontalAlignment="Left" Height="23" Margin="70,63,0,0" TextWrapping="Wrap"
                  Text="4" VerticalAlignment="Top" Width="40" TextAlignment="Center" VerticalContentAlignment="Center" />
 
         <Label x:Name="FontInfo" Content="Font: " Margin="10,95,0,0" Height="20" Padding="0"
                VerticalContentAlignment="Center" VerticalAlignment="Top" />
+        <!-- Gumb za prikazivanje prozora za mijenjanje fonta -->
         <Button Content="Change Font" HorizontalAlignment="Left" Margin="150,95,0,0" VerticalAlignment="Top" Width="75"
                 Click="ChangeFont_Click" />
-
+        <!-- Gumb za spremanje postavki -->
         <Button Content="Save changes" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="10"
                 Click="Save_Click" />
-
-
     </Grid>
 </Window>

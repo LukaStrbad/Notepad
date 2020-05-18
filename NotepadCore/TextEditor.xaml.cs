@@ -103,6 +103,7 @@ namespace NotepadCore
                 // Ako je jezik C# ili Markup vraća određeni Highlighter
                 HighlightingLanguage.CSharp => new CSharpHighlighter(),
                 HighlightingLanguage.MarkupLanguage => new MarkupHighlighter(),
+                HighlightingLanguage.JSON => new JSONHighlighter(),
                 // Ako nijedan od slučajeva nije zadovoljen, vraća prazan Highlighter
                 _ => new EmptyHighlighter()
             };
@@ -236,7 +237,7 @@ namespace NotepadCore
         /// <summary>
         ///     Changes the font of the two textboxes
         /// </summary>
-        private void ChangeFont()
+        public void ChangeFont()
         {
             // Stvaranje instance korisničkih postavki
             var userSettings = Settings.UserSettings.Create();

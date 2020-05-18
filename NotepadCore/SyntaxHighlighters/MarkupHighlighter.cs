@@ -14,10 +14,13 @@ namespace NotepadCore.SyntaxHighlighters
     {
         private static readonly (Regex Pattern, SolidColorBrush Brush)[] Keywords =
         {
+            // Uzorak i boja za tagove 
             (new Regex($@"(?<=<\/?)[a-zA-Z][\w:\.]*(?=( |>?)(.|{Environment.NewLine})*?>)"),
-                Brushes.Blue), // Tags
-            (new Regex(@"(?<= )[a-zA-Z][\w:\.]*(?=="")"), Brushes.Red), // Properties
-            (new Regex(@"""(\\""|[^""])*"""), Brushes.Brown) // Strings
+                Brushes.Blue),
+            // Uzroak i boja za svojstva
+            (new Regex(@"(?<= )[a-zA-Z][\w:\.]*(?=="")"), Brushes.Red),
+            // Uzorak i boja za vrijednosti svojstva
+            (new Regex(@"""(\\""|[^""])*"""), Brushes.Brown)
         };
 
         private static (Regex Pattern, SolidColorBrush Brush) Comment =>
@@ -25,16 +28,16 @@ namespace NotepadCore.SyntaxHighlighters
 
         IEnumerable<((int Index, int Length) Match, SolidColorBrush Brush)> IHighlighter.GetMatches(TextRange textRange)
         {
-            // Gets all indexes of new lines in text
+            // Vraća indekse svih novih linija u tekstu
             var newLines = textRange.Text.IndexesOf(Environment.NewLine);
 
-            // Loop through all keywords
+            // Petlja koja prolazi kroz sve pogotke za uzorak komentara
             foreach (var (pattern, brush) in Keywords)
             {
-                // Loop through all matches for a specific pattern
+                // Petlja koja prolazi kroz sve pogotke za trenutni uzorak 
                 foreach (Match match in pattern.Matches(textRange.Text))
                 {
-                    // Calculate offset because of new lines
+                    // Računanje istupa koji je uzrokovan novim linijama
                     int offset = newLines.Count(x => x < match.Index) * Environment.NewLine.Length;
                     yield return ((match.Index - offset, match.Length), brush);
                 }
@@ -43,11 +46,15 @@ namespace NotepadCore.SyntaxHighlighters
 
         public IEnumerable<((int Index, int Length) Match, SolidColorBrush Brush)> GetCommentMatches(TextRange textRange)
         {
+            // Vraća indekse svih novih linija u tekstu
             var newLines = textRange.Text.IndexesOf(Environment.NewLine).ToList();
-
+            // Petlja koja prolazi kroz sve pogotke za uzorak komentara
             foreach (Match match in Comment.Pattern.Matches(textRange.Text))
             {
+                // Računanje istupa koji je uzrokovan novim linijama prije početka pogotka
                 int indexOffset = newLines.Count(x => x < match.Index) * Environment.NewLine.Length;
+                // Računanje istupa koje je uzrokovan unutar raspona pogotka jer komentari
+                // mogu biti u više redova
                 int rangeOffset =
                     textRange.Text.Substring(match.Index, match.Length).IndexesOf(Environment.NewLine).Count() *
                     Environment.NewLine.Length;

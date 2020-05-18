@@ -13,26 +13,34 @@ namespace NotepadCore
 
         public FontWindow()
         {
+            // Inicijalizacija komponenti prozora
             InitializeComponent();
 
+            // Stvaranje instance korisničkih postavki
             var userSettings = Settings.UserSettings.Create();
 
-            // write font sizes from 8 to 96
-            for (var i = 8; i <= 96; i++)
+            // Prolazimo kroz petlju za vrijednosti od 8 do 96
+            for (var i = 8; i <= 96; i++) 
+                // Svaki broj dodajemo u listu veličina fontova
                 FontSizeChooseListBox.Items.Add(i);
-
-            FontChooseListBox.SelectedItem = new System.Windows.Media.FontFamily(userSettings.EditorFontFamily); // selects the fontfamily in the listbox
+            // Program odabire font na listi prema onome koji se nalazi u postavkama
+            FontChooseListBox.SelectedItem = new System.Windows.Media.FontFamily(userSettings.EditorFontFamily);
+            // Program odabire veličinu fonta prema onoj koja se nalazi u postavkama
             FontSizeChooseListBox.SelectedItem =
-                userSettings.EditorFontSize; // selects the font size in the listbox
+                userSettings.EditorFontSize;
 
-            FontChooseListBox.ScrollIntoView(new System.Windows.Media.FontFamily(userSettings.EditorFontFamily)); // scrolls to the font in the listbox
-            FontSizeChooseListBox.ScrollIntoView(userSettings.EditorFontSize); // scrolls to the font size in the listbox
+            // Odabrane postavke pomaknemo u pregledan dio lista
+            FontChooseListBox.ScrollIntoView(new System.Windows.Media.FontFamily(userSettings.EditorFontFamily));
+            FontSizeChooseListBox.ScrollIntoView(userSettings.EditorFontSize);
         }
 
         private void FontOKButton_Click(object sender, RoutedEventArgs e)
         {
+            // Spremanje obitelji fonta u svojstvo
             ChosenFontFamily = FontChooseListBox.SelectedItem.ToString();
+            // Spremanje veličine fonta u svojstvo
             ChosenFontSize = (int)FontSizeChooseListBox.SelectedItem;
+            // Skrivanje prozora
             Hide();
         }
     }
