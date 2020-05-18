@@ -13,9 +13,9 @@ using NotepadCore.SyntaxHighlighters;
 
 namespace NotepadCore
 {
-    /// <summary>
-    ///     Interaction logic for MainWindow.xaml
-    /// </summary>
+    
+    
+    
     public partial class MainWindow : Window
     {
         private int _newFileNumber = 1;
@@ -73,12 +73,11 @@ namespace NotepadCore
             Height = Properties.Settings.Default.WindowHeight;
         }
 
-
         public TextEditor CurrentTextEditor => (TextEditor)Tabs.SelectedContent;
 
-        /// <summary>
-        ///     Writes the text from MainTextBox when the window closes
-        /// </summary>
+        
+        
+        
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             // Stvaranje instance korisničkih postavki
@@ -128,10 +127,9 @@ namespace NotepadCore
             Application.Current.Shutdown();
         }
 
-
-        /// <summary>
-        ///     Creates and opens the file
-        /// </summary>
+        
+        
+        
         private void FileNew_Click(object sender, RoutedEventArgs e)
         {
             // Stvara instancu postavki
@@ -163,10 +161,9 @@ namespace NotepadCore
             userSettings.Save();
         }
 
-
-        /// <summary>
-        ///     Opens an existing file
-        /// </summary>
+        
+        
+        
         private void FileOpen_Click(object sender, RoutedEventArgs e)
         {
             // Stvara novu instancu postavki
@@ -207,7 +204,6 @@ namespace NotepadCore
             // Spremanje korisničkih postavki
             userSettings.Save();
         }
-
 
         private void FileClose_Click(object sender, RoutedEventArgs e)
         {
@@ -264,10 +260,9 @@ namespace NotepadCore
             userSettings.Save();
         }
 
-
-        /// <summary>
-        ///     Saves the current file
-        /// </summary>
+        
+        
+        
         private void FileSave_Click(object sender, RoutedEventArgs e)
         {
             var userSettings = UserSettings.Create(); // Stvara instancu postavki
@@ -307,10 +302,9 @@ namespace NotepadCore
             }
         }
 
-
-        /// <summary>
-        ///     Saves the content of the current file to a new file
-        /// </summary>
+        
+        
+        
         private void FileSaveAs_Click(object sender, RoutedEventArgs e)
         {
             var userSettings = UserSettings.Create(); // Stvara instancu postavki
@@ -339,7 +333,6 @@ namespace NotepadCore
                 sw.Write(CurrentTextEditor.Text);
             }
 
-
             // Dodjeljujemo novu putanju trenutnom editoru
             CurrentTextEditor.DocumentPath = saveDialog.FileName;
             // Spremanje sadržaja trenutnog editora
@@ -353,10 +346,9 @@ namespace NotepadCore
         }
 
 
-
-        /// <summary>
-        ///     Changes the font of the two textboxes according to passed values
-        /// </summary>
+        
+        
+        
         public void ChangeFont()
         {
             var userSettings = UserSettings.Create(); // Stvara instancu postavki
@@ -369,10 +361,9 @@ namespace NotepadCore
             }
         }
 
-
-        /// <summary>
-        ///     Opens the find/replace dialog. Work in progress
-        /// </summary>
+        
+        
+        
         private void FindReplace_Click(object sender, RoutedEventArgs e)
         {
             // Izlazi iz metode ako postoji otvoreni prozor Find
@@ -383,7 +374,6 @@ namespace NotepadCore
             new Find().Show();
         }
 
-
         private void Settings_Click(object sender, RoutedEventArgs e)
         {
             // Prikazuje dijaloški okvir u obliku dijaloga
@@ -392,7 +382,6 @@ namespace NotepadCore
             // Svojstvo Owner označava da je vlasnik trenutni prozor
             new SettingsWindow { Owner = this }.ShowDialog();
         }
-
 
         private void Tabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -411,7 +400,6 @@ namespace NotepadCore
             }
         }
 
-
         private TabItem EmptyTab => new TabItem
         {
             // Sadržaj prazne kartice je novi TextEditor
@@ -419,7 +407,6 @@ namespace NotepadCore
             // Naslov kartice počinje sa 1 i uvećava se svakim čitanjem svojstva
             Header = $"new file {_newFileNumber++}"
         };
-
 
         public IEnumerable<TextEditor> GetTextEditors()
         {
@@ -432,20 +419,17 @@ namespace NotepadCore
             }
         }
 
-
         private void Window_Deactivated(object sender, EventArgs e)
         {
             // Fokusiranje kontrole Tabs
             Tabs.Focus();
         }
 
-
         private void Window_Activated(object sender, EventArgs e)
         {
             // Fokusiranje glavnog editora trenutno odabrane kartice
             CurrentTextEditor.MainTextBox.Focus();
         }
-
 
         private void About_Click(object sender, RoutedEventArgs e)
         {
@@ -455,7 +439,6 @@ namespace NotepadCore
             // Pozivanje metode Show klase MessageBox za prikaz prozora sa porukom
             MessageBox.Show(message, "About", MessageBoxButton.OK, MessageBoxImage.None);
         }
-
 
         private void MainWindow_OnKeyDown(object sender, KeyEventArgs e)
         {
@@ -497,7 +480,6 @@ namespace NotepadCore
             }
         }
 
-
         private void Cut_Click(object sender, RoutedEventArgs e)
         {
             // Postavljanje sadržaja međuspremnika
@@ -505,7 +487,6 @@ namespace NotepadCore
             // Brisanje trenutno odabranog teksta
             CurrentTextEditor.MainTextBox.Selection.Text = "";
         }
-
 
         private void Copy_Click(object sender, RoutedEventArgs e)
         {

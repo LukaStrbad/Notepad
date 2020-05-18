@@ -33,7 +33,6 @@ namespace NotepadCore.SyntaxHighlighters
             "switch", "try", "while"
         };
 
-
         private static (Regex Pattern, SolidColorBrush Brush)[] Keywords => new[]
         {
             // Uzorak i boja za funkcije

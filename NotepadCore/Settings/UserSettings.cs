@@ -195,7 +195,6 @@ namespace NotepadCore.Settings
             Editors = Editors.Where(x => File.Exists(x.FilePath)).ToArray();
         }
 
-
         public void AddFiles(params string[] paths)
         {
             // Pozivanje metode AddFiles sa početnim indeksom koji je jednak veličini

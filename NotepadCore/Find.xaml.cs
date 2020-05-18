@@ -33,7 +33,6 @@ namespace NotepadCore
             CaseSensitiveCheckBox.Unchecked += (sender, args) => RecalculateNextMatch();
         }
 
-
         private Regex FindRegex
         {
             get
@@ -62,7 +61,6 @@ namespace NotepadCore
             }
         }
 
-
         private RichTextBox TextBox => ((TextEditor)MainWindow.Tabs.SelectedContent).MainTextBox;
 
         private void RecalculateNextMatch()
@@ -73,7 +71,6 @@ namespace NotepadCore
             CurrentMatch = FindRegex.Match(textRange.Text);
         }
 
-
         private void FindButton_Click(object sender, RoutedEventArgs e)
         {
             // Ako je tekst za pretraživanje prazan javljamo korisniku
@@ -83,7 +80,6 @@ namespace NotepadCore
             else
                 FindText();
         }
-
 
         private void SetNextMatch()
         {
@@ -96,7 +92,6 @@ namespace NotepadCore
             if (CurrentMatch == null || !CurrentMatch.Success)
                 CurrentMatch = FindRegex.Match(textRange.Text);
         }
-
 
         private void FindText()
         {
@@ -126,7 +121,6 @@ namespace NotepadCore
             MainWindow.Focus();
             Focus();
         }
-
 
         private void ReplaceButton_Click(object sender, RoutedEventArgs e)
         {

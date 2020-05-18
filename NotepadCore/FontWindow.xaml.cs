@@ -3,9 +3,9 @@ using System.Windows;
 
 namespace NotepadCore
 {
-    /// <summary>
-    ///     Interaction logic for Font.xaml
-    /// </summary>
+    
+    
+    
     public partial class FontWindow : Window
     {
         public string ChosenFontFamily { get; private set; }

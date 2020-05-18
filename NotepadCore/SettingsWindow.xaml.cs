@@ -6,9 +6,9 @@ using NotepadCore.Annotations;
 
 namespace NotepadCore
 {
-    /// <summary>
-    ///     Interaction logic for SettingsWindow.xaml
-    /// </summary>
+    
+    
+    
     public partial class SettingsWindow : Window, INotifyPropertyChanged
     {
         // Varijabla za spremanje stanja svojstva
@@ -41,7 +41,6 @@ namespace NotepadCore
             }
         }
 
-
         // Varijabla za spremanje svojstva
         private FontWindow _fontDialog;
 
@@ -53,7 +52,6 @@ namespace NotepadCore
             // Postavljanje varijable _fontDialog u neku vrijednost
             set => _fontDialog = value;
         }
-
 
         public SettingsWindow()
         {
@@ -73,7 +71,6 @@ namespace NotepadCore
             // checkbox
             SpacesCheckBox.IsChecked = Properties.Settings.Default.UseSpaces;
         }
-
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {

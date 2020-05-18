@@ -17,9 +17,9 @@ using NotepadCore.SyntaxHighlighters;
 
 namespace NotepadCore
 {
-    /// <summary>
-    ///     Interaction logic for TextEditor.xaml
-    /// </summary>
+    
+    
+    
     public partial class TextEditor : UserControl, INotifyPropertyChanged
     {
         // Putanja pohrane
@@ -32,7 +32,6 @@ namespace NotepadCore
         private int _tabSize;
         // Lista koja sprema lokacije svih komentara za isticanje
         private List<TextRange> _comments = new List<TextRange>();
-
 
         public HighlightingLanguage FileLanguage
         {
@@ -77,7 +76,6 @@ namespace NotepadCore
             }
         }
 
-
         public string DocumentPath
         {
             // Vraća svojstvo _documentPath, putanja datoteke
@@ -96,7 +94,6 @@ namespace NotepadCore
             }
         }
 
-
         private IHighlighter Highlighter =>
             FileLanguage switch
             {
@@ -107,7 +104,6 @@ namespace NotepadCore
                 // Ako nijedan od slučajeva nije zadovoljen, vraća prazan Highlighter
                 _ => new EmptyHighlighter()
             };
-
 
         public TextEditor()
         {
@@ -131,7 +127,6 @@ namespace NotepadCore
             MainTextBox_OnSelectionChanged(this, null);
         }
 
-
         public TextEditor(string documentPath) : this() // Poziv na prijašnji konstruktor
         {
             // Sprema putanju pohrane i učitava tekst ako datoteka postoji
@@ -150,7 +145,6 @@ namespace NotepadCore
             }
         }
 
-
         // Returns true if file exists
         public bool HasSaveLocation => File.Exists(DocumentPath);
 
@@ -165,7 +159,6 @@ namespace NotepadCore
                 return "";
             }
         }
-
 
 
         public bool ShowLineNumbers
@@ -198,7 +191,6 @@ namespace NotepadCore
                 }
             }
         }
-
 
         public string Text
         {
@@ -233,10 +225,9 @@ namespace NotepadCore
             }
         }
 
-
-        /// <summary>
-        ///     Changes the font of the two textboxes
-        /// </summary>
+        
+        
+        
         public void ChangeFont()
         {
             // Stvaranje instance korisničkih postavki
@@ -253,10 +244,9 @@ namespace NotepadCore
             LineTextBox.FontSize = userSettings.EditorFontSize;
         }
 
-
-        /// <summary>
-        ///     Writes the line numbers when the user control loads
-        /// </summary>
+        
+        
+        
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             // Ako postoji putanja pohrane
@@ -284,10 +274,9 @@ namespace NotepadCore
             WriteLineNumbers();
         }
 
-
-        /// <summary>
-        ///     Writes the line numbers if the new number of lines if different than the old one
-        /// </summary>
+        
+        
+        
         private void MainTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             // Broj linija je jednak broj blokova u dokumentu
@@ -310,7 +299,6 @@ namespace NotepadCore
             MainTextBox.TextChanged += MainTextBox_TextChanged;
         }
 
-
         private void HighlightCurrentLine()
         {
             // Ako nema jezika isticanja program izlazi iz metode
@@ -321,7 +309,6 @@ namespace NotepadCore
             HighlightRange(MainTextBox.CaretPosition.Paragraph.ContentStart,
                 MainTextBox.CaretPosition.Paragraph.ContentEnd);
         }
-
 
         private void HighlightRange(TextPointer start = null, TextPointer end = null)
         {
@@ -371,7 +358,6 @@ namespace NotepadCore
             }
         }
 
-
         private bool UndoCommentsInRange(bool highlightLater = true)
         {
             // Ako je glavni TextBox null, ili lista _comments null ili ne postoje  
@@ -399,7 +385,6 @@ namespace NotepadCore
             _comments.Clear();
             return true;
         }
-
 
         private void HighlightCommentsInRange(TextPointer start = null, TextPointer end = null,
      bool saveComments = true, bool highlightLater = true)
@@ -453,7 +438,6 @@ namespace NotepadCore
         }
 
 
-
         private void MainTextBox_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             // Broj linija jednak je broju blokova u dokumentu
@@ -465,10 +449,9 @@ namespace NotepadCore
             _oldNumberOfLines = lineCount;
         }
 
-
-        /// <summary>
-        ///     Synchronizes the scroll of the two textboxes
-        /// </summary>
+        
+        
+        
         private void ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             // Ako je pozivatelj metode glavni textbox, pomak textbox-a za linije se 
@@ -482,10 +465,9 @@ namespace NotepadCore
         }
 
 
-
-        /// <summary>
-        ///     Writes the line numbers to the LineTextBox
-        /// </summary>
+        
+        
+        
         private void WriteLineNumbers()
         {
             // Stvaranje objekta tipa StringBuilder zbog efikasnosti
@@ -498,10 +480,9 @@ namespace NotepadCore
                 new TextRange(LineTextBox.Document.ContentStart, LineTextBox.Document.ContentEnd).Text = sb.ToString();
         }
 
-
-        /// <summary>
-        ///     For custom tab size
-        /// </summary>
+        
+        
+        
         private void MainTextBox_KeyDown(object sender, KeyEventArgs e)
         {
             // Ako je pritisnuta tipka Tab
@@ -542,10 +523,9 @@ namespace NotepadCore
             }
         }
 
-
-        /// <summary>
-        ///     Saves the MainTextBox text to
-        /// </summary>
+        
+        
+        
         public void SaveFile()
         {
             // Ako ne postoji lokacija za pohranu, program baca grešku
@@ -556,17 +536,15 @@ namespace NotepadCore
             sw.Write(Text);
         }
 
-
         private void UserControl_LostFocus(object sender, RoutedEventArgs e)
         {
             // Označavanje da je event izvršen
             e.Handled = true;
         }
 
-
-        /// <summary>
-        /// Highlights the MainTextBox when changing language
-        /// </summary>
+        
+        
+        
         private void LanguageComboBox_OnSelectionChanged(object sender, RoutedEventArgs e)
         {
             try
@@ -586,7 +564,6 @@ namespace NotepadCore
             }
         }
 
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         // Atribut NotifyPropertyChangedInvocator naznačuje da je ovo metoda eventa
@@ -599,7 +576,6 @@ namespace NotepadCore
             // (pošiljatelja) i sa argumentima eventa koji sadrži ime svojstva
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
 
         private void MainTextBox_OnSelectionChanged(object sender, RoutedEventArgs e)
         {
